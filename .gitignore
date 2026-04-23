@@ -16,3 +16,4 @@ build/
 # Vercel & Vite caches
 .vercel/
 .vite/
+.vercel
