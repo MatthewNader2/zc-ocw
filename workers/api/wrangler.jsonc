@@ -31,4 +31,14 @@
 		"ALLOWED_ORIGIN": "http://localhost:3000",
 		"R2_PUBLIC_ID": "https://pub-c9973170d9e940ff93b0152afec2c45d.r2.dev",
 	},
+
+	"observability": {
+		"logs": {
+			"enabled": true,
+			"invocation_logs": true,
+		},
+		"traces": {
+			"enabled": true,
+		},
+	},
 }

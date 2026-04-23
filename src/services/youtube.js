@@ -88,6 +88,7 @@ export async function searchChannel(query, maxResults = 24) {
       maxResults,
     },
   });
+  console.log("Playlist Data:", data);
   return data;
 }
 

@@ -72,16 +72,28 @@ export default {
 		// Generic YouTube Proxy Handler
 		if (url.pathname.startsWith('/api/youtube/')) {
 			const endpoint = url.pathname.replace('/api/youtube/', '');
-			const searchParams = url.search; // Keeps all params like channelId, id, q, etc.
 
-			// Append the hidden API key and the default 'part' if not provided
-			const targetUrl = `https://www.googleapis.com/youtube/v3/${endpoint}${searchParams}&part=snippet,contentDetails,statistics,brandingSettings&key=${env.YOUTUBE_API_KEY}`;
+			// 1. Properly handle search params
+			const params = new URLSearchParams(url.search);
+			params.set('key', env.YOUTUBE_API_KEY);
+
+			// 2. Ensure 'part' is included if the frontend forgot it
+			if (!params.has('part')) {
+				params.set('part', 'snippet,contentDetails,statistics,brandingSettings');
+			}
+
+			const targetUrl = `https://www.googleapis.com/youtube/v3/${endpoint}?${params.toString()}`;
 
 			try {
 				const response = await fetch(targetUrl);
 				const data = await response.json();
+
+				// Log the status for Cloudflare Logs
+				console.log(`YouTube API responded with ${response.status} for ${endpoint}`);
+
 				return json(data, response.status, cors);
 			} catch (e) {
+				console.error('YouTube Proxy Error:', e);
 				return err('YouTube Proxy Error', 500, cors);
 			}
 		}
