@@ -118,24 +118,3 @@ git add .
 git commit -m "Your commit message"
 git push
 ```
-"""
-
-with open('README.md', 'w', encoding='utf-8') as f:
-    f.write(content)
-print("README.md generated successfully")
-
-```
-Your Markdown file is ready
-[file-tag: code-generated-file-0-1776969865571795092]
-
-You can download this `README.md` file or copy its contents into the root `D:\zc-ocw\zc-ocw` folder. 
-
-It covers all the bases for a full-stack educational platform: detailing the student experience (YouTube sync, bookmarks, materials), the admin workflow, the exact tech stack you are using, local development instructions, and the production deployment steps for both Vercel and Cloudflare. 
-
-Once you have saved it into your project folder alongside your `vercel.json` and `.gitignore`, you can go ahead and run your final push:
-
-```cmd
-git add README.md
-git commit -m "Add project README"
-git push
-```
