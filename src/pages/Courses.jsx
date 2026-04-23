@@ -1,128 +1,135 @@
 import { useState, useEffect, useRef } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { usePlaylists } from '@/hooks/useYouTube'
+import { SlidersHorizontal } from 'lucide-react'
+import { usePlaylists }  from '@/hooks/useYouTube'
+import { useAdminData }  from '@/context/AdminDataContext'
+import { SCHOOLS, PROGRAMS, detectFromTitle, getSchool } from '@/data/coursesCatalog'
 import CourseCard from '@/components/ui/CourseCard'
 import { CourseCardSkeleton, LoadingSpinner } from '@/components/ui/LoadingSpinner'
 import ErrorMessage from '@/components/ui/ErrorMessage'
-import { DEPARTMENTS, LEVELS } from '@/data/courses'
+import ScrollReveal from '@/components/ui/ScrollReveal'
+import clsx from 'clsx'
+
+const LEVELS = ['All levels', 'Undergraduate', 'Graduate']
+const SCHOOL_ACCENT = { csai:'#0096c7', business:'#0d9488', science:'#7c3aed', engineering:'#ea580c' }
 
 export default function Courses() {
-  const { slug: deptSlug } = useParams()          // from /departments/:slug
-  const [searchParams] = useSearchParams()
-  const [levelFilter, setLevelFilter] = useState('All')
-  const [deptFilter,  setDeptFilter]  = useState(deptSlug || 'All')
+  const { schoolId: slugSchool, programId: slugProgram } = useParams()
+  const [levelFilter,  setLevelFilter]  = useState('All levels')
+  const [schoolFilter, setSchoolFilter] = useState(slugSchool || 'all')
   const loadMoreRef = useRef(null)
+  const { getCourseData } = useAdminData()
 
-  const {
-    data, isLoading, isError, error,
-    fetchNextPage, hasNextPage, isFetchingNextPage, refetch,
-  } = usePlaylists()
-
-  // Flatten all pages into one list
+  const { data, isLoading, isError, fetchNextPage, hasNextPage, isFetchingNextPage, refetch } = usePlaylists()
   const allCourses = data?.pages.flatMap(p => p.items) ?? []
 
-  // Client-side filter (dept + level)
   const filtered = allCourses.filter(c => {
-    const deptOk  = deptFilter  === 'All' || c.meta?.department === deptFilter
-    const levelOk = levelFilter === 'All' || c.meta?.level === levelFilter
-    return deptOk && levelOk
+    const ov = getCourseData(c.id)
+    const au = detectFromTitle(c.snippet.title)
+    const sid = ov.schoolId ?? au?.schoolId ?? null
+    const pid = ov.programId ?? au?.programId ?? null
+    const lv  = ov.level ?? null
+    return (schoolFilter === 'all' || sid === schoolFilter)
+        && (!slugProgram || pid === slugProgram)
+        && (levelFilter === 'All levels' || lv === levelFilter)
   })
 
-  // Intersection observer for infinite scroll
   useEffect(() => {
     if (!hasNextPage) return
-    const obs = new IntersectionObserver(
-      entries => { if (entries[0].isIntersecting) fetchNextPage() },
-      { threshold: 0.1 }
-    )
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) fetchNextPage() }, { threshold: 0.1 })
     if (loadMoreRef.current) obs.observe(loadMoreRef.current)
     return () => obs.disconnect()
   }, [hasNextPage, fetchNextPage])
 
-  // Sync dept from URL slug
-  useEffect(() => {
-    if (deptSlug) setDeptFilter(deptSlug)
-  }, [deptSlug])
+  useEffect(() => { if (slugSchool) setSchoolFilter(slugSchool) }, [slugSchool])
 
-  const pageTitle = deptSlug
-    ? `${DEPARTMENTS.find(d => d.slug === deptSlug)?.label ?? deptSlug} Courses — ZC OCW`
-    : 'All Courses — ZC OCW'
+  const school   = slugSchool ? getSchool(slugSchool) : null
+  const programs = slugSchool ? PROGRAMS[slugSchool] ?? [] : []
+  const program  = slugProgram ? programs.find(p => p.id === slugProgram) : null
+  const accent   = slugSchool ? SCHOOL_ACCENT[slugSchool] : null
+  const pageTitle = program?.label ?? school?.label ?? 'All Courses'
 
   return (
     <>
-      <Helmet><title>{pageTitle}</title></Helmet>
+      <Helmet><title>{pageTitle} — ZC OCW</title></Helmet>
 
-      {/* Page header */}
-      <div className="bg-zc-navy text-white py-12">
+      {/* Accent line */}
+      {accent && <div className="h-1" style={{ background: accent }} />}
+
+      <div className="page-header">
         <div className="section">
-          <h1 className="font-display text-4xl md:text-5xl mb-2">
-            {deptSlug
-              ? DEPARTMENTS.find(d => d.slug === deptSlug)?.label ?? 'Courses'
-              : 'All Courses'}
-          </h1>
-          <p className="text-white/60">
-            {filtered.length} course{filtered.length !== 1 ? 's' : ''} available
-          </p>
+          {school && (
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl">{school.icon}</span>
+              <span className="badge text-xs text-white" style={{ backgroundColor: accent }}>{school.short}</span>
+            </div>
+          )}
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-2">{pageTitle}</h1>
+          <p className="text-white/40">{filtered.length} course{filtered.length !== 1 ? 's' : ''} available</p>
         </div>
       </div>
 
       <div className="section py-8">
         {/* Filters */}
-        <div className="flex flex-wrap gap-3 mb-8">
-          {/* Department filter */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setDeptFilter('All')}
-              className={`badge text-xs cursor-pointer transition-colors ${
-                deptFilter === 'All' ? 'bg-zc-navy text-white' : 'bg-gray-100 text-zc-gray hover:bg-gray-200'
-              }`}
-            >
-              All Departments
-            </button>
-            {DEPARTMENTS.map(d => (
-              <button
-                key={d.slug}
-                onClick={() => setDeptFilter(d.slug)}
-                className={`badge text-xs cursor-pointer transition-colors ${
-                  deptFilter === d.slug ? 'bg-zc-navy text-white' : `${d.color} opacity-80 hover:opacity-100`
-                }`}
-              >
-                {d.label}
+        <ScrollReveal className="flex flex-wrap gap-3 items-center mb-10">
+          <div className="flex items-center gap-1.5 text-ink-ghost">
+            <SlidersHorizontal className="w-4 h-4" />
+            <span className="text-sm font-semibold">Filter:</span>
+          </div>
+
+          {/* School chips — only on /courses root */}
+          {!slugSchool && (
+            <div className="flex flex-wrap gap-1.5">
+              {[{ id:'all', label:'All Schools', icon:'🎓', accent: null }, ...SCHOOLS.filter(s=>s.id!=='general')].map(s => (
+                <button key={s.id} onClick={() => setSchoolFilter(s.id)}
+                        className={clsx(
+                          'badge cursor-pointer transition-all text-xs',
+                          schoolFilter === s.id && s.id !== 'all' ? 'text-white shadow-sm' :
+                          schoolFilter === s.id ? 'bg-ocean-950 text-white' :
+                          'bg-slate-100 text-ink-subtle hover:bg-slate-200'
+                        )}
+                        style={schoolFilter === s.id && s.id !== 'all' ? { backgroundColor: SCHOOL_ACCENT[s.id] } : {}}>
+                  {s.icon ?? ''} {s.label ?? s.short}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Level filter */}
+          <div className="flex gap-1.5 ml-auto">
+            {LEVELS.map(l => (
+              <button key={l} onClick={() => setLevelFilter(l)}
+                      className={clsx(
+                        'px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all',
+                        levelFilter === l ? 'bg-ocean-950 text-white border-ocean-950' : 'border-slate-200 text-ink-subtle hover:border-ocean-400 hover:text-ocean-600'
+                      )}>
+                {l}
               </button>
             ))}
           </div>
+        </ScrollReveal>
 
-          {/* Level filter */}
-          <select
-            value={levelFilter}
-            onChange={e => setLevelFilter(e.target.value)}
-            className="ml-auto text-sm border border-gray-200 rounded-lg px-3 py-1.5
-                       bg-white text-zc-navy focus:outline-none focus:ring-2 focus:ring-zc-sky/40"
-          >
-            <option value="All">All levels</option>
-            {LEVELS.map(l => <option key={l} value={l}>{l}</option>)}
-          </select>
-        </div>
-
-        {/* Grid */}
         {isError ? (
           <ErrorMessage onRetry={refetch} />
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {isLoading
-                ? Array.from({ length: 9 }).map((_, i) => <CourseCardSkeleton key={i} />)
+                ? Array.from({length:9}).map((_,i) => <CourseCardSkeleton key={i} />)
                 : filtered.length === 0
-                ? <p className="col-span-3 text-center text-zc-gray py-20">
-                    No courses found for this filter.
-                  </p>
-                : filtered.map(c => <CourseCard key={c.id} playlist={c} />)
+                ? <div className="col-span-3 text-center py-24">
+                    <p className="font-display text-xl text-ink-muted mb-2">No courses found</p>
+                    <p className="text-sm text-ink-ghost">Try a different filter, or check back when more are added.</p>
+                  </div>
+                : filtered.map((c, i) => (
+                    <ScrollReveal key={c.id} delay={`${Math.min(i * 0.04, 0.3)}s`}>
+                      <CourseCard playlist={c} className="h-full" />
+                    </ScrollReveal>
+                  ))
               }
             </div>
-
-            {/* Infinite scroll sentinel */}
-            <div ref={loadMoreRef} className="h-10 flex items-center justify-center mt-8">
+            <div ref={loadMoreRef} className="h-16 flex items-center justify-center mt-6">
               {isFetchingNextPage && <LoadingSpinner />}
             </div>
           </>

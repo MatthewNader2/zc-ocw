@@ -1,12 +1,13 @@
 {
   "name": "zc-ocw",
   "private": true,
-  "version": "1.0.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "profile": "node scripts/courseProfiler.js",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write \"src/**/*.{js,jsx,css}\""
   },
@@ -19,6 +20,7 @@
     "react-player": "^2.16.0",
     "react-helmet-async": "^2.0.4",
     "react-intersection-observer": "^9.8.1",
+    "lucide-react": "^0.383.0",
     "clsx": "^2.1.0",
     "date-fns": "^3.4.0"
   },

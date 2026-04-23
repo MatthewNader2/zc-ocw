@@ -1,131 +1,149 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Search, Bookmark, Settings, LayoutDashboard, Menu, X, GraduationCap } from 'lucide-react'
+import { useProgress } from '@/context/ProgressContext'
+import { useAuth }     from '@/context/AuthContext'
+import clsx from 'clsx'
 
-const NAV_LINKS = [
+const NAV = [
   { to: '/courses',     label: 'Courses'     },
   { to: '/departments', label: 'Departments' },
   { to: '/about',       label: 'About'       },
 ]
 
 export default function Navbar() {
-  const [open,      setOpen]      = useState(false)
-  const [scrolled,  setScrolled]  = useState(false)
-  const [query,     setQuery]     = useState('')
-  const navigate = useNavigate()
+  const [open,    setOpen]    = useState(false)
+  const [scrolled,setScrolled] = useState(false)
+  const [query,   setQuery]   = useState('')
+  const { getBookmarks } = useProgress()
+  const { isAdmin }      = useAuth()
+  const navigate         = useNavigate()
+  const bmCount          = getBookmarks().length
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handler)
-    return () => window.removeEventListener('scroll', handler)
+    const h = () => setScrolled(window.scrollY > 16)
+    window.addEventListener('scroll', h, { passive: true })
+    return () => window.removeEventListener('scroll', h)
   }, [])
 
-  function handleSearch(e) {
+  function submit(e) {
     e.preventDefault()
-    if (query.trim()) {
-      navigate(`/search?q=${encodeURIComponent(query.trim())}`)
-      setQuery('')
-      setOpen(false)
-    }
+    const q = query.trim()
+    if (q) { navigate(`/search?q=${encodeURIComponent(q)}`); setQuery(''); setOpen(false) }
   }
 
   return (
-    <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled ? 'bg-zc-navy shadow-lg' : 'bg-zc-navy'
-      }`}
-    >
-      <div className="section flex items-center justify-between h-16">
+    <header className={clsx(
+      'sticky top-0 z-50 transition-all duration-300',
+      scrolled
+        ? 'bg-ocean-950/95 backdrop-blur-xl shadow-[0_1px_0_rgba(72,202,228,0.12),0_4px_24px_rgba(3,4,94,0.35)]'
+        : 'bg-ocean-950'
+    )}>
+      <div className="section flex items-center h-16 gap-4">
+
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-3 group" onClick={() => setOpen(false)}>
-          <img src="/logo.svg" alt="Zewail City" className="h-9 w-auto" />
-          <span className="hidden sm:block font-display text-white text-lg leading-tight">
-            <span className="text-zc-gold font-bold">ZC</span> OCW
-          </span>
+        <Link to="/" onClick={() => setOpen(false)}
+              className="flex items-center gap-3 flex-shrink-0 group">
+          <img src="/logo.svg" alt="ZC" className="h-9 w-auto" />
+          <div className="hidden sm:flex flex-col leading-none">
+            <span className="font-display text-base font-bold text-white">ZC <span className="text-ocean-400">OCW</span></span>
+            <span className="text-[10px] text-white/35 font-body tracking-wide">Open CourseWare</span>
+          </div>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-1">
-          {NAV_LINKS.map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                `px-4 py-2 rounded-lg text-sm font-body font-semibold transition-colors ${
-                  isActive
-                    ? 'bg-zc-blue text-white'
-                    : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`
-              }
-            >
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-0.5 ml-2">
+          {NAV.map(({ to, label }) => (
+            <NavLink key={to} to={to} className={({ isActive }) => clsx(
+              'px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200',
+              isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/65 hover:text-white hover:bg-white/8'
+            )}>
               {label}
             </NavLink>
           ))}
         </nav>
 
-        {/* Desktop search */}
-        <form onSubmit={handleSearch} className="hidden md:flex items-center">
-          <div className="relative">
+        {/* Search */}
+        <form onSubmit={submit} className="hidden md:flex flex-1 max-w-xs ml-auto">
+          <div className="relative w-full">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35 pointer-events-none" />
             <input
-              type="search"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
+              type="search" value={query} onChange={e => setQuery(e.target.value)}
               placeholder="Search courses…"
-              className="w-52 pl-9 pr-3 py-1.5 rounded-lg bg-white/10 text-white placeholder-white/50
-                         text-sm border border-white/20 focus:outline-none focus:border-zc-gold
-                         focus:bg-white/20 transition-all"
+              className="input-dark w-full pl-9 py-1.5 text-sm"
             />
-            <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-            </svg>
           </div>
         </form>
 
+        {/* Right icons — desktop */}
+        <div className="hidden md:flex items-center gap-1">
+          <Link to="/bookmarks"
+                className="relative p-2.5 rounded-xl text-white/55 hover:text-white hover:bg-white/8 transition-all">
+            <Bookmark className="w-4.5 h-4.5" strokeWidth={2} />
+            {bmCount > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-ocean-500 text-white text-[9px] font-bold flex items-center justify-center">
+                {bmCount > 9 ? '9+' : bmCount}
+              </span>
+            )}
+          </Link>
+          <Link to="/settings"
+                className="p-2.5 rounded-xl text-white/55 hover:text-white hover:bg-white/8 transition-all">
+            <Settings className="w-4.5 h-4.5" strokeWidth={2} />
+          </Link>
+          {isAdmin && (
+            <Link to="/admin"
+                  className="ml-1 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
+                             text-ocean-300 bg-ocean-500/15 border border-ocean-400/20
+                             hover:bg-ocean-500/25 transition-all">
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              Admin
+            </Link>
+          )}
+        </div>
+
         {/* Mobile burger */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="md:hidden text-white p-2 rounded-lg hover:bg-white/10"
-          aria-label="Toggle menu"
-        >
-          {open
-            ? <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            : <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-          }
+        <button onClick={() => setOpen(!open)} className="md:hidden text-white/80 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all">
+          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-zc-blue border-t border-white/10 px-4 py-4 space-y-2 animate-fade-in">
-          <form onSubmit={handleSearch} className="mb-3">
-            <input
-              type="search"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search courses…"
-              className="w-full px-4 py-2 rounded-lg bg-white/10 text-white placeholder-white/50
-                         text-sm border border-white/20 focus:outline-none focus:border-zc-gold"
-            />
+        <div className="md:hidden bg-ocean-950/98 backdrop-blur-xl border-t border-white/8 px-4 py-5 space-y-2 animate-slide-up-in">
+          <form onSubmit={submit} className="mb-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/35" />
+              <input type="search" value={query} onChange={e => setQuery(e.target.value)}
+                     placeholder="Search courses…" className="input-dark w-full pl-10" />
+            </div>
           </form>
-          {NAV_LINKS.map(({ to, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                `block px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-                  isActive ? 'bg-zc-navy text-white' : 'text-white/80 hover:text-white hover:bg-white/10'
-                }`
-              }
-            >
+          {NAV.map(({ to, label }) => (
+            <NavLink key={to} to={to} onClick={() => setOpen(false)}
+              className={({ isActive }) => clsx(
+                'flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all',
+                isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
+              )}>
               {label}
             </NavLink>
           ))}
+          <div className="divider my-2" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          <Link to="/bookmarks" onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/70 hover:text-white hover:bg-white/8 transition-all">
+            <Bookmark className="w-4 h-4" />
+            Bookmarks {bmCount > 0 && <span className="ml-auto badge bg-ocean-500/20 text-ocean-300">{bmCount}</span>}
+          </Link>
+          <Link to="/settings" onClick={() => setOpen(false)}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white/70 hover:text-white hover:bg-white/8 transition-all">
+            <Settings className="w-4 h-4" />
+            Settings
+          </Link>
+          {isAdmin && (
+            <Link to="/admin" onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-ocean-300 hover:bg-ocean-500/15 transition-all">
+              <LayoutDashboard className="w-4 h-4" />
+              Admin Dashboard
+            </Link>
+          )}
         </div>
       )}
     </header>

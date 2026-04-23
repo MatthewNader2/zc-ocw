@@ -1,0 +1,42 @@
+School of Computational Sciences and Artificial Intelligence
+CSAI 100 Introduction to Computational Sciences and AI
+CSAI 101 Fundamentals of Programming and Computer Science
+CSAI 102 Digital Logic and Computer Architecture
+CSAI 151 Object-Oriented Programming
+CSAI 201 Data Structures
+CSAI 202 Introduction to Database Systems
+CSAI 253 Machine Learning
+CSAI 301 Artificial Intelligence
+DSAI 308 Deep Learning
+DSAI 352 Computer Vision
+DSAI 353 Natural language processing
+DSAI 402 Reinforcement Learning
+School of Science
+PHYS 101 Introduction to Classical Mechanics
+PHYS 102 Introduction to Electromagnetism
+PHYS 201 Thermodynamics Wave Motion and Optics
+PHYS 202 Modern Physics
+PHYS 204 Analytical Mechanics
+PHYS 316 Mathematical Physics I
+PHYS 323 Quantum Mechanics I
+PHYS 348 Quantum Mechanics II
+PHYS 405 Cosmology
+PHYS 453 Gravity and General Relativity
+MATH 101 Calculus I
+MATH 102 Calculus II
+MATH 201 Linear Algebra and Vector Geometry
+MATH 202 Ordinary Differential Equations
+MATH 301 Probability and Statistics
+School of Engineering
+CIE 227 Signals and Systems
+CIE 239 Digital Design and Computer Architecture
+CIE 247 Digital Signal Processing
+CIE 317 Machine Learning
+CIE 318 Control Systems
+CIE 337 Communications Theory and Systems
+CIE 347 Information Theory and Coding
+CIE 357 Digital and Wireless Communications
+CIE 367 Computer Networks
+CIE 419 Computer Vision
+CIE 450 Robotics Transformations Kinematics and Dynamics
+CIE 455 Neural Networks and Deep Learning

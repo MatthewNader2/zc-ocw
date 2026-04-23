@@ -1,57 +1,68 @@
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { DEPARTMENTS } from '@/data/courses'
+import { ArrowRight } from 'lucide-react'
+import { SCHOOLS, PROGRAMS } from '@/data/coursesCatalog'
+import ScrollReveal from '@/components/ui/ScrollReveal'
 
-const DEPT_DESC = {
-  nanotechnology: 'Nanoscale materials, quantum effects, and the science of the very small.',
-  physics:        'Classical mechanics, quantum physics, electromagnetism, and beyond.',
-  chemistry:      'Organic, inorganic, and physical chemistry with lab techniques.',
-  biology:        'Cell biology, genetics, molecular biology, and systems biology.',
-  engineering:    'Electrical, mechanical, and systems engineering fundamentals.',
-  cs:             'Algorithms, data structures, AI, and software engineering.',
-  mathematics:    'Pure and applied mathematics, statistics, and numerical methods.',
-  humanities:     'Arabic, philosophy, history of science, and academic writing.',
-}
-
-const ICONS = {
-  nanotechnology: '⚛️', physics: '🔭', chemistry: '🧪', biology: '🧬',
-  engineering: '⚙️', cs: '💻', mathematics: '📐', humanities: '📚',
-}
+const ACCENT = { csai:'#0096c7', business:'#0d9488', science:'#7c3aed', engineering:'#ea580c' }
 
 export default function Departments() {
   return (
     <>
       <Helmet><title>Departments — ZC OCW</title></Helmet>
-
-      <div className="bg-zc-navy text-white py-12">
+      <div className="page-header">
         <div className="section">
-          <h1 className="font-display text-4xl md:text-5xl mb-2">Departments</h1>
-          <p className="text-white/60">Browse courses by academic discipline</p>
+          <p className="text-ocean-400 text-xs font-semibold uppercase tracking-widest mb-2">Explore</p>
+          <h1 className="font-display text-5xl md:text-6xl font-bold mb-2">Schools &amp; Departments</h1>
+          <p className="text-white/45 text-base">Browse courses by academic school and program</p>
         </div>
       </div>
-
-      <div className="section py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {DEPARTMENTS.map(dept => (
-            <Link
-              key={dept.slug}
-              to={`/departments/${dept.slug}`}
-              className="card group flex flex-col p-6 gap-4 items-start"
-            >
-              <span className="text-4xl">{ICONS[dept.slug]}</span>
-              <div>
-                <h2 className="font-display text-xl text-zc-navy font-semibold mb-1
-                               group-hover:text-zc-sky transition-colors">
-                  {dept.label}
-                </h2>
-                <p className="text-sm text-zc-gray leading-relaxed">
-                  {DEPT_DESC[dept.slug]}
-                </p>
+      <div className="section py-16 space-y-20">
+        {SCHOOLS.filter(s => s.id !== 'general').map((school, si) => {
+          const programs = PROGRAMS[school.id] ?? []
+          const accent   = ACCENT[school.id]
+          return (
+            <ScrollReveal key={school.id} delay={`${si * 0.05}s`}>
+              {/* School header */}
+              <div className="flex items-center gap-5 mb-8">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 shadow-card"
+                     style={{ backgroundColor: accent + '15', border: `1px solid ${accent}25` }}>
+                  {school.icon}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <h2 className="font-display text-2xl md:text-3xl font-bold text-ink">{school.label}</h2>
+                    <Link to={`/departments/${school.id}`}
+                          className="text-xs font-semibold flex items-center gap-1 transition-colors"
+                          style={{ color: accent }}>
+                      View all <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                  <p className="text-sm text-ink-ghost mt-1">{school.description}</p>
+                </div>
               </div>
-              <span className="btn-ghost text-sm mt-auto">View courses →</span>
-            </Link>
-          ))}
-        </div>
+              {/* Programs grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 pl-0 md:pl-[5.25rem]">
+                {programs.map((prog, pi) => (
+                  <ScrollReveal key={prog.id} delay={`${pi * 0.04}s`}>
+                    <Link to={`/departments/${school.id}/${prog.id}`}
+                          className="group flex flex-col gap-1.5 bg-white rounded-2xl p-4 border border-slate-100
+                                     shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-0.5">
+                      <span className="font-display font-semibold text-[13px] text-ink leading-snug
+                                       transition-colors duration-200 group-hover:text-[color:var(--accent)]"
+                            style={{ '--accent': accent }}>
+                        {prog.label}
+                      </span>
+                      <span className="font-mono text-[10px] text-ink-ghost">{prog.prefixes.join(', ')}</span>
+                    </Link>
+                  </ScrollReveal>
+                ))}
+              </div>
+              {/* Divider */}
+              <div className="mt-14 divider" />
+            </ScrollReveal>
+          )
+        })}
       </div>
     </>
   )
