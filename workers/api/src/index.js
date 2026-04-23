@@ -2,19 +2,21 @@
  * ZC OCW — Cloudflare Worker API
  *
  * Routes:
- *   GET    /api/overrides              → all course overrides
- *   GET    /api/overrides/:id          → one course override
- *   PUT    /api/overrides/:id          → upsert course override  [admin]
- *   GET    /api/materials/:playlistId  → materials for a course
- *   POST   /api/materials/:playlistId  → add material            [admin]
- *   DELETE /api/materials/:id          → delete material         [admin]
- *   GET    /api/books/:playlistId      → books for a course
- *   POST   /api/books/:playlistId      → add book                [admin]
- *   DELETE /api/books/:id             → delete book             [admin]
- *   POST   /api/upload/:playlistId    → upload file to R2       [admin]
+ * GET    /api/overrides              → all course overrides
+ * GET    /api/overrides/:id          → one course override
+ * PUT    /api/overrides/:id          → upsert course override  [admin]
+ * GET    /api/materials/:playlistId  → materials for a course
+ * POST   /api/materials/:playlistId  → add material            [admin]
+ * DELETE /api/materials/:id          → delete material         [admin]
+ * GET    /api/books/:playlistId      → books for a course
+ * POST   /api/books/:playlistId      → add book                [admin]
+ * DELETE /api/books/:id             → delete book             [admin]
+ * POST   /api/upload/:playlistId    → upload file to R2       [admin]
+ * GET    /api/youtube/playlists     → fetch YouTube playlists (proxy)
+ * GET    /api/youtube/channels      → fetch YouTube channel details (proxy)
  *
  * Authentication:
- *   Admin routes require header: Authorization: Bearer YOUR_ADMIN_PASSWORD
+ * Admin routes require header: Authorization: Bearer YOUR_ADMIN_PASSWORD
  */
 
 // ── CORS headers — allow your frontend to call this API ────────────────────
@@ -66,6 +68,58 @@ export default {
 		}
 
 		const url = new URL(req.url);
+
+		// Generic YouTube Proxy Handler
+		if (url.pathname.startsWith('/api/youtube/')) {
+			const endpoint = url.pathname.replace('/api/youtube/', '');
+			const searchParams = url.search; // Keeps all params like channelId, id, q, etc.
+
+			// Append the hidden API key and the default 'part' if not provided
+			const targetUrl = `https://www.googleapis.com/youtube/v3/${endpoint}${searchParams}&part=snippet,contentDetails,statistics,brandingSettings&key=${env.YOUTUBE_API_KEY}`;
+
+			try {
+				const response = await fetch(targetUrl);
+				const data = await response.json();
+				return json(data, response.status, cors);
+			} catch (e) {
+				return err('YouTube Proxy Error', 500, cors);
+			}
+		}
+
+		// Handle YouTube Proxy Routes BEFORE splitting segments
+		if (url.pathname === '/api/youtube/playlists' && req.method === 'GET') {
+			const channelId = url.searchParams.get('channelId');
+			if (!channelId) return err('Missing channelId', 400, cors);
+
+			const ytUrl = `https://www.googleapis.com/youtube/v3/playlists?channelId=${channelId}&part=snippet,contentDetails&maxResults=20&key=${env.YOUTUBE_API_KEY}`;
+
+			try {
+				const response = await fetch(ytUrl);
+				const data = await response.json();
+				if (!response.ok) return err(data.error?.message || 'YouTube API Error', response.status, cors);
+				return json(data, 200, cors);
+			} catch (e) {
+				return err('Failed to fetch from YouTube', 500, cors);
+			}
+		}
+
+		if (url.pathname === '/api/youtube/channels' && req.method === 'GET') {
+			const id = url.searchParams.get('id');
+			if (!id) return err('Missing id', 400, cors);
+
+			const ytUrl = `https://www.googleapis.com/youtube/v3/channels?id=${id}&part=snippet,statistics,brandingSettings&key=${env.YOUTUBE_API_KEY}`;
+
+			try {
+				const response = await fetch(ytUrl);
+				const data = await response.json();
+				if (!response.ok) return err(data.error?.message || 'YouTube API Error', response.status, cors);
+				return json(data, 200, cors);
+			} catch (e) {
+				return err('Failed to fetch from YouTube', 500, cors);
+			}
+		}
+
+		// Standard resource routing
 		const segments = url.pathname.replace('/api/', '').split('/');
 		const [resource, id] = segments;
 
