@@ -308,6 +308,132 @@ export default {
 				return json({ ok: true }, 200, cors);
 			}
 
+			// ── GET /api/profiles ──────────────────────────────────────────────────────
+			if (resource === 'profiles' && !id && req.method === 'GET') {
+				const { results } = await env.DB.prepare('SELECT * FROM playlist_profiles ORDER BY category, title').all();
+				return json(results, 200, cors);
+			}
+
+			// ── GET /api/profiles/:playlistId ──────────────────────────────────────────
+			if (resource === 'profiles' && id && req.method === 'GET') {
+				const row = await env.DB.prepare('SELECT * FROM playlist_profiles WHERE playlist_id = ?').bind(id).first();
+				if (!row) return json({}, 200, cors);
+				return json(
+					{
+						...row,
+						detection: JSON.parse(row.detection || '{}'),
+						suggested: JSON.parse(row.suggested || '{}'),
+					},
+					200,
+					cors,
+				);
+			}
+
+			// ── PUT /api/profiles ──────────────────────────────────────────────────────
+			// Bulk upsert (profiler script uses this)
+			if (resource === 'profiles' && !id && req.method === 'PUT') {
+				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				const body = await req.json();
+				const profiles = Array.isArray(body) ? body : [body];
+
+				for (const p of profiles) {
+					await env.DB.prepare(
+						`
+      INSERT INTO playlist_profiles
+        (playlist_id, title, cleaned_title, category, school_id, program_id,
+         course_code, course_name, instructor, semester, year, is_incomplete,
+         lecture_count, confidence, detection, suggested, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+      ON CONFLICT(playlist_id) DO UPDATE SET
+        title         = excluded.title,
+        cleaned_title = excluded.cleaned_title,
+        category      = excluded.category,
+        school_id     = excluded.school_id,
+        program_id    = excluded.program_id,
+        course_code   = excluded.course_code,
+        course_name   = excluded.course_name,
+        instructor    = excluded.instructor,
+        semester      = excluded.semester,
+        year          = excluded.year,
+        is_incomplete = excluded.is_incomplete,
+        lecture_count = excluded.lecture_count,
+        confidence    = excluded.confidence,
+        detection     = excluded.detection,
+        suggested     = excluded.suggested,
+        updated_at    = excluded.updated_at
+    `,
+					)
+						.bind(
+							p.playlistId,
+							p.title || null,
+							p.cleanedTitle || null,
+							p.category || 'course',
+							p.suggested?.schoolId || null,
+							p.suggested?.programId || null,
+							p.suggested?.courseCode || null,
+							p.suggested?.courseName || null,
+							p.suggested?.instructor || null,
+							p.suggested?.semester || null,
+							p.suggested?.year || null,
+							p.suggested?.isIncomplete ? 1 : 0,
+							p.lectureCount || null,
+							p.detection?.confidence || null,
+							JSON.stringify(p.detection || {}),
+							JSON.stringify(p.suggested || {}),
+						)
+						.run();
+				}
+				return json({ ok: true, count: profiles.length }, 200, cors);
+			}
+
+			// ── PUT /api/profiles/:playlistId ──────────────────────────────────────────
+			if (resource === 'profiles' && id && req.method === 'PUT') {
+				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				const body = await req.json();
+				await env.DB.prepare(
+					`
+    INSERT INTO playlist_profiles
+      (playlist_id, category, school_id, program_id, course_code, course_name,
+       instructor, semester, year, is_incomplete, lecture_count, confidence,
+       detection, suggested, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    ON CONFLICT(playlist_id) DO UPDATE SET
+      category      = excluded.category,
+      school_id     = excluded.school_id,
+      program_id    = excluded.program_id,
+      course_code   = excluded.course_code,
+      course_name   = excluded.course_name,
+      instructor    = excluded.instructor,
+      semester      = excluded.semester,
+      year          = excluded.year,
+      is_incomplete = excluded.is_incomplete,
+      lecture_count = excluded.lecture_count,
+      confidence    = excluded.confidence,
+      detection     = excluded.detection,
+      suggested     = excluded.suggested,
+      updated_at    = excluded.updated_at
+  `,
+				)
+					.bind(
+						id,
+						body.category || 'course',
+						body.schoolId || null,
+						body.programId || null,
+						body.courseCode || null,
+						body.courseName || null,
+						body.instructor || null,
+						body.semester || null,
+						body.year || null,
+						body.isIncomplete ? 1 : 0,
+						body.lectureCount || null,
+						body.confidence || null,
+						JSON.stringify(body.detection || {}),
+						JSON.stringify(body.suggested || {}),
+					)
+					.run();
+				return json({ ok: true }, 200, cors);
+			}
+
 			// ── Health check ───────────────────────────────────────────────────
 			if (url.pathname === '/api/health') {
 				return json({ status: 'ok', timestamp: new Date().toISOString() }, 200, cors);

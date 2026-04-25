@@ -21,7 +21,7 @@ export const DEPARTMENTS = [
   { slug: 'humanities',        label: 'Humanities',              color: 'bg-indigo-100 text-indigo-800'},
 ]
 
-export const LEVELS = ['Undergraduate', 'Graduate', 'All levels']
+export const LEVELS = ['Undergraduate', 'Graduate', 'Pre-college', 'All levels']
 
 /**
  * Manually enrich playlist metadata.

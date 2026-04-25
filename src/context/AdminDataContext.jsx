@@ -1,9 +1,10 @@
 /**
  * AdminDataContext.jsx
  *
- * Hybrid storage: Supabase when configured, localStorage as fallback.
- * The admin panel writes to Supabase (if VITE_SUPABASE_URL is set) so data
- * persists across devices. Falls back to localStorage when offline.
+ * Hybrid storage:
+ *   1. Playlist profiles → fetched from Cloudflare Worker on mount (cached in localStorage)
+ *   2. Course overrides  → Cloudflare when configured, localStorage fallback
+ *   3. Materials / Books → Cloudflare when configured, localStorage fallback
  */
 import {
   createContext,
@@ -11,26 +12,56 @@ import {
   useState,
   useCallback,
   useEffect,
+  useMemo,
 } from "react";
 import * as storage from "@/services/storage";
-import * as supabase from "@/services/cloudflare";
+import * as cloudflare from "@/services/cloudflare";
 
 const AdminDataContext = createContext(null);
 
 export function AdminDataProvider({ children }) {
   const [version, setVersion] = useState(0);
   const [synced, setSynced] = useState(false);
-  const [useCloud, setUseCloud] = useState(supabase.isConfigured);
+  const [useCloud, setUseCloud] = useState(cloudflare.isConfigured);
+  const [syncingPlaylists, setSyncingPlaylists] = useState({});
+  const [profiles, setProfiles] = useState(() => {
+    // Hydrate from localStorage on first render to avoid flash
+    return storage.get("playlist_profiles", []);
+  });
 
   const bump = useCallback(() => setVersion((v) => v + 1), []);
 
-  // ── On mount: pull Supabase overrides into localStorage cache ───────────────
+  // ── On mount: pull playlist profiles from Worker ──────────────────────────
   useEffect(() => {
-    if (!supabase.isConfigured) {
+    if (!cloudflare.isConfigured) {
       setSynced(true);
       return;
     }
-    supabase
+    cloudflare
+      .fetchProfiles()
+      .then((rows) => {
+        if (rows.length) {
+          setProfiles(rows);
+          storage.set("playlist_profiles", rows);
+        }
+        setSynced(true);
+        bump();
+      })
+      .catch(() => {
+        // Fallback to cached localStorage profiles
+        const cached = storage.get("playlist_profiles", []);
+        if (cached.length) setProfiles(cached);
+        setSynced(true);
+      });
+  }, []); // eslint-disable-line
+
+  // ── On mount: pull overrides into localStorage cache ──────────────────────
+  useEffect(() => {
+    if (!cloudflare.isConfigured) {
+      setSynced(true);
+      return;
+    }
+    cloudflare
       .fetchAllOverrides()
       .then((rows) => {
         const all = {};
@@ -53,23 +84,82 @@ export function AdminDataProvider({ children }) {
       .catch(() => {
         setSynced(true);
       });
-  }, []);
+  }, []); // eslint-disable-line
 
-  // ── Course override CRUD ─────────────────────────────────────────────────────
+  // ── Profile helpers (NEW) ─────────────────────────────────────────────────
+
+  const getPlaylistProfile = useCallback(
+    (playlistId) => {
+      return profiles.find((p) => p.playlistId === playlistId) || null;
+    },
+    [profiles],
+  );
+
+  const getPlaylistCategory = useCallback(
+    (playlistId) => {
+      return getPlaylistProfile(playlistId)?.category || "course";
+    },
+    [getPlaylistProfile],
+  );
+
+  const isSpecialPlaylist = useCallback(
+    (playlistId) => {
+      return getPlaylistCategory(playlistId) !== "course";
+    },
+    [getPlaylistCategory],
+  );
+
+  // ── Course override CRUD ──────────────────────────────────────────────────
+
+  const syncCourseContent = useCallback(
+    async (playlistId) => {
+      if (!useCloud || syncingPlaylists[playlistId]) return;
+      setSyncingPlaylists((p) => ({ ...p, [playlistId]: true }));
+      try {
+        const [cloudMats, cloudBooks] = await Promise.all([
+          cloudflare.fetchMaterials(playlistId),
+          cloudflare.fetchBooks(playlistId),
+        ]);
+
+        const formattedMats = cloudMats.map((m) => ({
+          id: m.id,
+          type: m.type,
+          label: m.label,
+          url: m.url,
+          file_path: m.file_key,
+          file_size: m.file_size,
+          mime_type: m.mime_type,
+          cloudId: m.id,
+        }));
+
+        const formattedBooks = cloudBooks.map((b) => ({
+          ...b,
+          cloudId: b.id,
+        }));
+
+        storage.set(`materials_${playlistId}`, formattedMats);
+        storage.set(`books_${playlistId}`, formattedBooks);
+        bump();
+      } catch (e) {
+        console.warn("Failed to sync materials from cloud", e);
+      } finally {
+        setSyncingPlaylists((p) => ({ ...p, [playlistId]: false }));
+      }
+    },
+    [bump, useCloud, syncingPlaylists],
+  );
 
   const getCourseData = useCallback(
-    (playlistId) => {
-      return storage.getOverride(playlistId);
-    },
+    (playlistId) => storage.getOverride(playlistId),
     [version],
-  ); // eslint-disable-line
+  );
 
   const saveCourseData = useCallback(
     async (playlistId, data) => {
       storage.saveOverride(playlistId, data);
       if (useCloud) {
         try {
-          await supabase.upsertOverride(playlistId, data);
+          await cloudflare.upsertOverride(playlistId, data);
         } catch {
           /* local fallback ok */
         }
@@ -79,24 +169,21 @@ export function AdminDataProvider({ children }) {
     [bump, useCloud],
   );
 
-  // ── Materials ────────────────────────────────────────────────────────────────
+  // ── Materials ─────────────────────────────────────────────────────────────
 
   const getMaterials = useCallback(
-    (playlistId) => {
-      return storage.getMaterials(playlistId);
-    },
+    (playlistId) => storage.getMaterials(playlistId),
     [version],
-  ); // eslint-disable-line
+  );
 
   const addMaterial = useCallback(
     async (playlistId, mat) => {
-      // mat may include a `file` (File object) for upload OR just a URL
       let finalMat = { ...mat };
       delete finalMat.file;
 
       if (mat.file && useCloud) {
         try {
-          const { publicUrl, size, mimeType } = await supabase.uploadFile(
+          const { publicUrl, size, mimeType } = await cloudflare.uploadFile(
             mat.file,
             playlistId,
           );
@@ -112,7 +199,7 @@ export function AdminDataProvider({ children }) {
 
       if (useCloud) {
         try {
-          const row = await supabase.insertMaterial(playlistId, {
+          const row = await cloudflare.insertMaterial(playlistId, {
             type: finalMat.type,
             label: finalMat.label,
             url: finalMat.url,
@@ -120,7 +207,6 @@ export function AdminDataProvider({ children }) {
             file_size: finalMat.file_size,
             mime_type: finalMat.mime_type,
           });
-          // Store cloud ID alongside local ID
           if (row?.id) {
             const list = storage
               .getMaterials(playlistId)
@@ -146,7 +232,7 @@ export function AdminDataProvider({ children }) {
       storage.deleteMaterial(playlistId, materialId);
       if (useCloud && mat?.cloudId) {
         try {
-          await supabase.deleteMaterial(mat.cloudId);
+          await cloudflare.deleteMaterial(mat.cloudId);
         } catch {}
       }
       bump();
@@ -154,21 +240,19 @@ export function AdminDataProvider({ children }) {
     [bump, useCloud],
   );
 
-  // ── Books ────────────────────────────────────────────────────────────────────
+  // ── Books ─────────────────────────────────────────────────────────────────
 
   const getBooks = useCallback(
-    (playlistId) => {
-      return storage.getBooks(playlistId);
-    },
+    (playlistId) => storage.getBooks(playlistId),
     [version],
-  ); // eslint-disable-line
+  );
 
   const addBook = useCallback(
     async (playlistId, book) => {
       const item = storage.addBook(playlistId, book);
       if (useCloud) {
         try {
-          const row = await supabase.insertBook(playlistId, book);
+          const row = await cloudflare.insertBook(playlistId, book);
           if (row?.id) {
             const list = storage
               .getBooks(playlistId)
@@ -189,7 +273,7 @@ export function AdminDataProvider({ children }) {
       storage.deleteBook(playlistId, bookId);
       if (useCloud && bk?.cloudId) {
         try {
-          await supabase.deleteBook(bk.cloudId);
+          await cloudflare.deleteBook(bk.cloudId);
         } catch {}
       }
       bump();
@@ -197,22 +281,47 @@ export function AdminDataProvider({ children }) {
     [bump, useCloud],
   );
 
+  const value = useMemo(
+    () => ({
+      version,
+      synced,
+      useCloud,
+      profiles,
+      getPlaylistProfile,
+      getPlaylistCategory,
+      isSpecialPlaylist,
+      getCourseData,
+      saveCourseData,
+      getMaterials,
+      addMaterial,
+      deleteMaterial,
+      getBooks,
+      addBook,
+      deleteBook,
+      syncCourseContent,
+    }),
+    [
+      version,
+      synced,
+      useCloud,
+      profiles,
+      getPlaylistProfile,
+      getPlaylistCategory,
+      isSpecialPlaylist,
+      getCourseData,
+      saveCourseData,
+      getMaterials,
+      addMaterial,
+      deleteMaterial,
+      getBooks,
+      addBook,
+      deleteBook,
+      syncCourseContent,
+    ],
+  );
+
   return (
-    <AdminDataContext.Provider
-      value={{
-        version,
-        synced,
-        useCloud,
-        getCourseData,
-        saveCourseData,
-        getMaterials,
-        addMaterial,
-        deleteMaterial,
-        getBooks,
-        addBook,
-        deleteBook,
-      }}
-    >
+    <AdminDataContext.Provider value={value}>
       {children}
     </AdminDataContext.Provider>
   );

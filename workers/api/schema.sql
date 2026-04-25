@@ -44,3 +44,27 @@ CREATE TABLE IF NOT EXISTS books (
   added_at      TEXT DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_books_playlist ON books(playlist_id);
+
+
+-- Playlist metadata from the profiler (source of truth for category, school, etc.)
+CREATE TABLE IF NOT EXISTS playlist_profiles (
+  playlist_id   TEXT PRIMARY KEY,
+  title         TEXT,
+  cleaned_title TEXT,
+  category      TEXT DEFAULT 'course',
+  school_id     TEXT,
+  program_id    TEXT,
+  course_code   TEXT,
+  course_name   TEXT,
+  instructor    TEXT,
+  semester      TEXT,
+  year          INTEGER,
+  is_incomplete INTEGER DEFAULT 0,
+  lecture_count INTEGER,
+  confidence    TEXT,
+  detection     TEXT DEFAULT '{}',
+  suggested     TEXT DEFAULT '{}',
+  updated_at    TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_profiles_category ON playlist_profiles(category);
+CREATE INDEX IF NOT EXISTS idx_profiles_school   ON playlist_profiles(school_id);
