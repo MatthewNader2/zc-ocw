@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { Play, BookOpen, CheckCircle2, FileText } from "lucide-react";
 import { getThumbnail } from "@/services/youtube";
-import autoProfiles from "@/data/auto-profiles.json";
 import { detectFromTitle, getSchool } from "@/data/coursesCatalog";
+import { getPlaylistProfile } from "@/data/profileHelpers";
 import { useAdminData } from "@/context/AdminDataContext";
 import { useProgress } from "@/context/ProgressContext";
 import { useSettings } from "@/context/SettingsContext";
@@ -29,8 +29,8 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
 
   const override = getCourseData(id);
   const auto = detectFromTitle(snippet.title);
-  const profilerData =
-    autoProfiles.results?.find((r) => r.playlistId === id)?.suggested || {};
+  const profile = getPlaylistProfile(id);
+  const profilerData = profile?.suggested || {};
 
   // 🔥 Changed ?? to || so it ignores empty strings from the admin panel!
   const schoolId =

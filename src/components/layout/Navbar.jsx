@@ -8,6 +8,7 @@ import clsx from 'clsx'
 const NAV = [
   { to: '/courses',     label: 'Courses'     },
   { to: '/departments', label: 'Departments' },
+  { to: '/interviews',  label: 'Interviews'  },
   { to: '/about',       label: 'About'       },
 ]
 

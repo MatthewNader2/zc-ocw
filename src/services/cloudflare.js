@@ -106,9 +106,9 @@ export async function insertMaterial(playlistId, mat) {
       type: mat.type,
       label: mat.label,
       url: mat.url || null,
-      fileKey: mat.fileKey || null,
-      fileSize: mat.fileSize || null,
-      mimeType: mat.mimeType || null,
+      fileKey: mat.fileKey || mat.file_path || null,
+      fileSize: mat.fileSize || mat.file_size || null,
+      mimeType: mat.mimeType || mat.mime_type || null,
     },
     admin: true,
   });
@@ -138,4 +138,61 @@ export async function insertBook(playlistId, book) {
 export async function deleteBook(id) {
   if (!isConfigured) return;
   await call(`books/${id}`, { method: "DELETE", admin: true });
+}
+
+// ── Playlist Profiles ────────────────────────────────────────────────────────
+
+export async function fetchProfiles() {
+  if (!isConfigured) return [];
+  const rows = await call("profiles");
+  return (rows ?? []).map(normalizeProfile);
+}
+
+export async function fetchProfile(playlistId) {
+  if (!isConfigured) return null;
+  const row = await call(`profiles/${playlistId}`);
+  return row ? normalizeProfile(row) : null;
+}
+
+export async function upsertProfile(playlistId, data) {
+  if (!isConfigured) return;
+  await call(`profiles/${playlistId}`, {
+    method: "PUT",
+    body: data,
+    admin: true,
+  });
+}
+
+export async function upsertProfilesBulk(profiles) {
+  if (!isConfigured) return;
+  await call("profiles", {
+    method: "PUT",
+    body: profiles,
+    admin: true,
+  });
+}
+
+// Normalize D1 row shape → app shape
+function normalizeProfile(row) {
+  return {
+    playlistId: row.playlist_id,
+    title: row.title,
+    cleanedTitle: row.cleaned_title,
+    category: row.category || "course",
+    lectureCount: row.lecture_count,
+    metadata: {
+      semester: row.semester,
+      year: row.year,
+      isIncomplete: !!row.is_incomplete,
+      extractedInstructor: row.instructor,
+    },
+    detection:
+      typeof row.detection === "string"
+        ? JSON.parse(row.detection)
+        : row.detection || {},
+    suggested:
+      typeof row.suggested === "string"
+        ? JSON.parse(row.suggested)
+        : row.suggested || {},
+  };
 }

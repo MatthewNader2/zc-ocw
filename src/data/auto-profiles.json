@@ -1,13 +1,13 @@
 {
-  "generatedAt": "2026-04-16T15:07:40.749Z",
+  "generatedAt": "2026-04-25T23:15:58.479Z",
   "stats": {
-    "high": 17,
-    "medium": 5,
-    "low": 3,
-    "none": 9,
+    "high": 19,
+    "medium": 6,
+    "low": 7,
+    "none": 2,
     "schools": {
-      "engineering": 4,
-      "science": 16,
+      "engineering": 6,
+      "science": 21,
       "business": 1
     }
   },
@@ -15,7 +15,16 @@
     {
       "playlistId": "PL-XWNe_oYcGOS4HUncbye-KU8jvsoF7ah",
       "title": "Aerodynamics - Dr. Mostafa Abdullah",
+      "cleanedTitle": "Aerodynamics",
       "lectureCount": 15,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Mostafa AbduIIah"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "SPC 307",
         "prefix": "SPC",
@@ -29,20 +38,33 @@
           "space",
           "flight mechanics"
         ],
-        "instructor": "Dr. Mostafa Abdullah",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "engineering",
         "courseCode": "SPC 307",
         "courseName": "Aerodynamics",
-        "instructor": "Dr. Mostafa Abdullah"
+        "instructor": "Dr. Mostafa AbduIIah",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGNMy9tR_OWDJct0YB3lpD29",
       "title": "Analytical Mechanics (Incomplete) - Dr. Tamer AbuElfadl",
+      "cleanedTitle": "Analytical Mechanics",
       "lectureCount": 11,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": true,
+        "extractedInstructor": "Dr. Tamer AbuElfadl"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "PHYS 204",
         "prefix": "PHYS",
@@ -56,20 +78,73 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Tamer AbuElfadl",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "PHYS 204",
         "courseName": "Analytical Mechanics",
-        "instructor": "Dr. Tamer AbuElfadl"
+        "instructor": "Dr. Tamer AbuElfadl",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": true
+      }
+    },
+    {
+      "playlistId": "PL-XWNe_oYcGM46Lmyuu1ILCtHdWsP9J0X",
+      "title": "CFP Summer School - Analytical Mechanics Mini-Course - Dr. Ahmed Aamer",
+      "cleanedTitle": "Analytical Mechanics - Course",
+      "lectureCount": 7,
+      "metadata": {
+        "semester": "Summer",
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ahmed Aamer"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
+      "detection": {
+        "code": "PHYS 204",
+        "prefix": "PHYS",
+        "name": "Analytical Mechanics",
+        "schoolId": "science",
+        "programId": "physics",
+        "programLabel": "Physics",
+        "tags": [
+          "physics",
+          "quantum mechanics",
+          "electromagnetism",
+          "astrophysics"
+        ],
+        "instructor": null,
+        "confidence": "high"
+      },
+      "suggested": {
+        "schoolId": "science",
+        "courseCode": "PHYS 204",
+        "courseName": "Analytical Mechanics",
+        "instructor": "Dr. Ahmed Aamer",
+        "semester": "Summer",
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGMgufBBqfYQrB16M21X1jT4",
       "title": "Digital Signal Processing - Dr. Mahmoud Abdelaziz",
+      "cleanedTitle": "Digital Signal Processing",
       "lectureCount": 11,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Mahmoud Abdelaziz"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "CIE 247",
         "prefix": "CIE",
@@ -83,20 +158,33 @@
           "signal processing",
           "engineering"
         ],
-        "instructor": "Dr. Mahmoud Abdelaziz",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "engineering",
         "courseCode": "CIE 247",
         "courseName": "Digital Signal Processing",
-        "instructor": "Dr. Mahmoud Abdelaziz"
+        "instructor": "Dr. Mahmoud Abdelaziz",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGP7KQBJO2zVo9Aohd4BqULu",
       "title": "Electrodynamics I - Dr. Tamer AbuElfadl",
+      "cleanedTitle": "Electrodynamics I",
       "lectureCount": 22,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Tamer AbuElfadl"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "PHYS 208",
         "prefix": "PHYS",
@@ -110,20 +198,33 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Tamer AbuElfadl",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "PHYS 208",
         "courseName": "Electrodynamics I",
-        "instructor": "Dr. Tamer AbuElfadl"
+        "instructor": "Dr. Tamer AbuElfadl",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGPQX2VCxONQgtAGsJspb0IZ",
       "title": "Information Theory and Coding - Dr. Mahmoud Abdelaziz",
+      "cleanedTitle": "Information Theory and Coding",
       "lectureCount": 9,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Mahmoud Abdelaziz"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "CIE 347",
         "prefix": "CIE",
@@ -137,20 +238,33 @@
           "signal processing",
           "engineering"
         ],
-        "instructor": "Dr. Mahmoud Abdelaziz",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "engineering",
         "courseCode": "CIE 347",
         "courseName": "Information Theory and Coding",
-        "instructor": "Dr. Mahmoud Abdelaziz"
+        "instructor": "Dr. Mahmoud Abdelaziz",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGOX9I1B52EC8ha35jFH7lrY",
       "title": "Introduction to Cosmology - Dr. Moataz Emam",
+      "cleanedTitle": "Introduction to Cosmology",
       "lectureCount": 20,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Moataz Emam"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "PHYS 405",
         "prefix": "PHYS",
@@ -164,20 +278,33 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Moataz Emam",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "PHYS 405",
         "courseName": "Cosmology",
-        "instructor": "Dr. Moataz Emam"
+        "instructor": "Dr. Moataz Emam",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGMg3b2x4xpv_AptvvY-Z86g",
       "title": "Introduction to Electromagnetism - Dr. Amr Mohamed",
+      "cleanedTitle": "Introduction to Electromagnetism",
       "lectureCount": 10,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Amr Mohamed"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "PHYS 102",
         "prefix": "PHYS",
@@ -191,20 +318,33 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Amr Mohamed",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "PHYS 102",
         "courseName": "Introduction to Electromagnetism",
-        "instructor": "Dr. Amr Mohamed"
+        "instructor": "Dr. Amr Mohamed",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGP-ZoRaODBHsRCQltIHKq6A",
       "title": "Linear Algebra and Vector Geometry - Dr. Hatem Fayed",
+      "cleanedTitle": "Linear Algebra and Vector Geometry",
       "lectureCount": 23,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Hatem Fayed"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "MATH 201",
         "prefix": "MATH",
@@ -218,20 +358,33 @@
           "linear algebra",
           "statistics"
         ],
-        "instructor": "Dr. Hatem Fayed",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "general",
         "courseCode": "MATH 201",
         "courseName": "Linear Algebra and Vector Geometry",
-        "instructor": "Dr. Hatem Fayed"
+        "instructor": "Dr. Hatem Fayed",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGPNEZGQHj1G_meW5wytbj5J",
       "title": "Mathematical Physics I - Dr. Ali Nassar",
+      "cleanedTitle": "Mathematical Physics I",
       "lectureCount": 29,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "PHYS 316",
         "prefix": "PHYS",
@@ -245,24 +398,37 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Ali Nassar",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "PHYS 316",
         "courseName": "Mathematical Physics I",
-        "instructor": "Dr. Ali Nassar"
+        "instructor": "Dr. Ali Nassar",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGOnRvkXNBOJbUXGFrSneeXd",
       "title": "Mathematical Physics II (Spring 2020) - Dr. Ali Nassar",
+      "cleanedTitle": "Mathematical Physics I",
       "lectureCount": 27,
+      "metadata": {
+        "semester": "Spring",
+        "year": 2020,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
-        "code": "PHYS 326",
+        "code": "PHYS 316",
         "prefix": "PHYS",
-        "name": "Mathematical Physics II",
+        "name": "Mathematical Physics I",
         "schoolId": "science",
         "programId": "physics",
         "programLabel": "Physics",
@@ -272,24 +438,37 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Ali Nassar",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
-        "courseCode": "PHYS 326",
-        "courseName": "Mathematical Physics II",
-        "instructor": "Dr. Ali Nassar"
+        "courseCode": "PHYS 316",
+        "courseName": "Mathematical Physics I",
+        "instructor": "Dr. Ali Nassar",
+        "semester": "Spring",
+        "year": 2020,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGMao-Yrsd_bB5QrwElkdmc1",
       "title": "Mathematical Physics III - Dr. Ali Nassar",
+      "cleanedTitle": "Mathematical Physics I",
       "lectureCount": 23,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
-        "code": "PHYS 455",
+        "code": "PHYS 316",
         "prefix": "PHYS",
-        "name": "Mathematical Physics III",
+        "name": "Mathematical Physics I",
         "schoolId": "science",
         "programId": "physics",
         "programLabel": "Physics",
@@ -299,20 +478,73 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Ali Nassar",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
-        "courseCode": "PHYS 455",
-        "courseName": "Mathematical Physics III",
-        "instructor": "Dr. Ali Nassar"
+        "courseCode": "PHYS 316",
+        "courseName": "Mathematical Physics I",
+        "instructor": "Dr. Ali Nassar",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
+      }
+    },
+    {
+      "playlistId": "PL-XWNe_oYcGPn9d_2D5YN5uTiZmzza0Qt",
+      "title": "Mathematical Physics ll (Spring 2018) - Dr. Ali Nassar",
+      "cleanedTitle": "Mathematical Physics I",
+      "lectureCount": 21,
+      "metadata": {
+        "semester": "Spring",
+        "year": 2018,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
+      "detection": {
+        "code": "PHYS 316",
+        "prefix": "PHYS",
+        "name": "Mathematical Physics I",
+        "schoolId": "science",
+        "programId": "physics",
+        "programLabel": "Physics",
+        "tags": [
+          "physics",
+          "quantum mechanics",
+          "electromagnetism",
+          "astrophysics"
+        ],
+        "instructor": null,
+        "confidence": "high"
+      },
+      "suggested": {
+        "schoolId": "science",
+        "courseCode": "PHYS 316",
+        "courseName": "Mathematical Physics I",
+        "instructor": "Dr. Ali Nassar",
+        "semester": "Spring",
+        "year": 2018,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGPmJEbTx8UDLZkwT1LKC-pq",
       "title": "Modern Physics - Dr. Tarek Ibrahim",
+      "cleanedTitle": "Modern Physics",
       "lectureCount": 17,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Tarek Ibrahim"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "PHYS 202",
         "prefix": "PHYS",
@@ -326,20 +558,33 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Tarek Ibrahim",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "PHYS 202",
         "courseName": "Modern Physics",
-        "instructor": "Dr. Tarek Ibrahim"
+        "instructor": "Dr. Tarek Ibrahim",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGOkjUerkx2IQVrnvEkh9me4",
       "title": "Ordinary Differential Equations - Dr. Ahmed Abdel Samea",
+      "cleanedTitle": "Ordinary Differential Equations",
       "lectureCount": 24,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ahmed Abdel Samea"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "MATH 202",
         "prefix": "MATH",
@@ -353,20 +598,33 @@
           "linear algebra",
           "statistics"
         ],
-        "instructor": "Dr. Ahmed Abdel Samea",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "general",
         "courseCode": "MATH 202",
         "courseName": "Ordinary Differential Equations",
-        "instructor": "Dr. Ahmed Abdel Samea"
+        "instructor": "Dr. Ahmed Abdel Samea",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGPhVkFUsOgyBlH_buLYO3-J",
       "title": "Organic Chemistry II - Dr. Abdelrahman S. Mayhoub",
+      "cleanedTitle": "Organic Chemistry II",
       "lectureCount": 19,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Abdelrahman S. Mayhoub"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "CHEM 203",
         "prefix": "CHEM",
@@ -379,20 +637,33 @@
           "organic chemistry",
           "analytical chemistry"
         ],
-        "instructor": "Dr. Abdelrahman S. Mayhoub",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "CHEM 203",
         "courseName": "Organic Chemistry II",
-        "instructor": "Dr. Abdelrahman S. Mayhoub"
+        "instructor": "Dr. Abdelrahman S. Mayhoub",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGNTdsQ57exHIfw9cz5A8XAl",
       "title": "Partial Differential Equations and Complex Analysis - Dr. Ahmed Abdel Samea",
+      "cleanedTitle": "Partial Differential Equations and Complex Analysis",
       "lectureCount": 27,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ahmed Abdel Samea"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "MATH 302",
         "prefix": "MATH",
@@ -406,24 +677,37 @@
           "linear algebra",
           "statistics"
         ],
-        "instructor": "Dr. Ahmed Abdel Samea",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "general",
         "courseCode": "MATH 302",
         "courseName": "Partial Differential Equations and Complex Analysis",
-        "instructor": "Dr. Ahmed Abdel Samea"
+        "instructor": "Dr. Ahmed Abdel Samea",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGMgJC-hRSTO-HaNNlsFRYbe",
       "title": "Quantum Mechanics II - Dr. Ali Nassar",
+      "cleanedTitle": "Quantum Mechanics I",
       "lectureCount": 32,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
-        "code": "PHYS 348",
+        "code": "PHYS 323",
         "prefix": "PHYS",
-        "name": "Quantum Mechanics II",
+        "name": "Quantum Mechanics I",
         "schoolId": "science",
         "programId": "physics",
         "programLabel": "Physics",
@@ -433,24 +717,37 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Ali Nassar",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
-        "courseCode": "PHYS 348",
-        "courseName": "Quantum Mechanics II",
-        "instructor": "Dr. Ali Nassar"
+        "courseCode": "PHYS 323",
+        "courseName": "Quantum Mechanics I",
+        "instructor": "Dr. Ali Nassar",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGOPM3y3HWuKLH7KoT147Lka",
       "title": "Quantum Mechanics III - Dr. Ali Nassar",
+      "cleanedTitle": "Quantum Mechanics I",
       "lectureCount": 29,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
-        "code": "PHYS 430",
+        "code": "PHYS 323",
         "prefix": "PHYS",
-        "name": "Quantum Mechanics III",
+        "name": "Quantum Mechanics I",
         "schoolId": "science",
         "programId": "physics",
         "programLabel": "Physics",
@@ -460,20 +757,72 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Ali Nassar",
+        "instructor": null,
         "confidence": "high"
       },
       "suggested": {
         "schoolId": "science",
-        "courseCode": "PHYS 430",
-        "courseName": "Quantum Mechanics III",
-        "instructor": "Dr. Ali Nassar"
+        "courseCode": "PHYS 323",
+        "courseName": "Quantum Mechanics I",
+        "instructor": "Dr. Ali Nassar",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
+      }
+    },
+    {
+      "playlistId": "PL-XWNe_oYcGPodH9iExm08-ypB2hwf6_r",
+      "title": "CFP Summer School - Quantum Mechanics Mini-Course - Dr. Tarek Ibrahim",
+      "cleanedTitle": "Quantum Mechanics Mini - Course",
+      "lectureCount": 10,
+      "metadata": {
+        "semester": "Summer",
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Tarek Ibrahim"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
+      "detection": {
+        "code": "NANOSC 303",
+        "prefix": "NANOSC",
+        "name": "Quantum Mechanics",
+        "schoolId": "science",
+        "programId": "nanosc",
+        "programLabel": "Nanoscience",
+        "tags": [
+          "nanoscience",
+          "nanotechnology",
+          "quantum",
+          "materials"
+        ],
+        "instructor": null,
+        "confidence": "medium"
+      },
+      "suggested": {
+        "schoolId": "science",
+        "courseCode": "NANOSC 303",
+        "courseName": "Quantum Mechanics",
+        "instructor": "Dr. Tarek Ibrahim",
+        "semester": "Summer",
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGP3IcpymdAmis9ZIprn8Trr",
       "title": "Integrated Silicone Photonics",
       "lectureCount": 23,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": null
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "NANENG 470",
         "prefix": "NANENG",
@@ -494,13 +843,26 @@
         "schoolId": "engineering",
         "courseCode": "NANENG 470",
         "courseName": "Introduction to Silicon Integrated Photonics",
-        "instructor": null
+        "instructor": null,
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGOxqoHMlBLCUNui5xVdadfn",
       "title": "Introduction to Gravity & General Relativity - Dr. Tarek Ibrahim",
+      "cleanedTitle": "Introduction to Gravity & General Relativity",
       "lectureCount": 51,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Tarek Ibrahim"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "PHYS 453",
         "prefix": "PHYS",
@@ -514,20 +876,33 @@
           "electromagnetism",
           "astrophysics"
         ],
-        "instructor": "Dr. Tarek Ibrahim",
+        "instructor": null,
         "confidence": "medium"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "PHYS 453",
         "courseName": "Gravity & General Relativity",
-        "instructor": "Dr. Tarek Ibrahim"
+        "instructor": "Dr. Tarek Ibrahim",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGNgFlHdOarAnYZvkusmDSq_",
       "title": "Linear & Nonlinear Programming - Dr. Ahmed AbdelSamea",
+      "cleanedTitle": "Linear & Nonlinear Programming",
       "lectureCount": 23,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ahmed AbdelSamea"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "BGEN 210",
         "prefix": "BGEN",
@@ -536,20 +911,33 @@
         "programId": "finance",
         "programLabel": "Finance",
         "tags": [],
-        "instructor": "Dr. Ahmed AbdelSamea",
+        "instructor": null,
         "confidence": "medium"
       },
       "suggested": {
         "schoolId": "business",
         "courseCode": "BGEN 210",
         "courseName": "Programming",
-        "instructor": "Dr. Ahmed AbdelSamea"
+        "instructor": "Dr. Ahmed AbdelSamea",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGMsyY2F8req12CcpFkyWrc4",
       "title": "Principles of Biochemistry - Dr. Reem Arafa",
+      "cleanedTitle": "Principles of Biochemistry",
       "lectureCount": 20,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Reem Arafa"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "BMS 204",
         "prefix": "BMS",
@@ -563,20 +951,33 @@
           "medicine",
           "pharmacology"
         ],
-        "instructor": "Dr. Reem Arafa",
+        "instructor": null,
         "confidence": "medium"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "BMS 204",
         "courseName": "Biochemistry",
-        "instructor": "Dr. Reem Arafa"
+        "instructor": "Dr. Reem Arafa",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGPBZ4s0w_oBea058D7RkqF-",
       "title": "Relativistic Quantum Mechanics - Dr. Ali Nassar",
+      "cleanedTitle": "Relativistic Quantum Mechanics",
       "lectureCount": 23,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": "NANOSC 303",
         "prefix": "NANOSC",
@@ -590,44 +991,155 @@
           "quantum",
           "materials"
         ],
-        "instructor": "Dr. Ali Nassar",
+        "instructor": null,
         "confidence": "medium"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": "NANOSC 303",
         "courseName": "Quantum Mechanics",
-        "instructor": "Dr. Ali Nassar"
+        "instructor": "Dr. Ali Nassar",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
-      "playlistId": "PL-XWNe_oYcGPn9d_2D5YN5uTiZmzza0Qt",
-      "title": "Mathematical Physics ll (Spring 2018) - Dr. Ali Nassar",
-      "lectureCount": 21,
+      "playlistId": "PL-XWNe_oYcGMD_p59wKD24Q9T67RMOau0",
+      "title": "Advanced RF/Mixed Signal ICs",
+      "lectureCount": 20,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": null
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
+        "confidence": "low",
+        "schoolId": "engineering",
         "code": null,
-        "prefix": null,
-        "name": null,
+        "name": "Advanced RF/Mixed Signal ICs",
+        "instructor": null
+      },
+      "suggested": {
+        "schoolId": "engineering",
+        "courseCode": null,
+        "courseName": "Advanced RF/Mixed Signal ICs",
+        "instructor": null,
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
+      }
+    },
+    {
+      "playlistId": "PL-XWNe_oYcGOubrIpkn-TwXaFfeyzo9NB",
+      "title": "CFP Summer School - Electrodynamics Mini-Course - Dr. Ali Nassar",
+      "cleanedTitle": "Electrodynamics Mini - Course",
+      "lectureCount": 10,
+      "metadata": {
+        "semester": "Summer",
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Ali Nassar"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
+      "detection": {
+        "confidence": "low",
         "schoolId": "science",
-        "programId": "physics",
-        "programLabel": "Physics",
-        "tags": [
-          "physics"
-        ],
-        "instructor": "Dr. Ali Nassar",
-        "confidence": "low"
+        "code": null,
+        "name": "Electrodynamics Mini - Course",
+        "instructor": "Dr. Ali Nassar"
       },
       "suggested": {
         "schoolId": "science",
         "courseCode": null,
-        "courseName": null,
-        "instructor": "Dr. Ali Nassar"
+        "courseName": "Electrodynamics Mini - Course",
+        "instructor": "Dr. Ali Nassar",
+        "semester": "Summer",
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
+      }
+    },
+    {
+      "playlistId": "PL-XWNe_oYcGOYr20-1GtFIhzi783IJUhf",
+      "title": "CFP Summer School - Statistical Mechanics Mini-Course - Dr. Mohamed Abbas",
+      "cleanedTitle": "Statistical Mechanics Mini - Course",
+      "lectureCount": 9,
+      "metadata": {
+        "semester": "Summer",
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Mohamed Abbas"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
+      "detection": {
+        "confidence": "low",
+        "schoolId": "science",
+        "code": null,
+        "name": "Statistical Mechanics Mini - Course",
+        "instructor": "Dr. Mohamed Abbas"
+      },
+      "suggested": {
+        "schoolId": "science",
+        "courseCode": null,
+        "courseName": "Statistical Mechanics Mini - Course",
+        "instructor": "Dr. Mohamed Abbas",
+        "semester": "Summer",
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
+      }
+    },
+    {
+      "playlistId": "PL-XWNe_oYcGPXF5Cd8P0oFvTFIB-7tV_z",
+      "title": "Introduction to Special Theory of Relativity - Dr. Tarek Ibrahim",
+      "cleanedTitle": "Introduction to Special Theory of Relativity",
+      "lectureCount": 12,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": "Dr. Tarek Ibrahim"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
+      "detection": {
+        "confidence": "low",
+        "schoolId": "science",
+        "code": null,
+        "name": "Introduction to Special Theory of Relativity",
+        "instructor": "Dr. Tarek Ibrahim"
+      },
+      "suggested": {
+        "schoolId": "science",
+        "courseCode": null,
+        "courseName": "Introduction to Special Theory of Relativity",
+        "instructor": "Dr. Tarek Ibrahim",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGMITxqMst7Va00o4RSclxCd",
       "title": "Physics Club - Zewail City (General Lectures)",
       "lectureCount": 6,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": null
+      },
+      "category": "club",
+      "categoryLabel": "Physics Club",
       "detection": {
         "code": null,
         "prefix": null,
@@ -645,13 +1157,56 @@
         "schoolId": "science",
         "courseCode": null,
         "courseName": null,
+        "instructor": null,
+        "semester": null,
+        "year": null,
+        "category": "club",
+        "isIncomplete": false
+      }
+    },
+    {
+      "playlistId": "PL-XWNe_oYcGP3H4DI9i4bHO0pzPC79rlW",
+      "title": "Public Lectures",
+      "lectureCount": 5,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": null
+      },
+      "category": "public-lectures",
+      "categoryLabel": "Public Lectures",
+      "detection": {
+        "confidence": "low",
+        "schoolId": "engineering",
+        "code": null,
+        "name": "Public Lectures",
         "instructor": null
+      },
+      "suggested": {
+        "schoolId": "engineering",
+        "courseCode": null,
+        "courseName": "Public Lectures",
+        "instructor": null,
+        "semester": null,
+        "year": null,
+        "category": "public-lectures",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGNlR0qsVGBLATsJ56nLw_lh",
       "title": "Vector Calculus (Incomplete) - Dr. Tamer AbuElfadl",
+      "cleanedTitle": "Vector Calculus",
       "lectureCount": 7,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": true,
+        "extractedInstructor": "Dr. Tamer AbuElfadl"
+      },
+      "category": "course",
+      "categoryLabel": "Course",
       "detection": {
         "code": null,
         "prefix": null,
@@ -662,212 +1217,70 @@
         "tags": [
           "calculus"
         ],
-        "instructor": "Dr. Tamer AbuElfadl",
+        "instructor": null,
         "confidence": "low"
       },
       "suggested": {
         "schoolId": "general",
         "courseCode": null,
         "courseName": null,
-        "instructor": "Dr. Tamer AbuElfadl"
-      }
-    },
-    {
-      "playlistId": "PL-XWNe_oYcGMD_p59wKD24Q9T67RMOau0",
-      "title": "Advanced RF/Mixed Signal ICs",
-      "lectureCount": 20,
-      "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
-        "instructor": null,
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": null
-      }
-    },
-    {
-      "playlistId": "PL-XWNe_oYcGM46Lmyuu1ILCtHdWsP9J0X",
-      "title": "CFP Summer School - Analytical Mechanics Mini-Course - Dr. Ahmed Aamer",
-      "lectureCount": 7,
-      "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
-        "instructor": "Dr. Ahmed Aamer",
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": "Dr. Ahmed Aamer"
-      }
-    },
-    {
-      "playlistId": "PL-XWNe_oYcGOubrIpkn-TwXaFfeyzo9NB",
-      "title": "CFP Summer School - Electrodynamics Mini-Course - Dr. Ali Nassar",
-      "lectureCount": 10,
-      "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
-        "instructor": "Dr. Ali Nassar",
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": "Dr. Ali Nassar"
-      }
-    },
-    {
-      "playlistId": "PL-XWNe_oYcGPodH9iExm08-ypB2hwf6_r",
-      "title": "CFP Summer School - Quantum Mechanics Mini-Course - Dr. Tarek Ibrahim",
-      "lectureCount": 10,
-      "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
-        "instructor": "Dr. Tarek Ibrahim",
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": "Dr. Tarek Ibrahim"
-      }
-    },
-    {
-      "playlistId": "PL-XWNe_oYcGOYr20-1GtFIhzi783IJUhf",
-      "title": "CFP Summer School - Statistical Mechanics Mini-Course - Dr. Mohamed Abbas",
-      "lectureCount": 9,
-      "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
-        "instructor": "Dr. Mohamed Abbas",
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": "Dr. Mohamed Abbas"
+        "instructor": "Dr. Tamer AbuElfadl",
+        "semester": null,
+        "year": null,
+        "category": "course",
+        "isIncomplete": true
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGNTOhCpVcyFkONAevplpCND",
       "title": "Interviews",
       "lectureCount": 6,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": null
+      },
+      "category": "interviews",
+      "categoryLabel": "Interviews",
       "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
+        "confidence": "none"
+      },
+      "suggested": {
         "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
+        "courseCode": null,
+        "courseName": null,
         "instructor": null,
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": null
-      }
-    },
-    {
-      "playlistId": "PL-XWNe_oYcGPXF5Cd8P0oFvTFIB-7tV_z",
-      "title": "Introduction to Special Theory of Relativity - Dr. Tarek Ibrahim",
-      "lectureCount": 12,
-      "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
-        "instructor": "Dr. Tarek Ibrahim",
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": "Dr. Tarek Ibrahim"
+        "semester": null,
+        "year": null,
+        "category": "interviews",
+        "isIncomplete": false
       }
     },
     {
       "playlistId": "PL-XWNe_oYcGO5cO3DAso3AqMa-1xHZmR_",
       "title": "Once Upon an Undergrad",
       "lectureCount": 4,
+      "metadata": {
+        "semester": null,
+        "year": null,
+        "isIncomplete": false,
+        "extractedInstructor": null
+      },
+      "category": "special",
+      "categoryLabel": "Once Upon an Undergrad",
       "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
-        "instructor": null,
         "confidence": "none"
       },
       "suggested": {
         "schoolId": null,
         "courseCode": null,
         "courseName": null,
-        "instructor": null
-      }
-    },
-    {
-      "playlistId": "PL-XWNe_oYcGP3H4DI9i4bHO0pzPC79rlW",
-      "title": "Public Lectures",
-      "lectureCount": 5,
-      "detection": {
-        "code": null,
-        "prefix": null,
-        "name": null,
-        "schoolId": null,
-        "programId": null,
-        "programLabel": null,
-        "tags": [],
         "instructor": null,
-        "confidence": "none"
-      },
-      "suggested": {
-        "schoolId": null,
-        "courseCode": null,
-        "courseName": null,
-        "instructor": null
+        "semester": null,
+        "year": null,
+        "category": "special",
+        "isIncomplete": false
       }
     }
   ]

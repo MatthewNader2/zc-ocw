@@ -13,6 +13,7 @@ import About            from '@/pages/About'
 import Search           from '@/pages/Search'
 import Bookmarks        from '@/pages/Bookmarks'
 import SettingsPage     from '@/pages/Settings'
+import Interviews       from '@/pages/Interviews'
 import NotFound         from '@/pages/NotFound'
 import AdminLogin       from '@/pages/Admin/Login'
 import AdminDashboard   from '@/pages/Admin/Dashboard'
@@ -37,6 +38,7 @@ function AppRoutes() {
         <Route path="/departments/:schoolId/:programId"    element={<Courses />} />
         <Route path="/about"                               element={<About />} />
         <Route path="/search"                              element={<Search />} />
+        <Route path="/interviews"                          element={<Interviews />} />
         <Route path="/bookmarks"                           element={<Bookmarks />} />
         <Route path="/settings"                            element={<SettingsPage />} />
         <Route path="/admin/login"                         element={<AdminLogin />} />

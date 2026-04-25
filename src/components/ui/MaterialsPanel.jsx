@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   FileText, Presentation, BookOpen, HelpCircle, FileCheck, CheckCircle2,
   FlaskConical, ClipboardList, Zap, Book, Video, Image, Link2, Paperclip,
@@ -39,7 +39,11 @@ function groupMaterials(list) {
 export default function MaterialsPanel({ playlistId, inAdmin = false }) {
   const { isAdmin }                                = useAuth()
   const { getMaterials, addMaterial, deleteMaterial,
-          getBooks, addBook, deleteBook, useCloud } = useAdminData()
+          getBooks, addBook, deleteBook, useCloud, syncCourseContent } = useAdminData()
+
+  useEffect(() => {
+    syncCourseContent(playlistId)
+  }, [playlistId, syncCourseContent])
 
   const materials = getMaterials(playlistId)
   const books     = getBooks(playlistId)
