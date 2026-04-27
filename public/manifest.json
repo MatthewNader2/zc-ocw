@@ -1,0 +1,9 @@
+{
+  "short_name": "ZC OCW",
+  "name": "Zewail City Open CourseWare",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#03045e",
+  "theme_color": "#03045e",
+  "icons": [{ "src": "/logo.svg", "type": "image/svg+xml", "sizes": "any" }]
+}
