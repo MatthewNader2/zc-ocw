@@ -26,17 +26,39 @@ export default function ContactUs() {
     e.preventDefault();
     setLoading(true);
     try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+
       const res = await fetch(
         `${import.meta.env.VITE_WORKER_URL}/api/feedback`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ type: "contact", ...form }),
+          signal: controller.signal,
+          credentials: "omit",
         },
       );
-      if (res.ok) setSent(true);
-    } catch {}
-    setLoading(false);
+      clearTimeout(timeout);
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Server error ${res.status}`);
+      }
+      setSent(true);
+    } catch (err) {
+      console.error("Submit failed:", err);
+      const pending = JSON.parse(
+        localStorage.getItem("zcocw_pending_feedback") || "[]",
+      );
+      pending.push({ type: "contact", ...form, timestamp: Date.now() });
+      localStorage.setItem("zcocw_pending_feedback", JSON.stringify(pending));
+      alert(
+        "Could not send right now. Your message is saved and will retry on next visit.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (sent)
@@ -69,7 +91,7 @@ export default function ContactUs() {
       </div>
       <div className="section py-12 max-w-3xl">
         <ScrollReveal>
-          <form onSubmit={submit} className="card space-y-5">
+          <form onSubmit={submit} className="card space-y-5 p-6 md:p-8">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-ink-muted mb-1.5">
