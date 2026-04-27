@@ -1,4 +1,4 @@
-import { useQuery, useInfiniteQuery } from '@tanstack/react-query'
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import {
   fetchPlaylists,
   fetchPlaylist,
@@ -6,16 +6,18 @@ import {
   fetchVideos,
   fetchChannelStats,
   searchChannel,
-} from '@/services/youtube'
-import { enrichCourse } from '@/data/courses'
+} from "@/services/youtube";
+import { enrichCourse } from "@/data/courses";
 
 // ── All playlists (= course catalog) ──────────────────────────────────────
 
 export function usePlaylists() {
   return useInfiniteQuery({
-    queryKey: ['playlists'],
-    queryFn: ({ pageParam = '' }) => fetchPlaylists({ pageToken: pageParam }),
+    queryKey: ["playlists"],
+    queryFn: ({ pageParam = "" }) => fetchPlaylists({ pageToken: pageParam }),
     getNextPageParam: (lastPage) => lastPage.nextPageToken || undefined,
+    staleTime: 1000 * 60 * 5, // 5 min
+    gcTime: 1000 * 60 * 30, // 30 min
     select: (data) => ({
       ...data,
       pages: data.pages.map((page) => ({
@@ -23,57 +25,58 @@ export function usePlaylists() {
         items: page.items.map(enrichCourse),
       })),
     }),
-  })
+  });
 }
 
 // ── Single course / playlist ──────────────────────────────────────────────
 
 export function useCourse(playlistId) {
   return useQuery({
-    queryKey: ['playlist', playlistId],
+    queryKey: ["playlist", playlistId],
     queryFn: () => fetchPlaylist(playlistId),
     enabled: !!playlistId,
     select: (data) => enrichCourse(data),
-  })
+  });
 }
 
 // ── Lectures in a course ──────────────────────────────────────────────────
 
 export function useLectures(playlistId) {
   return useQuery({
-    queryKey: ['lectures', playlistId],
+    queryKey: ["lectures", playlistId],
     queryFn: () => fetchPlaylistItems(playlistId),
     enabled: !!playlistId,
-  })
+  });
 }
 
 // ── Single video ──────────────────────────────────────────────────────────
 
 export function useVideo(videoId) {
   return useQuery({
-    queryKey: ['video', videoId],
+    queryKey: ["video", videoId],
     queryFn: () => fetchVideos([videoId]).then((items) => items[0] ?? null),
     enabled: !!videoId,
-  })
+  });
 }
 
 // ── Channel stats ─────────────────────────────────────────────────────────
 
 export function useChannelStats() {
   return useQuery({
-    queryKey: ['channelStats'],
+    queryKey: ["channelStats"],
     queryFn: fetchChannelStats,
     staleTime: 1000 * 60 * 60, // 1 hour
-  })
+    gcTime: 1000 * 60 * 60 * 2,
+  });
 }
 
 // ── Search ────────────────────────────────────────────────────────────────
 
 export function useSearch(query) {
   return useQuery({
-    queryKey: ['search', query],
+    queryKey: ["search", query],
     queryFn: () => searchChannel(query),
     enabled: !!query && query.length >= 2,
     staleTime: 1000 * 60 * 5,
-  })
+  });
 }

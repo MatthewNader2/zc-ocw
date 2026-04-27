@@ -50,6 +50,11 @@ function err(message, status = 400, cors = {}) {
 	return json({ error: message }, status, cors);
 }
 
+function sanitize(str) {
+	if (!str) return '';
+	return String(str).replace(/[<>]/g, '').slice(0, 5000);
+}
+
 // ── Auth check ──────────────────────────────────────────────────────────────
 function isAdmin(req, env) {
 	const header = req.headers.get('Authorization') || '';
@@ -432,6 +437,71 @@ export default {
 					)
 					.run();
 				return json({ ok: true }, 200, cors);
+			}
+
+			// ── POST /api/feedback ─────────────────────────────────────────────────────
+			if (resource === 'feedback' && req.method === 'POST') {
+				const body = await req.json();
+				if (!body.name || !body.email || !body.message || !body.type) {
+					return err('Name, email, message and type are required', 400, cors);
+				}
+				if (!['bug', 'contact'].includes(body.type)) {
+					return err('Type must be bug or contact', 400, cors);
+				}
+
+				const id = crypto.randomUUID();
+				await env.DB.prepare(
+					`
+    INSERT INTO feedback (id, type, name, email, category, title, subject, steps, message, browser, department)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `,
+				)
+					.bind(
+						id,
+						body.type,
+						sanitize(body.name),
+						sanitize(body.email),
+						sanitize(body.category) || null,
+						sanitize(body.title) || null,
+						sanitize(body.subject) || null,
+						sanitize(body.steps) || null,
+						sanitize(body.message),
+						sanitize(body.browser) || null,
+						sanitize(body.department) || null,
+					)
+					.run();
+
+				// Email forwarding via Resend (optional — set RESEND_API_KEY and FEEDBACK_EMAIL in worker secrets)
+				if (env.RESEND_API_KEY && env.FEEDBACK_EMAIL) {
+					try {
+						const [localPart, domain] = env.FEEDBACK_EMAIL.split('@');
+						const to = `${localPart}+${body.type}@${domain}`; // team+bug@domain.com or team+contact@domain.com
+						const subject =
+							body.type === 'bug'
+								? `[ZC-OCW-BUG] ${body.category || 'General'}: ${body.title || 'New Report'}`
+								: `[ZC-OCW-CONTACT] ${body.department || 'General'}: ${body.subject || 'New Message'}`;
+
+						await fetch('https://api.resend.com/emails', {
+							method: 'POST',
+							headers: {
+								Authorization: `Bearer ${env.RESEND_API_KEY}`,
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({
+								from: `ZC OCW <noreply@${domain}>`,
+								to,
+								subject,
+								reply_to: sanitize(body.email),
+								text: `From: ${sanitize(body.name)} <${sanitize(body.email)}>\n\n${sanitize(body.message)}\n\n${body.steps ? `Steps to reproduce:\n${sanitize(body.steps)}` : ''}\n\nBrowser: ${sanitize(body.browser) || 'N/A'}`,
+							}),
+						});
+					} catch (e) {
+						console.error('Email send failed:', e);
+						// D1 already stored it — do not fail the HTTP request
+					}
+				}
+
+				return json({ ok: true, id }, 201, cors);
 			}
 
 			// ── Health check ───────────────────────────────────────────────────

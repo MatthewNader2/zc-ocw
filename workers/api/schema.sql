@@ -68,3 +68,22 @@ CREATE TABLE IF NOT EXISTS playlist_profiles (
 );
 CREATE INDEX IF NOT EXISTS idx_profiles_category ON playlist_profiles(category);
 CREATE INDEX IF NOT EXISTS idx_profiles_school   ON playlist_profiles(school_id);
+
+
+-- Feedback / Contact / Bug reports
+CREATE TABLE IF NOT EXISTS feedback (
+  id            TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  type          TEXT NOT NULL CHECK(type IN ('bug', 'contact')),
+  name          TEXT NOT NULL,
+  email         TEXT NOT NULL,
+  category      TEXT,
+  title         TEXT,
+  subject       TEXT,
+  steps         TEXT,
+  message       TEXT NOT NULL,
+  browser       TEXT,
+  department    TEXT,
+  created_at    TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_feedback_type ON feedback(type);
+CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at);

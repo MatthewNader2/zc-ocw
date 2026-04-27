@@ -12,14 +12,16 @@ import {
 } from "lucide-react";
 import { useCourse, useLectures } from "@/hooks/useYouTube";
 import { getThumbnail } from "@/services/youtube";
-import autoProfiles from "@/data/auto-profiles.json";
 import { detectFromTitle, getSchool } from "@/data/coursesCatalog";
+import { getPlaylistProfile } from "@/data/profileHelpers";
 import { useAdminData } from "@/context/AdminDataContext";
 import { useProgress } from "@/context/ProgressContext";
 import VideoCard from "@/components/ui/VideoCard";
 import MaterialsPanel from "@/components/ui/MaterialsPanel";
 import TagBadge from "@/components/ui/TagBadge";
 import BookmarkButton from "@/components/ui/BookmarkButton";
+import ShareButton from "@/components/ui/ShareButton";
+import RelatedCourses from "@/components/sections/RelatedCourses";
 import { PageLoader, VideoCardSkeleton } from "@/components/ui/LoadingSpinner";
 import ErrorMessage from "@/components/ui/ErrorMessage";
 import ScrollReveal from "@/components/ui/ScrollReveal";
@@ -50,9 +52,10 @@ export default function CourseDetail() {
   const { snippet, contentDetails } = course;
   const override = getCourseData(playlistId);
   const auto = detectFromTitle(snippet.title);
-  const profilerData =
-    autoProfiles.results?.find((r) => r.playlistId === playlistId)?.suggested ||
-    {};
+
+  // 🆕 Use profileHelpers instead of direct JSON import
+  const profile = getPlaylistProfile(playlistId);
+  const profilerData = profile?.suggested || {};
 
   // 🔥 Changed ?? to ||
   const schoolId =
@@ -62,7 +65,8 @@ export default function CourseDetail() {
 
   const instructor =
     override.instructor || profilerData.instructor || auto?.instructor || null;
-  const semester = override.semester || null;
+  const semester = override.semester || profilerData.semester || null;
+  const year = profilerData.year || null;
   const level = override.level || null;
   const courseCode =
     override.courseCode || profilerData.courseCode || auto?.code || null;
@@ -76,11 +80,20 @@ export default function CourseDetail() {
   const progress = getCourseProgress(lectureIds);
   const firstId = lectureIds[0];
 
+  const pageUrl = `${window.location.origin}/courses/${playlistId}`;
+
   return (
     <>
       <Helmet>
         <title>{snippet.title} — ZC OCW</title>
         <meta name="description" content={description?.slice(0, 160)} />
+        <meta property="og:title" content={snippet.title} />
+        <meta property="og:description" content={description?.slice(0, 160)} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={pageUrl} />
+        {snippet.thumbnails?.high?.url && (
+          <meta property="og:image" content={snippet.thumbnails.high.url} />
+        )}
       </Helmet>
 
       {/* Thin accent line */}
@@ -118,6 +131,11 @@ export default function CourseDetail() {
                     {level}
                   </span>
                 )}
+                {year && (
+                  <span className="badge text-xs bg-white/10 text-white/60">
+                    {year}
+                  </span>
+                )}
               </div>
               <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-5">
                 {snippet.title}
@@ -138,7 +156,7 @@ export default function CourseDetail() {
                 {semester && (
                   <span className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5" />
-                    {semester}
+                    {year ? `${semester} ${year}` : semester}
                   </span>
                 )}
                 <span className="flex items-center gap-1.5">
@@ -157,7 +175,7 @@ export default function CourseDetail() {
                     <span
                       key={t}
                       className="text-[11px] font-mono font-semibold px-2.5 py-1 rounded-full
-                                             bg-white/10 text-white/70 border border-white/10"
+                                 bg-white/10 text-white/70 border border-white/10"
                     >
                       #{t}
                     </span>
@@ -176,6 +194,7 @@ export default function CourseDetail() {
                   </Link>
                 )}
                 <BookmarkButton playlistId={playlistId} size="lg" />
+                <ShareButton title={snippet.title} url={pageUrl} />
                 {progress > 0 && (
                   <div className="glass rounded-xl px-4 py-2.5 flex items-center gap-3">
                     <div
@@ -263,7 +282,10 @@ export default function CourseDetail() {
                   { label: "Lectures", val: contentDetails.itemCount },
                   level && { label: "Level", val: level },
                   instructor && { label: "Instructor", val: instructor },
-                  semester && { label: "Semester", val: semester },
+                  semester && {
+                    label: "Semester",
+                    val: year ? `${semester} ${year}` : semester,
+                  },
                   courseCode && { label: "Code", val: courseCode },
                   school &&
                     schoolId !== "general" && {
@@ -288,6 +310,9 @@ export default function CourseDetail() {
           </ScrollReveal>
         </aside>
       </div>
+
+      {/* 🆕 Related Courses */}
+      <RelatedCourses currentPlaylistId={playlistId} />
     </>
   );
 }
