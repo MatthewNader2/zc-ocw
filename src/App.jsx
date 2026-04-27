@@ -21,6 +21,7 @@ import ContactUs from "@/pages/ContactUs";
 import Acknowledgments from "@/pages/Acknowledgments";
 import NotFound from "@/pages/NotFound";
 import AdminLogin from "@/pages/Admin/Login";
+import FeedbackViewer from "@/pages/Admin/FeedbackViewer";
 
 const AdminDashboard = lazy(() => import("@/pages/Admin/Dashboard"));
 const AdminCourseEditor = lazy(() => import("@/pages/Admin/CourseEditor"));
@@ -67,6 +68,14 @@ function AppRoutes() {
               >
                 <AdminDashboard />
               </Suspense>
+            </ProtectedAdmin>
+          }
+        />
+        <Route
+          path="/admin/feedback"
+          element={
+            <ProtectedAdmin>
+              <FeedbackViewer />
             </ProtectedAdmin>
           }
         />

@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS feedback (
   message       TEXT NOT NULL,
   browser       TEXT,
   department    TEXT,
+  email_sent    INTEGER DEFAULT 0,  -- ← NEW: track if Resend email was sent
   created_at    TEXT DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_feedback_type ON feedback(type);

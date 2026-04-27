@@ -137,6 +137,14 @@ export default function Footer() {
                 <Bug className="w-3.5 h-3.5" /> Report a Bug
               </Link>
             </li>
+            <li>
+              <a
+                href="mailto:zcocw@zewailcity.edu.eg"
+                className="hover:text-ocean-300 transition-colors flex items-center gap-1.5"
+              >
+                <Mail className="w-3.5 h-3.5" /> zcocw@zewailcity.edu.eg
+              </a>
+            </li>
           </ul>
         </div>
       </div>
