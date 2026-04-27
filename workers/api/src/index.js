@@ -14,6 +14,14 @@
  * POST   /api/upload/:playlistId    → upload file to R2       [admin]
  * GET    /api/youtube/playlists     → fetch YouTube playlists (proxy)
  * GET    /api/youtube/channels      → fetch YouTube channel details (proxy)
+ * POST   /api/feedback              → submit feedback (public)
+ * GET    /api/feedback              → list feedback [admin]
+ * GET    /api/feedback/:id          → get feedback by id [admin]
+ * GET    /api/profiles              → list playlist profiles
+ * GET    /api/profiles/:id          → get profile by playlist_id
+ * PUT    /api/profiles              → bulk upsert profiles [admin]
+ * PUT    /api/profiles/:id          → upsert single profile [admin]
+ * GET    /api/health                → health check
  *
  * Authentication:
  * Admin routes require header: Authorization: Bearer YOUR_ADMIN_PASSWORD
@@ -442,6 +450,8 @@ export default {
 			// ── POST /api/feedback ─────────────────────────────────────────────────────
 			if (resource === 'feedback' && req.method === 'POST') {
 				const body = await req.json();
+
+				// Validate required fields
 				if (!body.name || !body.email || !body.message || !body.type) {
 					return err('Name, email, message and type are required', 400, cors);
 				}
@@ -450,11 +460,13 @@ export default {
 				}
 
 				const id = crypto.randomUUID();
+
+				// Store in D1 with sanitized inputs
 				await env.DB.prepare(
 					`
-    INSERT INTO feedback (id, type, name, email, category, title, subject, steps, message, browser, department)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `,
+					INSERT INTO feedback (id, type, name, email, category, title, subject, steps, message, browser, department, email_sent)
+					VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)
+				`,
 				)
 					.bind(
 						id,
@@ -471,37 +483,94 @@ export default {
 					)
 					.run();
 
-				// Email forwarding via Resend (optional — set RESEND_API_KEY and FEEDBACK_EMAIL in worker secrets)
+				// Optional: Try Resend if configured — never fail the request if email fails
 				if (env.RESEND_API_KEY && env.FEEDBACK_EMAIL) {
 					try {
-						const [localPart, domain] = env.FEEDBACK_EMAIL.split('@');
-						const to = `${localPart}+${body.type}@${domain}`; // team+bug@domain.com or team+contact@domain.com
+						const email = env.FEEDBACK_EMAIL.trim();
+						if (!email.includes('@')) throw new Error('Invalid FEEDBACK_EMAIL format');
+
+						const [localPart, domain] = email.split('@');
+						const to = `${localPart}+${body.type}@${domain}`; // e.g., team+bug@domain.com
+
 						const subject =
 							body.type === 'bug'
-								? `[ZC-OCW-BUG] ${body.category || 'General'}: ${body.title || 'New Report'}`
-								: `[ZC-OCW-CONTACT] ${body.department || 'General'}: ${body.subject || 'New Message'}`;
+								? `[ZC-OCW-BUG] ${sanitize(body.category) || 'General'}: ${sanitize(body.title) || 'New Report'}`
+								: `[ZC-OCW-CONTACT] ${sanitize(body.department) || 'General'}: ${sanitize(body.subject) || 'New Message'}`;
 
-						await fetch('https://api.resend.com/emails', {
+						const emailBody = [
+							`Type: ${body.type.toUpperCase()}`,
+							`From: ${sanitize(body.name)} <${sanitize(body.email)}>`,
+							'',
+							sanitize(body.message),
+							body.steps ? `\nSteps to reproduce:\n${sanitize(body.steps)}` : '',
+							`\nBrowser: ${sanitize(body.browser) || 'N/A'}`,
+							`\n---`,
+							`Sent from ZC OCW Feedback System`,
+						].join('\n');
+
+						const emailRes = await fetch('https://api.resend.com/emails', {
 							method: 'POST',
 							headers: {
 								Authorization: `Bearer ${env.RESEND_API_KEY}`,
 								'Content-Type': 'application/json',
 							},
 							body: JSON.stringify({
-								from: `ZC OCW <noreply@${domain}>`,
-								to,
-								subject,
+								from: `ZC OCW <onboarding@resend.dev>`,
+								to: [to],
+								subject: subject.slice(0, 998), // Resend limit
 								reply_to: sanitize(body.email),
-								text: `From: ${sanitize(body.name)} <${sanitize(body.email)}>\n\n${sanitize(body.message)}\n\n${body.steps ? `Steps to reproduce:\n${sanitize(body.steps)}` : ''}\n\nBrowser: ${sanitize(body.browser) || 'N/A'}`,
+								text: emailBody,
+								headers: {
+									'X-Feedback-Type': body.type,
+									'X-OCW-Source': 'zc-ocw-platform',
+								},
 							}),
 						});
+
+						if (emailRes.ok) {
+							await env.DB.prepare('UPDATE feedback SET email_sent = 1 WHERE id = ?').bind(id).run();
+							console.log('✅ Email sent via Resend to:', to);
+						} else {
+							const errorText = await emailRes.text().catch(() => 'unknown');
+							console.error('❌ Resend API error:', emailRes.status, errorText);
+						}
 					} catch (e) {
-						console.error('Email send failed:', e);
-						// D1 already stored it — do not fail the HTTP request
+						console.error('❌ Email send failed:', e.message);
+						// D1 already stored it — feedback is never lost
 					}
 				}
 
 				return json({ ok: true, id }, 201, cors);
+			}
+
+			// ── GET /api/feedback ── Admin only: list all feedback ─────────────────────
+			if (resource === 'feedback' && !id && req.method === 'GET') {
+				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+
+				const type = url.searchParams.get('type');
+				let sql = 'SELECT * FROM feedback';
+				const params = [];
+
+				if (type) {
+					sql += ' WHERE type = ?';
+					params.push(type);
+				}
+				sql += ' ORDER BY created_at DESC LIMIT 100';
+
+				const { results } = await env.DB.prepare(sql)
+					.bind(...params)
+					.all();
+				return json(results, 200, cors);
+			}
+
+			// ── GET /api/feedback/:id ── Admin only: get single feedback ───────────────
+			if (resource === 'feedback' && id && req.method === 'GET') {
+				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+
+				const row = await env.DB.prepare('SELECT * FROM feedback WHERE id = ?').bind(id).first();
+				if (!row) return err('Not found', 404, cors);
+
+				return json(row, 200, cors);
 			}
 
 			// ── Health check ───────────────────────────────────────────────────
