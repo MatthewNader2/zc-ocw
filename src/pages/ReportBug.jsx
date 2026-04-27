@@ -36,9 +36,14 @@ export default function ReportBug() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "bug", ...form }),
+          body: JSON.stringify({
+            type: "bug",
+            ...form,
+            // Map steps to message since worker requires it
+            message: form.steps || `${form.title} - ${form.category}`,
+          }),
           signal: controller.signal,
-          credentials: "omit", // Prevents extension cookie interference
+          credentials: "omit",
         },
       );
       clearTimeout(timeout);
