@@ -40,43 +40,60 @@ export function AdminDataProvider({ children }) {
 
     let active = true;
 
-    Promise.allSettled([
-      cloudflare.fetchProfiles(),
-      cloudflare.fetchAllOverrides(),
-    ]).then(([profilesResult, overridesResult]) => {
-      if (!active) return;
+    const syncCloudData = () => {
+      Promise.allSettled([
+        cloudflare.fetchProfiles(),
+        cloudflare.fetchAllOverrides(),
+      ]).then(([profilesResult, overridesResult]) => {
+        if (!active) return;
 
-      if (profilesResult.status === "fulfilled" && profilesResult.value?.length) {
-        setProfiles(profilesResult.value);
-        storage.set("playlist_profiles", profilesResult.value);
-      } else {
-        const cached = storage.get("playlist_profiles", []);
-        if (cached.length) setProfiles(cached);
-      }
-
-      if (overridesResult.status === "fulfilled" && overridesResult.value) {
-        const all = {};
-        for (const row of overridesResult.value) {
-          all[row.playlist_id] = {
-            schoolId: row.school_id,
-            programId: row.program_id,
-            courseCode: row.course_code,
-            instructor: row.instructor,
-            semester: row.semester,
-            level: row.level,
-            description: row.description,
-            tags: row.tags ?? [],
-          };
+        if (profilesResult.status === "fulfilled" && profilesResult.value?.length) {
+          setProfiles(profilesResult.value);
+          storage.set("playlist_profiles", profilesResult.value);
+        } else {
+          const cached = storage.get("playlist_profiles", []);
+          if (cached.length) setProfiles(cached);
         }
-        storage.set("course_overrides", all);
-      }
 
-      setSynced(true);
-      bump();
-    });
+        if (overridesResult.status === "fulfilled" && overridesResult.value) {
+          const all = {};
+          for (const row of overridesResult.value) {
+            all[row.playlist_id] = {
+              schoolId: row.school_id,
+              programId: row.program_id,
+              courseCode: row.course_code,
+              instructor: row.instructor,
+              semester: row.semester,
+              level: row.level,
+              description: row.description,
+              tags: row.tags ?? [],
+            };
+          }
+          storage.set("course_overrides", all);
+        }
+
+        setSynced(true);
+        bump();
+      });
+    };
+
+    let idleId = null;
+    let timerId = null;
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(syncCloudData, { timeout: 2000 });
+    } else {
+      timerId = setTimeout(syncCloudData, 100);
+    }
 
     return () => {
       active = false;
+      if (idleId !== null && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timerId !== null) {
+        clearTimeout(timerId);
+      }
     };
   }, [bump]);
 
