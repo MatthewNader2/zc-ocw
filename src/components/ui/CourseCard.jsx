@@ -139,7 +139,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
       </div>
 
       {/* Body */}
-      <div className="flex-1 flex flex-col p-4 gap-2">
+      <div className="flex-1 flex flex-col p-4 gap-2 bg-white dark:bg-slate-900/90 transition-colors duration-300">
         {/* School badge + code */}
         <div className="flex items-center gap-2 flex-wrap">
           {school && schoolId !== "general" && (
@@ -151,12 +151,12 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
             </span>
           )}
           {courseCode && (
-            <span className="font-mono text-[11px] text-ink-ghost">
+            <span className="font-mono text-[11px] text-ink-ghost dark:text-slate-400">
               {courseCode}
             </span>
           )}
           {level && (
-            <span className="ml-auto text-[11px] font-semibold text-ink-ghost bg-slate-100 px-2 py-0.5 rounded-full">
+            <span className="ml-auto text-[11px] font-semibold text-ink-ghost dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
               {level}
             </span>
           )}
@@ -164,16 +164,16 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
 
         {/* Title */}
         <h3
-          className="font-display font-bold text-[15px] text-ink leading-snug line-clamp-2
-                       transition-colors duration-200 group-hover:text-ocean-600"
+          className="font-display font-bold text-[15px] text-ink dark:text-white leading-snug line-clamp-2
+                       transition-colors duration-200 group-hover:text-ocean-600 dark:group-hover:text-ocean-400"
         >
           {snippet.title}
         </h3>
 
         {/* Instructor */}
         {instructor && (
-          <p className="text-xs text-ink-ghost flex items-center gap-1.5">
-            <BookOpen className="w-3 h-3" />
+          <p className="text-xs text-ink-ghost dark:text-slate-400 flex items-center gap-1.5">
+            <BookOpen className="w-3 h-3 text-ocean-500" />
             {instructor}
           </p>
         )}
@@ -185,7 +185,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
               <span
                 key={t}
                 className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full
-                                       bg-ocean-50 text-ocean-600 border border-ocean-100"
+                                       bg-ocean-50 text-ocean-600 dark:bg-ocean-950/70 dark:text-ocean-300 border border-ocean-100 dark:border-ocean-800/50"
               >
                 #{t}
               </span>
@@ -197,7 +197,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
         {progress > 0 && (
           <div className="mt-auto pt-2">
             <div className="flex justify-between text-[10px] mb-1">
-              <span className="text-ink-ghost">Progress</span>
+              <span className="text-ink-ghost dark:text-slate-400">Progress</span>
               <span
                 className="font-mono font-bold"
                 style={{ color: accent.bg }}
@@ -205,7 +205,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
                 {progress}%
               </span>
             </div>
-            <div className="progress-track">
+            <div className="progress-track dark:bg-slate-800">
               <div
                 className="progress-fill"
                 style={{ width: `${progress}%`, background: accent.bg }}
@@ -215,8 +215,8 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 mt-auto text-xs">
-          <span className="text-ink-ghost">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 mt-auto text-xs">
+          <span className="text-ink-ghost dark:text-slate-400">
             {contentDetails.itemCount} lectures
           </span>
           <span
