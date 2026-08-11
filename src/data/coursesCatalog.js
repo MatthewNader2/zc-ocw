@@ -737,10 +737,32 @@ export function detectFromTitle(title) {
     const match = title.match(pattern);
     if (match) {
       prefix = match[1];
-      code = `${prefix} ${match[2]}`;
+      const numStr = match[2];
+      code = `${prefix} ${numStr}`;
       confidence = "high";
       courseName = COURSE_LOOKUP[code] || null;
-      break;
+
+      const numVal = parseInt(numStr, 10);
+      const level = !isNaN(numVal) && numVal >= 500 ? "Graduate" : "Undergraduate";
+
+      const info = PREFIX_MAP[prefix];
+      if (info) {
+        schoolId = info.schoolId;
+        programId = info.programId;
+        programLabel = info.programLabel;
+      }
+      return {
+        code,
+        prefix,
+        name: courseName || title,
+        schoolId,
+        programId,
+        programLabel,
+        level,
+        tags: PREFIX_TAGS[prefix] || [],
+        instructor,
+        confidence,
+      };
     }
   }
 

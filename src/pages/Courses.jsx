@@ -56,7 +56,12 @@ export default function Courses() {
 
       const sid = ov.schoolId ?? prof?.suggested?.schoolId ?? prof?.detection?.schoolId ?? au?.schoolId ?? null;
       const pid = ov.programId ?? prof?.suggested?.programId ?? prof?.detection?.programId ?? au?.programId ?? null;
-      const lv = ov.level ?? null;
+
+      const codeStr = ov.courseCode ?? prof?.suggested?.courseCode ?? prof?.detection?.code ?? au?.code ?? "";
+      const numMatch = codeStr.match(/\d{3}/);
+      const inferredLevel = numMatch && parseInt(numMatch[0], 10) >= 500 ? "Graduate" : "Undergraduate";
+      const lv = ov.level ?? prof?.suggested?.level ?? prof?.detection?.level ?? au?.level ?? inferredLevel;
+
       return (
         (schoolFilter === "all" || sid === schoolFilter) &&
         (!slugProgram || pid === slugProgram) &&
