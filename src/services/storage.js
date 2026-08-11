@@ -192,3 +192,11 @@ export function isBookmarked(playlistId) {
 export function getNote(videoId)         { return get(`note_${videoId}`, '') }
 export function saveNote(videoId, text)  { set(`note_${videoId}`, text) }
 export function deleteNote(videoId)      { remove(`note_${videoId}`) }
+
+// ── Custom Schools & Programs ─────────────────────────────────────────────────
+
+export function getCustomSchools() { return get('custom_schools', []) }
+export function saveCustomSchools(schools) { set('custom_schools', schools) }
+
+export function getCustomPrograms() { return get('custom_programs', {}) }
+export function saveCustomPrograms(programs) { set('custom_programs', programs) }

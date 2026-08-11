@@ -33,7 +33,7 @@ export default function Courses() {
   const [levelFilter, setLevelFilter] = useState("All levels");
   const [schoolFilter, setSchoolFilter] = useState(slugSchool || "all");
   const loadMoreRef = useRef(null);
-  const { getCourseData, version } = useAdminData();
+  const { getCourseData, version, allSchools, allPrograms, customSchools } = useAdminData();
 
   const {
     data,
@@ -86,12 +86,12 @@ export default function Courses() {
     if (slugSchool) setSchoolFilter(slugSchool);
   }, [slugSchool]);
 
-  const school = slugSchool ? getSchool(slugSchool) : null;
-  const programs = slugSchool ? (PROGRAMS[slugSchool] ?? []) : [];
+  const school = slugSchool ? getSchool(slugSchool, customSchools) : null;
+  const programs = slugSchool ? (allPrograms[slugSchool] ?? []) : [];
   const program = slugProgram
     ? programs.find((p) => p.id === slugProgram)
     : null;
-  const accent = slugSchool ? SCHOOL_ACCENT[slugSchool] : null;
+  const accent = school?.accent ?? (slugSchool ? SCHOOL_ACCENT[slugSchool] : null);
   const pageTitle = program?.label ?? school?.label ?? "All Courses";
 
   return (
@@ -110,7 +110,7 @@ export default function Courses() {
               <span className="text-3xl">{school.icon}</span>
               <span
                 className="badge text-xs text-white"
-                style={{ backgroundColor: accent }}
+                style={{ backgroundColor: accent || '#0284c7' }}
               >
                 {school.short}
               </span>
@@ -138,7 +138,7 @@ export default function Courses() {
             <div className="flex flex-wrap gap-1.5">
               {[
                 { id: "all", label: "All Schools", icon: "🎓", accent: null },
-                ...SCHOOLS.filter((s) => s.id !== "general"),
+                ...allSchools.filter((s) => s.id !== "general"),
               ].map((s) => (
                 <button
                   key={s.id}
@@ -153,7 +153,7 @@ export default function Courses() {
                   )}
                   style={
                     schoolFilter === s.id && s.id !== "all"
-                      ? { backgroundColor: SCHOOL_ACCENT[s.id] }
+                      ? { backgroundColor: s.accent || SCHOOL_ACCENT[s.id] || '#0284c7' }
                       : {}
                   }
                 >

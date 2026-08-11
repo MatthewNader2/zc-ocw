@@ -16,6 +16,7 @@ import {
 } from "react";
 import * as storage from "@/services/storage";
 import * as cloudflare from "@/services/cloudflare";
+import { getCombinedSchools, getCombinedPrograms } from "@/data/coursesCatalog";
 
 const AdminDataContext = createContext(null);
 
@@ -28,8 +29,68 @@ export function AdminDataProvider({ children }) {
     // Hydrate from localStorage on first render to avoid flash
     return storage.get("playlist_profiles", []);
   });
+  const [customSchools, setCustomSchools] = useState(() => storage.getCustomSchools());
+  const [customPrograms, setCustomPrograms] = useState(() => storage.getCustomPrograms());
 
   const bump = useCallback(() => setVersion((v) => v + 1), []);
+
+  // ── Custom Schools & Programs CRUD ────────────────────────────────────────
+
+  const addCustomSchool = useCallback((school) => {
+    setCustomSchools((prev) => {
+      const next = [...prev.filter((s) => s.id !== school.id), school];
+      storage.saveCustomSchools(next);
+      return next;
+    });
+    bump();
+  }, [bump]);
+
+  const deleteCustomSchool = useCallback((schoolId) => {
+    setCustomSchools((prev) => {
+      const next = prev.filter((s) => s.id !== schoolId);
+      storage.saveCustomSchools(next);
+      return next;
+    });
+    setCustomPrograms((prev) => {
+      const next = { ...prev };
+      delete next[schoolId];
+      storage.saveCustomPrograms(next);
+      return next;
+    });
+    bump();
+  }, [bump]);
+
+  const addCustomProgram = useCallback((schoolId, program) => {
+    setCustomPrograms((prev) => {
+      const schoolProgs = prev[schoolId] ?? [];
+      const nextProgs = [...schoolProgs.filter((p) => p.id !== program.id), program];
+      const next = { ...prev, [schoolId]: nextProgs };
+      storage.saveCustomPrograms(next);
+      return next;
+    });
+    bump();
+  }, [bump]);
+
+  const deleteCustomProgram = useCallback((schoolId, programId) => {
+    setCustomPrograms((prev) => {
+      const schoolProgs = prev[schoolId] ?? [];
+      const nextProgs = schoolProgs.filter((p) => p.id !== programId);
+      const next = { ...prev, [schoolId]: nextProgs };
+      storage.saveCustomPrograms(next);
+      return next;
+    });
+    bump();
+  }, [bump]);
+
+  const allSchools = useMemo(
+    () => getCombinedSchools(customSchools),
+    [customSchools]
+  );
+
+  const allPrograms = useMemo(
+    () => getCombinedPrograms(customPrograms),
+    [customPrograms]
+  );
 
   // ── On mount: pull profiles and overrides from Cloudflare ─────────────────
   useEffect(() => {
@@ -298,6 +359,14 @@ export function AdminDataProvider({ children }) {
       synced,
       useCloud,
       profiles,
+      customSchools,
+      customPrograms,
+      allSchools,
+      allPrograms,
+      addCustomSchool,
+      deleteCustomSchool,
+      addCustomProgram,
+      deleteCustomProgram,
       getPlaylistProfile,
       getPlaylistCategory,
       isSpecialPlaylist,
@@ -316,6 +385,14 @@ export function AdminDataProvider({ children }) {
       synced,
       useCloud,
       profiles,
+      customSchools,
+      customPrograms,
+      allSchools,
+      allPrograms,
+      addCustomSchool,
+      deleteCustomSchool,
+      addCustomProgram,
+      deleteCustomProgram,
       getPlaylistProfile,
       getPlaylistCategory,
       isSpecialPlaylist,

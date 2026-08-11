@@ -30,7 +30,7 @@ function FieldLabel({ children, hint }) {
 export default function AdminCourseEditor() {
   const { playlistId } = useParams();
   const { data: course, isLoading } = useCourse(playlistId);
-  const { getCourseData, saveCourseData } = useAdminData();
+  const { getCourseData, saveCourseData, allSchools, allPrograms } = useAdminData();
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState({
     schoolId: "",
@@ -47,7 +47,7 @@ export default function AdminCourseEditor() {
   const profilerData =
     autoProfiles.results?.find((r) => r.playlistId === playlistId)?.suggested ||
     {};
-  const programs = PROGRAMS[form.schoolId] || [];
+  const programs = allPrograms[form.schoolId] || [];
 
   // Combine runtime detection with our saved static profiler data
   const detected = {
@@ -173,7 +173,7 @@ export default function AdminCourseEditor() {
                   className="input"
                 >
                   <option value="">— Select —</option>
-                  {SCHOOLS.map((s) => (
+                  {allSchools.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.icon} {s.label}
                     </option>

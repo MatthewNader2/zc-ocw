@@ -880,14 +880,36 @@ export function detectFromTitle(title) {
   };
 }
 
-/** Get school config by ID */
-export function getSchool(id) {
-  return (
-    SCHOOLS.find((s) => s.id === id) ?? SCHOOLS.find((s) => s.id === "general")
-  );
+/** Get combined list of default and custom schools */
+export function getCombinedSchools(customSchools = []) {
+  if (!customSchools || !customSchools.length) return SCHOOLS;
+  const existingIds = new Set(SCHOOLS.map((s) => s.id));
+  const newSchools = customSchools.filter((s) => !existingIds.has(s.id));
+  return [...SCHOOLS, ...newSchools];
 }
 
-/** Get all programs for a school */
-export function getPrograms(schoolId) {
-  return PROGRAMS[schoolId] ?? [];
+/** Get combined map of default and custom programs by school */
+export function getCombinedPrograms(customPrograms = {}) {
+  const combined = { ...PROGRAMS };
+  if (customPrograms) {
+    for (const [schoolId, progs] of Object.entries(customPrograms)) {
+      const existing = combined[schoolId] ?? [];
+      const existingIds = new Set(existing.map((p) => p.id));
+      const newProgs = (progs ?? []).filter((p) => !existingIds.has(p.id));
+      combined[schoolId] = [...existing, ...newProgs];
+    }
+  }
+  return combined;
+}
+
+/** Get school config by ID (checking both standard and custom schools) */
+export function getSchool(id, customSchools = []) {
+  const list = getCombinedSchools(customSchools);
+  return list.find((s) => s.id === id) ?? list.find((s) => s.id === "general") ?? SCHOOLS[0];
+}
+
+/** Get all programs for a school (checking both standard and custom programs) */
+export function getPrograms(schoolId, customPrograms = {}) {
+  const all = getCombinedPrograms(customPrograms);
+  return all[schoolId] ?? [];
 }

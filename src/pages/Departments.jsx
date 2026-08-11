@@ -1,12 +1,14 @@
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { ArrowRight } from 'lucide-react'
-import { SCHOOLS, PROGRAMS } from '@/data/coursesCatalog'
+import { useAdminData } from '@/context/AdminDataContext'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
 const ACCENT = { csai:'#0096c7', business:'#0d9488', science:'#7c3aed', engineering:'#ea580c' }
 
 export default function Departments() {
+  const { allSchools, allPrograms } = useAdminData()
+
   return (
     <>
       <Helmet><title>Departments — ZC OCW</title></Helmet>
@@ -18,9 +20,9 @@ export default function Departments() {
         </div>
       </div>
       <div className="section py-16 space-y-20">
-        {SCHOOLS.filter(s => s.id !== 'general').map((school, si) => {
-          const programs = PROGRAMS[school.id] ?? []
-          const accent   = ACCENT[school.id]
+        {allSchools.filter(s => s.id !== 'general').map((school, si) => {
+          const programs = allPrograms[school.id] ?? []
+          const accent   = school.accent || ACCENT[school.id] || '#0284c7'
           return (
             <ScrollReveal key={school.id} delay={`${si * 0.05}s`}>
               {/* School header */}
@@ -53,7 +55,7 @@ export default function Departments() {
                             style={{ '--accent': accent }}>
                         {prog.label}
                       </span>
-                      <span className="font-mono text-[10px] text-ink-ghost">{prog.prefixes.join(', ')}</span>
+                      <span className="font-mono text-[10px] text-ink-ghost">{prog.prefixes?.join(', ') || ''}</span>
                     </Link>
                   </ScrollReveal>
                 ))}

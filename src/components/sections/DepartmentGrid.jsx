@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
-import { SCHOOLS } from '@/data/coursesCatalog'
+import { useAdminData } from '@/context/AdminDataContext'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 
 const ACCENT = { csai:'#0096c7', business:'#0d9488', science:'#7c3aed', engineering:'#ea580c' }
 
 export default function DepartmentGrid() {
+  const { allSchools } = useAdminData()
+
   return (
     <section className="py-20 bg-slate-50/60">
       <div className="section">
@@ -15,8 +17,8 @@ export default function DepartmentGrid() {
         </ScrollReveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {SCHOOLS.filter(s => s.id !== 'general').map((school, i) => {
-            const accent = ACCENT[school.id]
+          {allSchools.filter(s => s.id !== 'general').map((school, i) => {
+            const accent = school.accent || ACCENT[school.id] || '#0284c7'
             return (
               <ScrollReveal key={school.id} delay={`${i * 0.1}s`}>
                 <Link to={`/departments/${school.id}`}
