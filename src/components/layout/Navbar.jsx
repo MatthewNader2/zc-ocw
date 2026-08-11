@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Search, Bookmark, Settings, LayoutDashboard, Menu, X, GraduationCap } from 'lucide-react'
 import { useProgress } from '@/context/ProgressContext'
@@ -20,11 +20,27 @@ export default function Navbar() {
   const { isAdmin }      = useAuth()
   const navigate         = useNavigate()
   const bmCount          = getBookmarks().length
+  const searchInputRef   = useRef(null)
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 16)
     window.addEventListener('scroll', h, { passive: true })
     return () => window.removeEventListener('scroll', h)
+  }, [])
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (
+        e.key === '/' &&
+        !['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName) &&
+        !document.activeElement?.isContentEditable
+      ) {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   function submit(e) {
@@ -66,13 +82,18 @@ export default function Navbar() {
 
         {/* Search */}
         <form onSubmit={submit} className="hidden md:flex flex-1 max-w-xs ml-auto">
-          <div className="relative w-full">
+          <div className="relative w-full flex items-center">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35 pointer-events-none" />
             <input
+              ref={searchInputRef}
               type="search" value={query} onChange={e => setQuery(e.target.value)}
               placeholder="Search courses…"
-              className="input-dark w-full pl-9 py-1.5 text-sm"
+              className="input-dark w-full pl-9 pr-8 py-1.5 text-sm"
+              aria-label="Search courses"
             />
+            <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono text-white/40 bg-white/10 rounded border border-white/10 pointer-events-none">
+              /
+            </kbd>
           </div>
         </form>
 
