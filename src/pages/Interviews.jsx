@@ -10,14 +10,14 @@ export default function Interviews() {
   const allItems = data?.pages?.flatMap((p) => p.items) ?? [];
 
   const specialItems = allItems
-    .filter((c) => getPlaylistCategory(c.id) !== "course")
+    .filter((c) => getPlaylistCategory(c.id, c.snippet?.title) !== "course")
     .sort((a, b) => {
       // Interviews first, then everything else alphabetical by title
-      const aCat = getPlaylistCategory(a.id);
-      const bCat = getPlaylistCategory(b.id);
+      const aCat = getPlaylistCategory(a.id, a.snippet?.title);
+      const bCat = getPlaylistCategory(b.id, b.snippet?.title);
       if (aCat === "interviews" && bCat !== "interviews") return -1;
       if (bCat === "interviews" && aCat !== "interviews") return 1;
-      return a.snippet.title.localeCompare(b.snippet.title);
+      return (a.snippet?.title || "").localeCompare(b.snippet?.title || "");
     });
 
   return (

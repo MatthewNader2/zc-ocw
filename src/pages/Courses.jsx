@@ -10,7 +10,7 @@ import {
   detectFromTitle,
   getSchool,
 } from "@/data/coursesCatalog";
-import { getPlaylistCategory } from "@/data/profileHelpers";
+import { getPlaylistCategory, getPlaylistProfile } from "@/data/profileHelpers";
 import CourseCard from "@/components/ui/CourseCard";
 import {
   CourseCardSkeleton,
@@ -48,12 +48,14 @@ export default function Courses() {
 
   const filtered = useMemo(() => {
     return allCourses.filter((c) => {
-      if (getPlaylistCategory(c.id) !== "course") return false;
+      if (getPlaylistCategory(c.id, c.snippet?.title) !== "course") return false;
 
       const ov = getCourseData(c.id);
-      const au = detectFromTitle(c.snippet.title);
-      const sid = ov.schoolId ?? au?.schoolId ?? null;
-      const pid = ov.programId ?? au?.programId ?? null;
+      const prof = getPlaylistProfile(c.id);
+      const au = detectFromTitle(c.snippet?.title);
+
+      const sid = ov.schoolId ?? prof?.suggested?.schoolId ?? prof?.detection?.schoolId ?? au?.schoolId ?? null;
+      const pid = ov.programId ?? prof?.suggested?.programId ?? prof?.detection?.programId ?? au?.programId ?? null;
       const lv = ov.level ?? null;
       return (
         (schoolFilter === "all" || sid === schoolFilter) &&
