@@ -41,7 +41,11 @@ function AppRoutes() {
         <Route path="/courses/:playlistId" element={<CourseDetail />} />
         <Route
           path="/courses/:playlistId/watch/:videoId"
-          element={<VideoPlayer />}
+          element={
+            <ErrorBoundary title="Player Error">
+              <VideoPlayer />
+            </ErrorBoundary>
+          }
         />
         <Route path="/departments" element={<Departments />} />
         <Route path="/departments/:schoolId" element={<Courses />} />
@@ -59,15 +63,17 @@ function AppRoutes() {
           path="/admin"
           element={
             <ProtectedAdmin>
-              <Suspense
-                fallback={
-                  <div className="p-10 text-center text-ink-muted">
-                    Loading…
-                  </div>
-                }
-              >
-                <AdminDashboard />
-              </Suspense>
+              <ErrorBoundary title="Admin Dashboard Error">
+                <Suspense
+                  fallback={
+                    <div className="p-10 text-center text-ink-muted">
+                      Loading…
+                    </div>
+                  }
+                >
+                  <AdminDashboard />
+                </Suspense>
+              </ErrorBoundary>
             </ProtectedAdmin>
           }
         />

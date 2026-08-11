@@ -29,6 +29,7 @@ export default function VideoPlayer() {
   const [noteDirty, setNoteDirty] = useState(false)
   const [noteOpen,  setNoteOpen]  = useState(false)
   const [descOpen,  setDescOpen]  = useState(false)
+  const activeLectureRef = useRef(null)
 
   const title     = video?.snippet?.title ?? 'Loading…'
   const desc      = video?.snippet?.description ?? ''
@@ -41,12 +42,30 @@ export default function VideoPlayer() {
     setNoteDirty(false)
   }, [videoId, version, getNote])
 
+  // Debounced auto-save note
+  useEffect(() => {
+    if (!noteDirty) return
+    const timer = setTimeout(() => {
+      saveNote(videoId, note)
+      setNoteDirty(false)
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [note, noteDirty, videoId, saveNote])
+
   // Lecture nav
   const lectureIds = lectures?.map(l => l.contentDetails?.videoId || l.snippet?.resourceId?.videoId).filter(Boolean) ?? []
   const idx        = lectureIds.indexOf(videoId)
   const prevId     = lectureIds[idx - 1]
   const nextId     = lectureIds[idx + 1]
-  const progress   = lectures?.length ? Math.round(((idx + 1) / lectures.length) * 100) : 0
+  const watchedCount = lectureIds.filter(id => isWatched(id)).length
+  const courseProgressPct = lectureIds.length ? Math.round((watchedCount / lectureIds.length) * 100) : 0
+
+  // Auto-scroll active lecture into view
+  useEffect(() => {
+    if (activeLectureRef.current) {
+      activeLectureRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    }
+  }, [videoId, lectures])
 
   function handleNoteBlur() {
     if (noteDirty) { saveNote(videoId, note); setNoteDirty(false) }
@@ -194,13 +213,13 @@ export default function VideoPlayer() {
               <p className="font-display text-sm font-semibold text-white leading-snug line-clamp-2">
                 {course?.snippet?.title ?? 'Playlist'}
               </p>
-              <div className="flex items-center justify-between mt-2">
-                <p className="text-white/40 text-xs">{lectures?.length ?? '…'} lectures</p>
-                {idx >= 0 && <p className="text-white/40 text-xs">{idx + 1} / {lectures?.length}</p>}
+              <div className="flex items-center justify-between mt-2 text-xs text-white/50">
+                <span>{watchedCount} of {lectures?.length ?? '…'} watched</span>
+                <span className="font-mono font-bold text-ocean-300">{courseProgressPct}%</span>
               </div>
               {/* Progress bar */}
-              <div className="mt-2.5 progress-track">
-                <div className="progress-fill" style={{ width: `${progress}%` }} />
+              <div className="mt-2 progress-track">
+                <div className="progress-fill" style={{ width: `${courseProgressPct}%` }} />
               </div>
             </div>
 
@@ -222,6 +241,7 @@ export default function VideoPlayer() {
                     const active = id === videoId
                     return (
                       <Link key={item.id}
+                            ref={active ? activeLectureRef : null}
                             to={`/courses/${playlistId}/watch/${id}`}
                             className={clsx(
                               'flex gap-3 p-3 transition-all group',
