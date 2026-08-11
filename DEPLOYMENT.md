@@ -1,167 +1,75 @@
-# ZC OCW — Deployment Guide
+# ZC OCW — Deployment & Operations Guide
 
-## Architecture
+## Architecture Overview
 
 ```
-Browser ──► Vercel (React SPA)
-                │
-                ├──► YouTube Data API v3  (lectures, playlists, search)
-                └──► Supabase             (course metadata, file uploads)
+Browser (User) ──► Vercel Global CDN (React 18 SPA)
+                       │
+                       ├──► Cloudflare Worker API (Edge Proxy & D1 SQLite Database)
+                       └──► YouTube Data API v3 (Course Video Playlists)
 ```
 
-No Docker. No Kubernetes. This stack is free, zero-maintenance, and scales automatically.
+- **Frontend**: React 18 + Vite + TailwindCSS hosted on **Vercel**.
+- **Backend API**: Cloudflare Workers serverless API proxy (`workers/api`).
+- **Database**: Cloudflare D1 serverless SQLite database.
+- **Storage**: Cloudflare R2 / Local fallback for course materials and textbooks.
 
 ---
 
-## Step 1 — Supabase (Backend + File Storage)
+## Automatic Deployment Workflow (Vercel CI/CD)
 
-### Create the project
-1. Go to **https://supabase.com** → Sign up (free)
-2. Click **New project** → choose a name (e.g. `zc-ocw`) and a region close to Egypt
-3. Wait ~2 minutes for provisioning
+### 1. How Vercel Deployment Works
+Vercel is directly integrated with the GitHub repository (`MatthewNader2/zc-ocw`). 
 
-### Run the schema
-1. In your Supabase dashboard → **SQL Editor** → **New query**
-2. Paste the entire contents of `supabase/schema.sql`
-3. Click **Run**
+- **Automatic Trigger**: Every git push to the `main` branch automatically triggers Vercel to pull the latest code, execute `npm run build`, and deploy the production bundle to your live domain within ~30 seconds.
+- **No Manual Build Step Required**: You do **not** need to press any button in Vercel to update your website when code changes are pushed to `main`.
 
-### Create the storage bucket
-1. Left sidebar → **Storage** → **New bucket**
-2. Name: `materials`
-3. Toggle **Public bucket** ON → **Save**
+### 2. Required Vercel Environment Variables
+Ensure the following variables are configured in **Vercel Dashboard → Project Settings → Environment Variables**:
 
-### Get your keys
-Go to **Project Settings** (gear icon) → **API**:
-- **Project URL** → `VITE_SUPABASE_URL`
-- **anon / public key** → `VITE_SUPABASE_ANON_KEY`
-- **service_role key** → `VITE_SUPABASE_SERVICE_KEY` *(keep secret)*
+| Variable Name | Purpose | Example Value |
+|---|---|---|
+| `VITE_WORKER_URL` | Base URL of your deployed Cloudflare Worker API | `https://zc-ocw-api.your-subdomain.workers.dev` |
+| `VITE_YOUTUBE_CHANNEL_ID` | Official Zewail City YouTube Channel ID | `UCGNOEBp7AZaY4XPNoagpv8w` |
+| `VITE_ADMIN_PASSWORD` | Secure password for accessing `/admin` routes | `YourSecretAdminPassword123!` |
 
 ---
 
-## Step 2 — GitHub
+## Backend Deployment Guide (Cloudflare Workers & D1)
 
+The backend code is housed inside `workers/api`. Changes to the backend API or database schema are managed via Cloudflare Wrangler.
+
+### 1. Database Schema Deployment
+To provision or update the Cloudflare D1 production database schema:
 ```bash
-# In D:\zc-ocw\zc-ocw\
-git init                        # already done if you ran setup.sh
-git remote add origin https://github.com/YOUR_USERNAME/zc-ocw.git
-git add .
-git commit -m "feat: initial ZC OCW site"
-git push -u origin main
+cd workers/api
+npx wrangler d1 execute zc-ocw-db --remote --file=schema.sql
 ```
 
-Create the repo first at https://github.com/new (name: `zc-ocw`, private recommended).
-
----
-
-## Step 3 — Vercel (Frontend Hosting)
-
-### First deploy
-1. Go to **https://vercel.com** → Sign up with GitHub
-2. Click **Add New → Project**
-3. Import your `zc-ocw` repo
-4. Framework preset: **Vite**
-5. Click **Environment Variables** and add all 6 keys from your `.env`:
-
-| Key | Value |
-|-----|-------|
-| `VITE_YOUTUBE_API_KEY` | your YT key |
-| `VITE_YOUTUBE_CHANNEL_ID` | `UCGNOEBp7AZaY4XPNoagpv8w` |
-| `VITE_ADMIN_PASSWORD` | your strong password |
-| `VITE_SUPABASE_URL` | from Supabase |
-| `VITE_SUPABASE_ANON_KEY` | from Supabase |
-| `VITE_SUPABASE_SERVICE_KEY` | from Supabase |
-
-6. Click **Deploy** → done in ~30 seconds
-
-Your site is live at `https://zc-ocw.vercel.app` (or your custom domain).
-
-### Custom domain
-Vercel → your project → **Settings** → **Domains** → Add `ocw.zewailcity.edu.eg`
-Then add a CNAME record in your DNS: `ocw` → `cname.vercel-dns.com`
-
----
-
-## Updating the site
-
-Every push to `main` triggers an automatic Vercel redeploy:
-
+### 2. Deploying Worker API Code
+To deploy updates to the Cloudflare Worker API proxy:
 ```bash
-# Make your changes, then:
-git add .
-git commit -m "feat: add new course enrichments"
-git push
-# ✅ Vercel detects the push and redeploys in ~30s
-```
-
-To preview before going live:
-```bash
-git checkout -b my-feature
-# make changes
-git push origin my-feature
-# Vercel auto-creates a preview URL for this branch
+cd workers/api
+npx wrangler deploy
 ```
 
 ---
 
-## Updating course data (without code changes)
+## Action Items for You (What You Need to Do)
 
-1. Go to `https://your-site.vercel.app/admin/login`
-2. Log in with your `VITE_ADMIN_PASSWORD`
-3. Edit any course — changes save to Supabase instantly, no redeploy needed
+### Current Release (v3.1.0 Updates)
+- **Zero manual steps required!** All batch code updates have already been committed and pushed to `origin/main`. Vercel has automatically built and deployed the live site.
 
----
-
-## Docker (optional — local development only)
-
-Docker is not needed for deployment (Vercel and Supabase handle everything),
-but you can use it for a consistent local dev environment:
-
-```dockerfile
-# Dockerfile (local dev only)
-FROM node:20-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-EXPOSE 3000
-CMD ["npm", "run", "dev", "--", "--host"]
-```
-
-```bash
-docker build -t zc-ocw .
-docker run -p 3000:3000 --env-file .env zc-ocw
-# → http://localhost:3000
-```
-
-**Why not Kubernetes?**
-K8s is designed for 50+ microservices at massive scale. ZC OCW has 1 frontend
-(a static file bundle) and no custom backend server — Supabase is the backend.
-Using K8s here would be like renting a cargo ship to cross the street.
-Vercel + Supabase is the right tool: simpler, cheaper (free), and more reliable.
+### Checklist for Initial Setup (Only if setting up a new domain/environment)
+1. **Verify Vercel Environment Variables**: Ensure `VITE_WORKER_URL`, `VITE_YOUTUBE_CHANNEL_ID`, and `VITE_ADMIN_PASSWORD` are set in Vercel.
+2. **Custom Domain (Optional)**: In Vercel → Project Settings → Domains, add `ocw.zewailcity.edu.eg` and point your CNAME record to `cname.vercel-dns.com`.
+3. **Cloudflare Worker URL**: Ensure your Worker URL in `VITE_WORKER_URL` is active and responding to `/api/youtube/playlists`.
 
 ---
 
-## Cost
+## Handoff & Maintenance Summary
 
-| Service | Free tier limit | You'll use |
-|---------|----------------|------------|
-| Vercel | 100 GB bandwidth/mo | < 1 GB |
-| Supabase | 500 MB DB, 1 GB storage, 50 MB uploads | < 50 MB |
-| YouTube API | 10,000 quota units/day | ~200/day |
-
-**Total cost: $0/month** for any realistic university OCW traffic.
-
-If you ever outgrow Supabase Storage (1 GB), upgrade to the $25/mo Pro plan or
-switch file storage to Cloudflare R2 (10 GB free).
-
----
-
-## Environment variable security
-
-- `VITE_*` keys are bundled into the browser JavaScript — anyone can see them
-- `VITE_SUPABASE_ANON_KEY` is designed to be public (read-only by RLS policy)
-- `VITE_SUPABASE_SERVICE_KEY` allows writes — in production, move admin writes
-  to a Vercel serverless function (`api/admin.js`) so the service key never
-  reaches the browser. For a university internal tool this is fine as-is.
-- `VITE_ADMIN_PASSWORD` is visible in JS bundle — use a strong password and
-  consider adding IP restriction in Vercel if needed.
+- **Local Development**: `npm run dev` (Frontend) & `cd workers/api && npx wrangler dev` (Backend).
+- **Production Build Check**: `npm run build`.
+- **LocalStorage Namespace**: All client-side storage keys use `zcocw_` prefix managed via `src/services/storage.js`.
+- **Security Headers**: Standardized in `vercel.json` (`X-Frame-Options: SAMEORIGIN`, `X-Content-Type-Options: nosniff`, `Referrer-Policy`).
