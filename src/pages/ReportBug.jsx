@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Bug, Send, CheckCircle } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import * as storage from "@/services/storage";
 
 const CATEGORIES = [
   "UI / UX",
@@ -56,11 +57,9 @@ export default function ReportBug() {
     } catch (err) {
       console.error("Submit failed:", err);
       // Still save locally so user data isn't lost
-      const pending = JSON.parse(
-        localStorage.getItem("zcocw_pending_feedback") || "[]",
-      );
+      const pending = storage.get("pending_feedback", []);
       pending.push({ type: "bug", ...form, timestamp: Date.now() });
-      localStorage.setItem("zcocw_pending_feedback", JSON.stringify(pending));
+      storage.set("pending_feedback", pending);
       alert(
         "Could not send right now. Your report is saved and will retry on next visit.",
       );
@@ -102,10 +101,11 @@ export default function ReportBug() {
           <form onSubmit={submit} className="card space-y-5 p-6 md:p-8">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+                <label htmlFor="bug-name" className="block text-xs font-semibold text-ink-muted mb-1.5">
                   Name
                 </label>
                 <input
+                  id="bug-name"
                   required
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                   value={form.name}
@@ -115,10 +115,11 @@ export default function ReportBug() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+                <label htmlFor="bug-email" className="block text-xs font-semibold text-ink-muted mb-1.5">
                   Email
                 </label>
                 <input
+                  id="bug-email"
                   required
                   type="email"
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
@@ -130,10 +131,11 @@ export default function ReportBug() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+              <label htmlFor="bug-category" className="block text-xs font-semibold text-ink-muted mb-1.5">
                 Category
               </label>
               <select
+                id="bug-category"
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 value={form.category}
                 onChange={(e) =>
@@ -146,10 +148,11 @@ export default function ReportBug() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+              <label htmlFor="bug-title" className="block text-xs font-semibold text-ink-muted mb-1.5">
                 Short Title
               </label>
               <input
+                id="bug-title"
                 required
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 placeholder="e.g. Search results empty"
@@ -160,10 +163,11 @@ export default function ReportBug() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+              <label htmlFor="bug-steps" className="block text-xs font-semibold text-ink-muted mb-1.5">
                 Steps to Reproduce
               </label>
               <textarea
+                id="bug-steps"
                 required
                 rows={4}
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
@@ -175,10 +179,11 @@ export default function ReportBug() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+              <label htmlFor="bug-browser" className="block text-xs font-semibold text-ink-muted mb-1.5">
                 Browser / Device
               </label>
               <input
+                id="bug-browser"
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 placeholder="Chrome 120 on Windows 11"
                 value={form.browser}

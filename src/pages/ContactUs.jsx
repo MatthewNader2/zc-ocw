@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Mail, Send, CheckCircle } from "lucide-react";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import * as storage from "@/services/storage";
 
 const DEPARTMENTS = [
   "General Inquiry",
@@ -48,11 +49,9 @@ export default function ContactUs() {
       setSent(true);
     } catch (err) {
       console.error("Submit failed:", err);
-      const pending = JSON.parse(
-        localStorage.getItem("zcocw_pending_feedback") || "[]",
-      );
+      const pending = storage.get("pending_feedback", []);
       pending.push({ type: "contact", ...form, timestamp: Date.now() });
-      localStorage.setItem("zcocw_pending_feedback", JSON.stringify(pending));
+      storage.set("pending_feedback", pending);
       alert(
         "Could not send right now. Your message is saved and will retry on next visit.",
       );
@@ -94,10 +93,11 @@ export default function ContactUs() {
           <form onSubmit={submit} className="card space-y-5 p-6 md:p-8">
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+                <label htmlFor="contact-name" className="block text-xs font-semibold text-ink-muted mb-1.5">
                   Name
                 </label>
                 <input
+                  id="contact-name"
                   required
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                   value={form.name}
@@ -107,10 +107,11 @@ export default function ContactUs() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+                <label htmlFor="contact-email" className="block text-xs font-semibold text-ink-muted mb-1.5">
                   Email
                 </label>
                 <input
+                  id="contact-email"
                   required
                   type="email"
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
@@ -122,10 +123,11 @@ export default function ContactUs() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+              <label htmlFor="contact-dept" className="block text-xs font-semibold text-ink-muted mb-1.5">
                 Department
               </label>
               <select
+                id="contact-dept"
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 value={form.department}
                 onChange={(e) =>
@@ -138,10 +140,11 @@ export default function ContactUs() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+              <label htmlFor="contact-subject" className="block text-xs font-semibold text-ink-muted mb-1.5">
                 Subject
               </label>
               <input
+                id="contact-subject"
                 required
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 value={form.subject}
@@ -151,10 +154,11 @@ export default function ContactUs() {
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-ink-muted mb-1.5">
+              <label htmlFor="contact-message" className="block text-xs font-semibold text-ink-muted mb-1.5">
                 Message
               </label>
               <textarea
+                id="contact-message"
                 required
                 rows={5}
                 className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"

@@ -62,13 +62,20 @@ export function deleteOverride(playlistId) {
 // ── Materials ─────────────────────────────────────────────────────────────────
 // Shape: { [playlistId]: Material[] }
 
+function generateId(prefix) {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `${prefix}_${crypto.randomUUID()}`
+  }
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+}
+
 export function getMaterials(playlistId) {
   return get(`materials_${playlistId}`, [])
 }
 
 export function addMaterial(playlistId, material) {
   const list = getMaterials(playlistId)
-  const item = { ...material, id: `mat_${Date.now()}`, addedAt: Date.now() }
+  const item = { ...material, id: generateId('mat'), addedAt: Date.now() }
   set(`materials_${playlistId}`, [...list, item])
   return item
 }
@@ -93,7 +100,7 @@ export function getBooks(playlistId) {
 
 export function addBook(playlistId, book) {
   const list = getBooks(playlistId)
-  const item = { ...book, id: `bk_${Date.now()}`, addedAt: Date.now() }
+  const item = { ...book, id: generateId('bk'), addedAt: Date.now() }
   set(`books_${playlistId}`, [...list, item])
   return item
 }

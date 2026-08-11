@@ -37,7 +37,7 @@ export default function Search() {
 
   // Client-side course search
   const courseResults = query ? clientSearch(allPlaylists, query) : []
-  const videoResults  = apiResults?.items?.filter(i => i.id.kind === 'youtube#video') ?? []
+  const videoResults  = (tab === 'videos' && apiResults?.items) ? apiResults.items.filter(i => i.id.kind === 'youtube#video') : []
 
   // Debounced query update
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { ChevronRight, CheckCircle2, NotebookPen, ChevronDown, Play, ArrowLeft, ArrowRight } from 'lucide-react'
 import { useVideo, useLectures, useCourse } from '@/hooks/useYouTube'
@@ -18,10 +18,11 @@ function WatchedCheckmark({ videoId }) {
 
 export default function VideoPlayer() {
   const { playlistId, videoId } = useParams()
+  const navigate = useNavigate()
   const { data: video,    isLoading: vl } = useVideo(videoId)
   const { data: course  }                 = useCourse(playlistId)
   const { data: lectures, isLoading: ll } = useLectures(playlistId)
-  const { markWatched, isWatched, getNote, saveNote } = useProgress()
+  const { markWatched, isWatched, getNote, saveNote, version } = useProgress()
   const { settings } = useSettings()
 
   const [note,      setNote]      = useState('')
@@ -36,19 +37,9 @@ export default function VideoPlayer() {
   // Load note
   useEffect(() => {
     const saved = getNote(videoId)
-    setNote(saved); setNoteDirty(false)
-  }, [videoId])
-
-  // Auto-mark watched
-  useEffect(() => {
-    const t = setTimeout(() => {
-      markWatched(videoId, playlistId, {
-        title: video?.snippet?.title,
-        thumbnail: getThumbnail(video?.snippet, 'medium'),
-      })
-    }, 8000)
-    return () => clearTimeout(t)
-  }, [videoId, video?.snippet?.title])
+    setNote(saved)
+    setNoteDirty(false)
+  }, [videoId, version, getNote])
 
   // Lecture nav
   const lectureIds = lectures?.map(l => l.contentDetails?.videoId || l.snippet?.resourceId?.videoId).filter(Boolean) ?? []
@@ -63,7 +54,7 @@ export default function VideoPlayer() {
 
   function handleEnded() {
     if (settings.autoplayNext && nextId) {
-      setTimeout(() => window.location.href = `/courses/${playlistId}/watch/${nextId}`, 1000)
+      setTimeout(() => navigate(`/courses/${playlistId}/watch/${nextId}`), 500)
     }
   }
 

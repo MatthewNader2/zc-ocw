@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { Lock, Eye, EyeOff } from 'lucide-react'
@@ -12,7 +12,11 @@ export default function AdminLogin() {
   const { login, isAdmin } = useAuth()
   const navigate = useNavigate()
 
-  if (isAdmin) { navigate('/admin', { replace: true }); return null }
+  useEffect(() => {
+    if (isAdmin) {
+      navigate('/admin', { replace: true })
+    }
+  }, [isAdmin, navigate])
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -22,6 +26,8 @@ export default function AdminLogin() {
       else { setError('Incorrect password.'); setLoading(false) }
     }, 400)
   }
+
+  if (isAdmin) return null
 
   return (
     <>
@@ -67,10 +73,6 @@ export default function AdminLogin() {
                   : 'Sign In'
                 }
               </button>
-
-              <p className="text-xs text-center text-ink-ghost pt-1">
-                Set <code className="bg-slate-100 px-1.5 py-0.5 rounded font-mono">VITE_ADMIN_PASSWORD</code> in .env
-              </p>
             </form>
           </div>
         </div>

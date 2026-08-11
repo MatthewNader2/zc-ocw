@@ -23,14 +23,17 @@ export const isConfigured = !!(SUPABASE_URL && ANON_KEY)
 /* ── Generic fetch helper ───────────────────────────────────────────────────── */
 async function sb(path, { method = 'GET', body, admin = false } = {}) {
   const key = admin ? (SERVICE_KEY ?? ANON_KEY) : ANON_KEY
+  const headers = {
+    'apikey': key,
+    'Authorization': `Bearer ${key}`,
+    'Content-Type': 'application/json',
+  }
+  if (method === 'POST' || method === 'PATCH' || method === 'PUT') {
+    headers['Prefer'] = 'return=representation'
+  }
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     method,
-    headers: {
-      'apikey':        key,
-      'Authorization': `Bearer ${key}`,
-      'Content-Type':  'application/json',
-      'Prefer':        method === 'POST' ? 'return=representation' : 'return=minimal',
-    },
+    headers,
     ...(body ? { body: JSON.stringify(body) } : {}),
   })
   if (!res.ok) {

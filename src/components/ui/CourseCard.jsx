@@ -46,13 +46,6 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
     override.courseCode || profilerData.courseCode || auto?.code || null;
   const matCount = getMaterials(id).length;
 
-  // 🐛 DEBUG TOOL: If it's still failing, check your browser's inspect console!
-  console.log(`Card [${courseCode}]:`, {
-    title: snippet.title,
-    profilerData,
-    instructor,
-  });
-
   const ids = lectureIds.length ? lectureIds : [];
   const progress =
     settings.showProgress && ids.length ? getCourseProgress(ids) : 0;

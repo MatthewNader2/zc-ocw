@@ -161,11 +161,16 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
     return () => document.removeEventListener('fullscreenchange', h)
   }, [])
 
+  const playingRef = useRef(playing)
+  playingRef.current = playing
+
   const bumpCtrl = useCallback(() => {
     setShowCtrl(true)
     clearTimeout(hideTimer.current)
-    hideTimer.current = setTimeout(() => { if (playing) setShowCtrl(false) }, 3200)
-  }, [playing])
+    hideTimer.current = setTimeout(() => {
+      if (playingRef.current) setShowCtrl(false)
+    }, 3200)
+  }, [])
 
   function handleProgress(state) {
     if (!seeking) { setPlayed(state.played); setLoaded(state.loaded) }
@@ -184,12 +189,16 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
     else document.exitFullscreen()
   }
 
-  function togglePlay() { setPlaying(p => !p); bumpCtrl() }
+  function togglePlay() {
+    setPlaying(p => !p)
+    bumpCtrl()
+  }
 
   // Keyboard shortcuts
   useEffect(() => {
     function onKey(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
+      if (e.code === 'Escape')     { setShowSettings(false); return }
       if (e.code === 'Space')      { e.preventDefault(); togglePlay() }
       if (e.code === 'ArrowRight') { playerRef.current?.seekTo(played * duration + 10, 'seconds') }
       if (e.code === 'ArrowLeft')  { playerRef.current?.seekTo(played * duration - 10, 'seconds') }
@@ -200,7 +209,7 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [played, duration])
+  }, [played, duration, bumpCtrl])
 
   if (error) {
     return (
