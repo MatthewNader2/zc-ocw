@@ -33,27 +33,29 @@ function fmtTime(s) {
 function SettingsPanel({ quality, setQuality, speed, setSpeed, onClose }) {
   const [page, setPage] = useState('main')  // 'main' | 'quality' | 'speed'
   return (
-    <div className="absolute bottom-full right-0 mb-2 w-52 bg-black/92 backdrop-blur-sm
-                    border border-white/10 rounded-2xl overflow-hidden shadow-deep z-30 animate-scale-in">
-
+    <div
+      onClick={(e) => e.stopPropagation()}
+      className="absolute bottom-full right-0 mb-2 w-52 bg-black/95 backdrop-blur-md
+                 border border-white/15 rounded-2xl overflow-hidden shadow-2xl z-40 animate-scale-in"
+    >
       {/* Main menu */}
       {page === 'main' && (
         <div className="py-1">
-          <div className="px-4 py-2 text-[11px] font-mono font-semibold text-white/30 uppercase tracking-wider">
+          <div className="px-4 py-2 text-[11px] font-mono font-semibold text-white/40 uppercase tracking-wider">
             Playback Settings
           </div>
-          <button onClick={() => setPage('quality')}
+          <button onClick={(e) => { e.stopPropagation(); setPage('quality'); }}
                   className="w-full flex items-center justify-between px-4 py-3 text-sm
-                             text-white/80 hover:bg-white/8 transition-colors">
+                             text-white/80 hover:bg-white/10 transition-colors">
             <span className="flex items-center gap-2">
               <MonitorPlay className="w-4 h-4 text-ocean-400" />
               Quality
             </span>
             <span className="text-white/40 text-xs">{QUALITIES.find(q=>q.value===quality)?.label ?? 'Auto'} ›</span>
           </button>
-          <button onClick={() => setPage('speed')}
+          <button onClick={(e) => { e.stopPropagation(); setPage('speed'); }}
                   className="w-full flex items-center justify-between px-4 py-3 text-sm
-                             text-white/80 hover:bg-white/8 transition-colors">
+                             text-white/80 hover:bg-white/10 transition-colors">
             <span className="flex items-center gap-2">
               <SkipForward className="w-4 h-4 text-ocean-400" />
               Speed
@@ -66,21 +68,21 @@ function SettingsPanel({ quality, setQuality, speed, setSpeed, onClose }) {
       {/* Quality sub-menu */}
       {page === 'quality' && (
         <div className="py-1">
-          <button onClick={() => setPage('main')}
+          <button onClick={(e) => { e.stopPropagation(); setPage('main'); }}
                   className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-white/60
-                             hover:text-white transition-colors border-b border-white/8">
+                             hover:text-white transition-colors border-b border-white/10">
             <ChevronLeft className="w-4 h-4" /> Quality
           </button>
           {QUALITIES.map(q => (
-            <button key={q.value} onClick={() => { setQuality(q.value); setPage('main') }}
+            <button key={q.value} onClick={(e) => { e.stopPropagation(); setQuality(q.value); setPage('main'); }}
                     className={clsx(
                       'w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors',
                       quality === q.value
-                        ? 'bg-ocean-500/20 text-ocean-300 font-semibold'
-                        : 'text-white/75 hover:bg-white/8 hover:text-white'
+                        ? 'bg-ocean-500/25 text-ocean-300 font-semibold'
+                        : 'text-white/75 hover:bg-white/10 hover:text-white'
                     )}>
               {q.label}
-              {quality === q.value && <span className="text-ocean-400 text-xs">✓</span>}
+              {quality === q.value && <span className="text-ocean-400 text-xs font-bold">✓</span>}
             </button>
           ))}
         </div>
@@ -89,21 +91,21 @@ function SettingsPanel({ quality, setQuality, speed, setSpeed, onClose }) {
       {/* Speed sub-menu */}
       {page === 'speed' && (
         <div className="py-1">
-          <button onClick={() => setPage('main')}
+          <button onClick={(e) => { e.stopPropagation(); setPage('main'); }}
                   className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-white/60
-                             hover:text-white transition-colors border-b border-white/8">
+                             hover:text-white transition-colors border-b border-white/10">
             <ChevronLeft className="w-4 h-4" /> Playback Speed
           </button>
           {SPEEDS.map(s => (
-            <button key={s} onClick={() => { setSpeed(s); setPage('main') }}
+            <button key={s} onClick={(e) => { e.stopPropagation(); setSpeed(s); setPage('main'); }}
                     className={clsx(
                       'w-full flex items-center justify-between px-4 py-2.5 text-sm transition-colors',
                       speed === s
-                        ? 'bg-ocean-500/20 text-ocean-300 font-semibold'
-                        : 'text-white/75 hover:bg-white/8 hover:text-white'
+                        ? 'bg-ocean-500/25 text-ocean-300 font-semibold'
+                        : 'text-white/75 hover:bg-white/10 hover:text-white'
                     )}>
               {s === 1 ? 'Normal' : `${s}×`}
-              {speed === s && <span className="text-ocean-400 text-xs">✓</span>}
+              {speed === s && <span className="text-ocean-400 text-xs font-bold">✓</span>}
             </button>
           ))}
         </div>
@@ -225,7 +227,16 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
     )
   }
 
-  const progressPct = played * 100
+  function handleContainerClick(e) {
+    if (e.target.closest('button') || e.target.closest('input')) {
+      return
+    }
+    if (showSettings) {
+      setShowSettings(false)
+      return
+    }
+    togglePlay()
+  }
 
   return (
     <div
@@ -233,10 +244,10 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
       className="relative bg-black rounded-2xl overflow-hidden shadow-deep group select-none"
       onMouseMove={bumpCtrl}
       onMouseLeave={() => { if (playing) { clearTimeout(hideTimer.current); setShowCtrl(false) } }}
-      onClick={() => { if (showSettings) { setShowSettings(false); return } }}
+      onClick={handleContainerClick}
     >
-      {/* Reactive Player */}
-      <div className="player-wrapper">
+      {/* Reactive Player Canvas */}
+      <div className="player-wrapper relative z-0">
         <ReactPlayer
           ref={playerRef}
           url={`https://www.youtube.com/watch?v=${videoId}`}
@@ -258,15 +269,18 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
               playerVars: {
                 controls: 0, rel: 0, modestbranding: 1,
                 disablekb: 1, iv_load_policy: 3,
+                origin: typeof window !== 'undefined' ? window.location.origin : '',
               },
             },
           }}
         />
+        {/* Transparent click catcher overlay to prevent YouTube iframe from taking direct clicks */}
+        <div className="absolute inset-0 z-10 cursor-pointer" />
       </div>
 
       {/* Loading overlay */}
       {!ready && (
-        <div className="absolute inset-0 flex items-center justify-center bg-ocean-950">
+        <div className="absolute inset-0 flex items-center justify-center bg-ocean-950 z-20">
           <div className="w-10 h-10 rounded-full border-2 border-ocean-400/30 border-t-ocean-400 animate-spin" />
         </div>
       )}
@@ -274,7 +288,7 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
       {/* Center play button when paused */}
       {!playing && ready && (
         <button onClick={togglePlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/25">
+                className="absolute inset-0 flex items-center justify-center bg-black/25 z-20">
           <div className="w-20 h-20 rounded-full bg-ocean-500 flex items-center justify-center
                           shadow-glow-lg scale-90 hover:scale-100 transition-transform duration-200 animate-scale-in">
             <Play className="w-8 h-8 text-white ml-1" fill="white" strokeWidth={0} />
@@ -284,7 +298,7 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
 
       {/* Controls bar */}
       <div className={clsx(
-        'absolute inset-x-0 bottom-0 transition-all duration-300',
+        'absolute inset-x-0 bottom-0 transition-all duration-300 z-30',
         showCtrl || !playing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3 pointer-events-none'
       )}>
         {/* Gradient */}
