@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { SlidersHorizontal } from "lucide-react";
@@ -33,7 +33,7 @@ export default function Courses() {
   const [levelFilter, setLevelFilter] = useState("All levels");
   const [schoolFilter, setSchoolFilter] = useState(slugSchool || "all");
   const loadMoreRef = useRef(null);
-  const { getCourseData } = useAdminData();
+  const { getCourseData, version } = useAdminData();
 
   const {
     data,
@@ -46,21 +46,22 @@ export default function Courses() {
   } = usePlaylists();
   const allCourses = data?.pages.flatMap((p) => p.items) ?? [];
 
-  const filtered = allCourses.filter((c) => {
-    // 🆕 Hide interviews / special content from the courses grid
-    if (getPlaylistCategory(c.id) !== "course") return false;
+  const filtered = useMemo(() => {
+    return allCourses.filter((c) => {
+      if (getPlaylistCategory(c.id) !== "course") return false;
 
-    const ov = getCourseData(c.id);
-    const au = detectFromTitle(c.snippet.title);
-    const sid = ov.schoolId ?? au?.schoolId ?? null;
-    const pid = ov.programId ?? au?.programId ?? null;
-    const lv = ov.level ?? null;
-    return (
-      (schoolFilter === "all" || sid === schoolFilter) &&
-      (!slugProgram || pid === slugProgram) &&
-      (levelFilter === "All levels" || lv === levelFilter)
-    );
-  });
+      const ov = getCourseData(c.id);
+      const au = detectFromTitle(c.snippet.title);
+      const sid = ov.schoolId ?? au?.schoolId ?? null;
+      const pid = ov.programId ?? au?.programId ?? null;
+      const lv = ov.level ?? null;
+      return (
+        (schoolFilter === "all" || sid === schoolFilter) &&
+        (!slugProgram || pid === slugProgram) &&
+        (levelFilter === "All levels" || lv === levelFilter)
+      );
+    });
+  }, [allCourses, schoolFilter, slugProgram, levelFilter, getCourseData, version]);
 
   useEffect(() => {
     if (!hasNextPage) return;

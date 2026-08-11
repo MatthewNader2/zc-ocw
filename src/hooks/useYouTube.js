@@ -35,6 +35,8 @@ export function useCourse(playlistId) {
     queryKey: ["playlist", playlistId],
     queryFn: () => fetchPlaylist(playlistId),
     enabled: !!playlistId,
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60,
     select: (data) => enrichCourse(data),
   });
 }
@@ -46,6 +48,8 @@ export function useLectures(playlistId) {
     queryKey: ["lectures", playlistId],
     queryFn: () => fetchPlaylistItems(playlistId),
     enabled: !!playlistId,
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60,
   });
 }
 
@@ -56,6 +60,8 @@ export function useVideo(videoId) {
     queryKey: ["video", videoId],
     queryFn: () => fetchVideos([videoId]).then((items) => items[0] ?? null),
     enabled: !!videoId,
+    staleTime: 1000 * 60 * 15,
+    gcTime: 1000 * 60 * 60,
   });
 }
 

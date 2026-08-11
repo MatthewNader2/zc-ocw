@@ -31,41 +31,32 @@ export function AdminDataProvider({ children }) {
 
   const bump = useCallback(() => setVersion((v) => v + 1), []);
 
-  // ── On mount: pull playlist profiles from Worker ──────────────────────────
+  // ── On mount: pull profiles and overrides from Cloudflare ─────────────────
   useEffect(() => {
     if (!cloudflare.isConfigured) {
       setSynced(true);
       return;
     }
-    cloudflare
-      .fetchProfiles()
-      .then((rows) => {
-        if (rows.length) {
-          setProfiles(rows);
-          storage.set("playlist_profiles", rows);
-        }
-        setSynced(true);
-        bump();
-      })
-      .catch(() => {
-        // Fallback to cached localStorage profiles
+
+    let active = true;
+
+    Promise.allSettled([
+      cloudflare.fetchProfiles(),
+      cloudflare.fetchAllOverrides(),
+    ]).then(([profilesResult, overridesResult]) => {
+      if (!active) return;
+
+      if (profilesResult.status === "fulfilled" && profilesResult.value?.length) {
+        setProfiles(profilesResult.value);
+        storage.set("playlist_profiles", profilesResult.value);
+      } else {
         const cached = storage.get("playlist_profiles", []);
         if (cached.length) setProfiles(cached);
-        setSynced(true);
-      });
-  }, []); // eslint-disable-line
+      }
 
-  // ── On mount: pull overrides into localStorage cache ──────────────────────
-  useEffect(() => {
-    if (!cloudflare.isConfigured) {
-      setSynced(true);
-      return;
-    }
-    cloudflare
-      .fetchAllOverrides()
-      .then((rows) => {
+      if (overridesResult.status === "fulfilled" && overridesResult.value) {
         const all = {};
-        for (const row of rows) {
+        for (const row of overridesResult.value) {
           all[row.playlist_id] = {
             schoolId: row.school_id,
             programId: row.program_id,
@@ -78,13 +69,16 @@ export function AdminDataProvider({ children }) {
           };
         }
         storage.set("course_overrides", all);
-        setSynced(true);
-        bump();
-      })
-      .catch(() => {
-        setSynced(true);
-      });
-  }, []); // eslint-disable-line
+      }
+
+      setSynced(true);
+      bump();
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [bump]);
 
   // ── Profile helpers (NEW) ─────────────────────────────────────────────────
 

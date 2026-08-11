@@ -10,16 +10,17 @@ export default function BookmarkButton({ playlistId, size = 'md', className = ''
   return (
     <button
       onClick={e => { e.preventDefault(); e.stopPropagation(); toggleBookmark(playlistId) }}
-      title={saved ? 'Remove bookmark' : 'Bookmark'}
+      title={saved ? 'Remove bookmark' : 'Bookmark course'}
+      aria-label={saved ? 'Remove bookmark' : 'Bookmark course'}
       className={clsx(
-        'flex items-center justify-center rounded-full transition-all duration-200 shadow-sm',
+        'flex items-center justify-center rounded-full transition-all duration-200 shadow-sm active:scale-90',
         s,
         saved
-          ? 'bg-ocean-500 text-white shadow-glow'
-          : 'bg-white/90 text-slate-400 hover:text-ocean-500 hover:bg-white backdrop-blur-sm',
+          ? 'bg-ocean-500 text-white shadow-glow scale-105'
+          : 'bg-white/90 text-slate-400 hover:text-ocean-500 hover:bg-white backdrop-blur-sm hover:scale-105',
         className
       )}>
-      <Bookmark className={i} fill={saved ? 'currentColor' : 'none'} strokeWidth={2} />
+      <Bookmark className={clsx(i, 'transition-transform duration-200')} fill={saved ? 'currentColor' : 'none'} strokeWidth={2} />
     </button>
   )
 }

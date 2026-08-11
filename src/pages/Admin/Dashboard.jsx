@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -29,15 +30,22 @@ const SCHOOL_ACCENT = {
 
 export default function AdminDashboard() {
   const { logout } = useAuth();
-  const { getCourseData, getMaterials, getBooks } = useAdminData();
+  const { getCourseData, getMaterials, getBooks, version } = useAdminData();
   const { data, isLoading } = usePlaylists();
   const courses = data?.pages?.flatMap((p) => p.items) ?? [];
 
-  const enrichedCount = courses.filter(
-    (c) => getCourseData(c.id)?.instructor || getCourseData(c.id)?.schoolId,
-  ).length;
-  const matCount = courses.filter((c) => getMaterials(c.id).length > 0).length;
-  const bookCount = courses.filter((c) => getBooks(c.id).length > 0).length;
+  const { enrichedCount, matCount, bookCount } = useMemo(() => {
+    let enriched = 0;
+    let mats = 0;
+    let books = 0;
+    for (const c of courses) {
+      const cd = getCourseData(c.id);
+      if (cd?.instructor || cd?.schoolId) enriched++;
+      if (getMaterials(c.id).length > 0) mats++;
+      if (getBooks(c.id).length > 0) books++;
+    }
+    return { enrichedCount: enriched, matCount: mats, bookCount: books };
+  }, [courses, getCourseData, getMaterials, getBooks, version]);
 
   return (
     <>
