@@ -34,9 +34,35 @@ export function remove(key) {
 
 // ── Admin auth ────────────────────────────────────────────────────────────────
 
-export function setAdminSession(token) { set('admin_session', token) }
-export function getAdminSession()       { return get('admin_session', null) }
-export function clearAdminSession()     { remove('admin_session') }
+const SESSION_TTL = 24 * 60 * 60 * 1000 // 24 hours
+
+export function setAdminSession(token = 'authenticated') {
+  const session = {
+    token,
+    createdAt: Date.now(),
+    expiresAt: Date.now() + SESSION_TTL,
+  }
+  set('admin_session', session)
+}
+
+export function getAdminSession() {
+  const session = get('admin_session', null)
+  if (!session) return null
+  if (typeof session === 'string') {
+    if (session === 'authenticated') return session
+    clearAdminSession()
+    return null
+  }
+  if (session.expiresAt && Date.now() > session.expiresAt) {
+    clearAdminSession()
+    return null
+  }
+  return session.token ?? null
+}
+
+export function clearAdminSession() {
+  remove('admin_session')
+}
 
 // ── Course overrides (admin-set) ──────────────────────────────────────────────
 // Shape: { [playlistId]: CourseOverride }

@@ -65,6 +65,21 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
   const groups = groupMaterials(materials)
   function toggleGroup(id) { setOpenGroups(p => ({ ...p, [id]: p[id] === false })) }
 
+  function sanitizeUrl(rawUrl) {
+    if (!rawUrl) return ''
+    const trimmed = rawUrl.trim()
+    if (!trimmed) return ''
+    const lower = trimmed.toLowerCase()
+    if (lower.startsWith('javascript:') || lower.startsWith('data:') || lower.startsWith('vbscript:')) {
+      alert('Invalid URL scheme. Only HTTP/HTTPS URLs are allowed.')
+      return null
+    }
+    if (!/^https?:\/\//i.test(trimmed) && !trimmed.startsWith('/')) {
+      return `https://${trimmed}`
+    }
+    return trimmed
+  }
+
   async function submitMat(e) {
     e.preventDefault()
     if (!matForm.label.trim()) return
@@ -78,7 +93,9 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
         payload.file = fileRef.current.files[0]
         payload.url  = ''
       } else {
-        payload.url = matForm.url.trim()
+        const cleanUrl = sanitizeUrl(matForm.url)
+        if (!cleanUrl) { setUploading(false); return }
+        payload.url = cleanUrl
       }
       await addMaterial(playlistId, payload)
       setMatForm({ type:'slides', label:'', url:'' })
@@ -90,7 +107,9 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
   async function submitBook(e) {
     e.preventDefault()
     if (!bookForm.title.trim()) return
-    await addBook(playlistId, { ...bookForm })
+    const cleanUrl = bookForm.url ? sanitizeUrl(bookForm.url) : ''
+    if (bookForm.url && !cleanUrl) return
+    await addBook(playlistId, { ...bookForm, url: cleanUrl })
     setBookForm({ title:'', author:'', edition:'', isbn:'', url:'' })
     setAddBookOpen(false)
   }
