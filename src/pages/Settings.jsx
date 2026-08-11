@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import {
-  Settings as SettingsIcon,   // ← renamed to avoid collision with the page component
-  Play, BookOpen, Gauge, RotateCcw
+  Settings as SettingsIcon,
+  Play, BookOpen, Gauge, RotateCcw, Sun, Moon, Monitor
 } from 'lucide-react'
 import { useSettings } from '@/context/SettingsContext'
 import ScrollReveal   from '@/components/ui/ScrollReveal'
@@ -29,10 +29,10 @@ function Toggle({ checked, onChange }) {
 function SettingRow({ label, desc, children }) {
   return (
     <div className="flex items-center justify-between gap-6 py-4
-                    border-b border-slate-100 last:border-0">
+                    border-b border-slate-100 dark:border-slate-800 last:border-0">
       <div className="flex-1 min-w-0">
-        <p className="font-semibold text-sm text-ink">{label}</p>
-        {desc && <p className="text-xs text-ink-ghost mt-0.5 leading-relaxed">{desc}</p>}
+        <p className="font-semibold text-sm text-ink dark:text-white">{label}</p>
+        {desc && <p className="text-xs text-ink-ghost dark:text-slate-400 mt-0.5 leading-relaxed">{desc}</p>}
       </div>
       <div className="flex-shrink-0">{children}</div>
     </div>
@@ -42,12 +42,12 @@ function SettingRow({ label, desc, children }) {
 /* ── Section card ────────────────────────────────────────────────────────────── */
 function Section({ icon: Icon, iconColor, title, children }) {
   return (
-    <div className="card-flat border border-slate-100 shadow-card">
-      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100">
+    <div className="card-flat border border-slate-100 dark:border-slate-800 dark:bg-slate-900 shadow-card">
+      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${iconColor}`}>
           <Icon className="w-4.5 h-4.5" strokeWidth={1.8} />
         </div>
-        <h2 className="font-display text-lg font-bold text-ink">{title}</h2>
+        <h2 className="font-display text-lg font-bold text-ink dark:text-white">{title}</h2>
       </div>
       {children}
     </div>
@@ -78,6 +78,38 @@ export default function SettingsPage() {
       </div>
 
       <div className="section py-10 max-w-2xl space-y-6">
+
+        {/* Appearance & Theme */}
+        <ScrollReveal>
+          <Section icon={Sun} iconColor="bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-300" title="Appearance & Theme">
+            <SettingRow
+              label="Theme Mode"
+              desc="Choose your preferred color theme or match your device system settings."
+            >
+              <div className="flex gap-2">
+                {[
+                  { id: 'light', label: 'Light', icon: Sun },
+                  { id: 'dark', label: 'Dark', icon: Moon },
+                  { id: 'system', label: 'System', icon: Monitor },
+                ].map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => update('theme', id)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+                      settings.theme === id
+                        ? 'bg-ocean-950 text-white border-ocean-950 dark:bg-ocean-500 dark:border-ocean-500'
+                        : 'border-slate-200 text-ink-subtle hover:border-ocean-400 dark:border-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </SettingRow>
+          </Section>
+        </ScrollReveal>
 
         {/* Playback */}
         <ScrollReveal>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
   ArrowRight,
@@ -8,8 +8,8 @@ import {
   PlayCircle,
   Award,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { useChannelStats } from "@/hooks/useYouTube";
+import ParticleBackground from "@/components/ui/ParticleBackground";
 
 function AnimatedNumber({ target, suffix = "" }) {
   const [val, setVal] = useState(0);
@@ -62,6 +62,9 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-[92vh] flex flex-col justify-center bg-ocean-950 overflow-hidden">
+      {/* Optimized particle background */}
+      <ParticleBackground />
+
       {/* Layered backgrounds */}
       <div className="absolute inset-0 bg-grid" />
       <div className="absolute inset-0 bg-hero-mesh" />

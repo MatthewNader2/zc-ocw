@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Search, Bookmark, Settings, LayoutDashboard, Menu, X, GraduationCap } from 'lucide-react'
+import { Search, Bookmark, Settings, LayoutDashboard, Menu, X, Sun, Moon } from 'lucide-react'
 import { useProgress } from '@/context/ProgressContext'
 import { useAuth }     from '@/context/AuthContext'
+import { useSettings } from '@/context/SettingsContext'
 import clsx from 'clsx'
 
 const NAV = [
@@ -18,9 +19,15 @@ export default function Navbar() {
   const [query,   setQuery]   = useState('')
   const { getBookmarks } = useProgress()
   const { isAdmin }      = useAuth()
+  const { settings, update } = useSettings()
   const navigate         = useNavigate()
   const bmCount          = getBookmarks().length
   const searchInputRef   = useRef(null)
+
+  function toggleTheme() {
+    const isDark = document.documentElement.classList.contains('dark')
+    update('theme', isDark ? 'light' : 'dark')
+  }
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 16)
@@ -99,6 +106,18 @@ export default function Navbar() {
 
         {/* Right icons — desktop */}
         <div className="hidden md:flex items-center gap-1">
+          <button
+            onClick={toggleTheme}
+            title="Toggle theme (Light / Dark)"
+            className="p-2.5 rounded-xl text-white/65 hover:text-white hover:bg-white/8 transition-all"
+            aria-label="Toggle Theme"
+          >
+            {settings.theme === 'dark' ? (
+              <Moon className="w-4.5 h-4.5 text-ocean-300" />
+            ) : (
+              <Sun className="w-4.5 h-4.5 text-amber-300" />
+            )}
+          </button>
           <Link to="/bookmarks"
                 className="relative p-2.5 rounded-xl text-white/55 hover:text-white hover:bg-white/8 transition-all">
             <Bookmark className="w-4.5 h-4.5" strokeWidth={2} />

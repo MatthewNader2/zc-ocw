@@ -27,7 +27,10 @@
       "kern" 1;
   }
   body {
-    @apply bg-surface text-ink font-body antialiased;
+    @apply bg-surface text-ink font-body antialiased transition-colors duration-300;
+  }
+  .dark body {
+    @apply bg-slate-950 text-slate-100;
   }
   h1,
   h2,
@@ -39,6 +42,10 @@
   ::selection {
     background: rgba(0, 180, 216, 0.25);
     color: #03045e;
+  }
+  .dark ::selection {
+    background: rgba(0, 180, 216, 0.45);
+    color: #ffffff;
   }
 }
 
@@ -82,14 +89,24 @@
     @apply bg-white rounded-[1.25rem] shadow-card border border-slate-100/80
            transition-all duration-300 ease-spring overflow-hidden;
   }
+  .dark .card {
+    @apply bg-slate-900 border-slate-800/80 text-slate-100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  }
   .card:hover {
     box-shadow:
       0 4px 6px rgba(3, 4, 94, 0.04),
       0 16px 48px rgba(3, 4, 94, 0.12);
     transform: translateY(-3px);
   }
+  .dark .card:hover {
+    box-shadow: 0 8px 30px rgba(0, 180, 216, 0.18);
+  }
   .card-flat {
     @apply bg-white rounded-[1.25rem] border border-slate-100 p-6;
+  }
+  .dark .card-flat {
+    @apply bg-slate-900 border-slate-800 text-slate-100;
   }
   .card-ocean {
     @apply bg-gradient-to-br from-ocean-950 to-ocean-900 rounded-[1.25rem] p-6 text-white;
@@ -115,6 +132,9 @@
            text-ink placeholder:text-ink-ghost font-body
            focus:outline-none focus:ring-2 focus:ring-ocean-400/40 focus:border-ocean-400
            transition-all duration-200;
+  }
+  .dark .input {
+    @apply bg-slate-900 border-slate-700 text-white placeholder:text-slate-500;
   }
   .input-dark {
     @apply w-full px-4 py-2.5 rounded-xl border border-white/15 bg-white/10 text-white

@@ -1,9 +1,11 @@
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import * as storage from '@/services/storage'
 
 const SettingsContext = createContext(null)
 
 const DEFAULTS = {
+  // Appearance & Theme
+  theme:          'system',  // 'light' | 'dark' | 'system'
   // Playback
   autoplayNext:   true,
   defaultQuality: 'hd720',
@@ -28,6 +30,32 @@ export function SettingsProvider({ children }) {
       return next
     })
   }, [])
+
+  // Sync theme mode to documentElement class (.dark)
+  useEffect(() => {
+    const root = document.documentElement
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+    function applyTheme() {
+      const isDark =
+        settings.theme === 'dark' ||
+        (settings.theme === 'system' && mediaQuery.matches)
+
+      if (isDark) {
+        root.classList.add('dark')
+      } else {
+        root.classList.remove('dark')
+      }
+    }
+
+    applyTheme()
+
+    const handler = () => {
+      if (settings.theme === 'system') applyTheme()
+    }
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [settings.theme])
 
   const reset = useCallback(() => {
     storage.remove('user_settings')
