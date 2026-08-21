@@ -5,7 +5,7 @@ const SettingsContext = createContext(null)
 
 const DEFAULTS = {
   // Appearance & Theme
-  theme:          'system',  // 'light' | 'dark' | 'system'
+  theme:          'dark',  // 'dark' | 'light' | 'system'
   // Playback
   autoplayNext:   true,
   defaultQuality: 'hd720',

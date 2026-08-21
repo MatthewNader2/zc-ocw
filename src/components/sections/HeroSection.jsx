@@ -61,7 +61,7 @@ export default function HeroSection() {
   ];
 
   return (
-    <section className="relative min-h-[92vh] flex flex-col justify-center bg-ocean-950 overflow-hidden">
+    <section className="relative min-h-[92vh] flex flex-col justify-center bg-ocean-950 dark:bg-[#000000] overflow-hidden transition-colors duration-300">
       {/* Optimized particle background */}
       <ParticleBackground />
 
