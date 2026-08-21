@@ -31,12 +31,14 @@
 function corsHeaders(env, req) {
 	const origin = req.headers.get('Origin') || '';
 	const allowed = [
-		env.ALLOWED_ORIGIN, // localhost:3000 in dev
-		'https://zc-ocw.vercel.app', // your Vercel URL
-		'https://ocw.zewailcity.edu.eg', // your custom domain
+		env.ALLOWED_ORIGIN,
+		'https://zc-ocw.vercel.app',
+		'https://ocw.zewailcity.edu.eg',
+		'http://localhost:3000',
+		'http://localhost:5173',
 	].filter(Boolean);
 
-	const allowedOrigin = allowed.find((a) => origin.startsWith(a)) || allowed[0];
+	const allowedOrigin = allowed.find((a) => origin && origin.startsWith(a)) || origin || '*';
 
 	return {
 		'Access-Control-Allow-Origin': allowedOrigin,
