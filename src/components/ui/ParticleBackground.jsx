@@ -17,7 +17,6 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
     let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth)
     let height = (canvas.height = canvas.parentElement?.clientHeight || window.innerHeight)
 
-    // Smooth lerping mouse coordinates
     let targetMouseX = width / 2
     let targetMouseY = height / 2
     let mouseX = targetMouseX
@@ -46,104 +45,114 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
     window.addEventListener('mouseleave', handleMouseLeave)
 
     const isMobile = width < 640
-    const particleCount = isMobile ? 18 : 34
+    const particleCount = isMobile ? 22 : 45
 
     const particles = Array.from({ length: particleCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.45,
-      vy: (Math.random() - 0.5) * 0.45,
-      radius: Math.random() * 2.0 + 1.0,
-      baseAlpha: Math.random() * 0.4 + 0.2,
-      colorOffset: Math.random() * 360,
+      vx: (Math.random() - 0.5) * 0.6,
+      vy: (Math.random() - 0.5) * 0.6,
+      radius: Math.random() * 2.2 + 1.0,
+      baseAlpha: Math.random() * 0.45 + 0.25,
+      pulseSpeed: Math.random() * 0.03 + 0.01,
+      angle: Math.random() * Math.PI * 2,
     }))
 
-    let frame = 0
+    let time = 0
 
     const render = () => {
-      frame++
+      time += 0.015
       ctx.clearRect(0, 0, width, height)
 
-      // Lerp mouse position
-      mouseX += (targetMouseX - mouseX) * 0.08
-      mouseY += (targetMouseY - mouseY) * 0.08
+      // Lerp cursor position
+      mouseX += (targetMouseX - mouseX) * 0.1
+      mouseY += (targetMouseY - mouseY) * 0.1
 
       const isDark = document.documentElement.classList.contains('dark')
 
-      // Render interactive cursor glow in dark mode
+      // Render glowing aura spotlight behind mouse in dark mode
       if (isDark && isMouseActive) {
-        const glowGradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 280)
-        glowGradient.addColorStop(0, 'rgba(56, 189, 248, 0.09)')
-        glowGradient.addColorStop(0.5, 'rgba(0, 180, 216, 0.04)')
-        glowGradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
-        ctx.fillStyle = glowGradient
+        const aura = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 320)
+        aura.addColorStop(0, 'rgba(0, 245, 212, 0.12)')
+        aura.addColorStop(0.4, 'rgba(0, 180, 216, 0.06)')
+        aura.addColorStop(1, 'rgba(0, 0, 0, 0)')
+        ctx.fillStyle = aura
         ctx.beginPath()
-        ctx.arc(mouseX, mouseY, 280, 0, Math.PI * 2)
+        ctx.arc(mouseX, mouseY, 320, 0, Math.PI * 2)
         ctx.fill()
       }
 
-      const particleColorRgb = isDark ? '56, 189, 248' : '0, 119, 182'
+      const primaryRgb = isDark ? '0, 245, 212' : '0, 150, 199'
+      const secondaryRgb = isDark ? '0, 180, 216' : '3, 4, 94'
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i]
 
-        // Move particle
+        // Oscillate pulse alpha
+        p.angle += p.pulseSpeed
+        const pulsingAlpha = p.baseAlpha + Math.sin(p.angle) * 0.15
+
+        // Particle physics movement
         p.x += p.vx
         p.y += p.vy
 
-        // Interactive push effect when cursor is close
+        // Mouse orbital attraction
         if (isMouseActive) {
-          const dx = p.x - mouseX
-          const dy = p.y - mouseY
+          const dx = mouseX - p.x
+          const dy = mouseY - p.y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          const maxDist = 160
 
-          if (dist < maxDist && dist > 0) {
-            const force = (1 - dist / maxDist) * 0.8
-            p.x += (dx / dist) * force
-            p.y += (dy / dist) * force
+          if (dist < 220 && dist > 10) {
+            const force = (1 - dist / 220) * 0.4
+            p.x += (dx / dist) * force + Math.cos(time + i) * 0.2
+            p.y += (dy / dist) * force + Math.sin(time + i) * 0.2
           }
         }
 
-        // Screen bounce / wrap
-        if (p.x < 0) p.x = width
-        if (p.x > width) p.x = 0
-        if (p.y < 0) p.y = height
-        if (p.y > height) p.y = 0
+        // Screen boundary bounce/wrap
+        if (p.x < -20) p.x = width + 20
+        if (p.x > width + 20) p.x = -20
+        if (p.y < -20) p.y = height + 20
+        if (p.y > height + 20) p.y = -20
 
-        // Draw particle dot
-        const currentAlpha = p.baseAlpha * (isDark ? 0.7 : 0.4)
+        // Draw particle core
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(${particleColorRgb}, ${currentAlpha})`
+        ctx.fillStyle = `rgba(${primaryRgb}, ${Math.max(0.1, pulsingAlpha)})`
+        ctx.shadowColor = isDark ? 'rgba(0, 245, 212, 0.6)' : 'transparent'
+        ctx.shadowBlur = isDark ? 8 : 0
         ctx.fill()
+        ctx.shadowBlur = 0
 
-        // Draw connecting lines
+        // Draw interactive energy web between particles
         for (let j = i + 1; j < particles.length; j++) {
           const p2 = particles[j]
           const dx = p.x - p2.x
           const dy = p.y - p2.y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          const linkMaxDist = 120
+          const linkMaxDist = 135
 
           if (dist < linkMaxDist) {
-            // Check proximity to cursor for line illumination
             const midX = (p.x + p2.x) / 2
             const midY = (p.y + p2.y) / 2
             const cursorDist = isMouseActive
               ? Math.sqrt((midX - mouseX) ** 2 + (midY - mouseY) ** 2)
               : 999
 
-            let lineAlpha = (1 - dist / linkMaxDist) * (isDark ? 0.22 : 0.08)
-            if (cursorDist < 180) {
-              lineAlpha *= 1 + (1 - cursorDist / 180) * 1.5
+            let lineAlpha = (1 - dist / linkMaxDist) * (isDark ? 0.25 : 0.1)
+
+            // Brighten lines near cursor
+            if (cursorDist < 200) {
+              lineAlpha *= 1 + (1 - cursorDist / 200) * 2.0
             }
 
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = `rgba(${particleColorRgb}, ${Math.min(lineAlpha, 0.45)})`
-            ctx.lineWidth = cursorDist < 180 ? 0.9 : 0.5
+            ctx.strokeStyle = cursorDist < 200
+              ? `rgba(${primaryRgb}, ${Math.min(lineAlpha, 0.6)})`
+              : `rgba(${secondaryRgb}, ${Math.min(lineAlpha, 0.3)})`
+            ctx.lineWidth = cursorDist < 200 ? 1.0 : 0.6
             ctx.stroke()
           }
         }

@@ -31,8 +31,15 @@ export function AdminDataProvider({ children }) {
   });
   const [customSchools, setCustomSchools] = useState(() => storage.getCustomSchools());
   const [customPrograms, setCustomPrograms] = useState(() => storage.getCustomPrograms());
+  const [acknowledgmentsConfig, setAcknowledgmentsConfig] = useState(() => storage.getAcknowledgmentsConfig());
 
   const bump = useCallback(() => setVersion((v) => v + 1), []);
+
+  const updateAcknowledgmentsConfig = useCallback((config) => {
+    setAcknowledgmentsConfig(config);
+    storage.saveAcknowledgmentsConfig(config);
+    bump();
+  }, [bump]);
 
   // ── Custom Schools & Programs CRUD ────────────────────────────────────────
 
@@ -361,6 +368,8 @@ export function AdminDataProvider({ children }) {
       profiles,
       customSchools,
       customPrograms,
+      acknowledgmentsConfig,
+      updateAcknowledgmentsConfig,
       allSchools,
       allPrograms,
       addCustomSchool,
@@ -387,6 +396,8 @@ export function AdminDataProvider({ children }) {
       profiles,
       customSchools,
       customPrograms,
+      acknowledgmentsConfig,
+      updateAcknowledgmentsConfig,
       allSchools,
       allPrograms,
       addCustomSchool,

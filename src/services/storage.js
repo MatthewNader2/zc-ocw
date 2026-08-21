@@ -200,3 +200,41 @@ export function saveCustomSchools(schools) { set('custom_schools', schools) }
 
 export function getCustomPrograms() { return get('custom_programs', {}) }
 export function saveCustomPrograms(programs) { set('custom_programs', programs) }
+
+// ── Acknowledgments Config ───────────────────────────────────────────────────
+
+export const DEFAULT_ACKNOWLEDGMENTS_CONFIG = {
+  headerTitle: "Acknowledgments",
+  headerSubtitle: "Built by students, for students. Huge thanks to everyone who contributed.",
+  slides: [
+    {
+      id: "slide_1",
+      url: "/acknowledgments-hero.jpg",
+      title: "Zewail City Innovation & Research",
+      caption: "Empowering open education and world-class scientific research across Egypt and the Arab world.",
+    },
+    {
+      id: "slide_2",
+      url: "/student-collaboration.jpg",
+      title: "Student & Faculty Collaboration",
+      caption: "Special thanks to all student clubs, course TAs, and professors who dedicated hours to record and organize lecture series.",
+    },
+  ],
+  team: [
+    { id: "t1", name: "Matthew Nader", role: "Project Lead & Full-Stack Architect", school: "CSAI" },
+    { id: "t2", name: "Physics & Math Club", role: "Content Curation & Verification", school: "Science" },
+    { id: "t3", name: "Engineering Society", role: "Lecture Recording & Media Editing", school: "Engineering" },
+  ],
+  sponsors: [
+    { id: "s1", name: "Zewail City of Science and Technology", contribution: "Facility & Recording Equipment" },
+    { id: "s2", name: "CFP Summer School Initiative", contribution: "Special Lecture Content & Materials" },
+  ],
+}
+
+export function getAcknowledgmentsConfig() {
+  return get('acknowledgments_config', DEFAULT_ACKNOWLEDGMENTS_CONFIG)
+}
+
+export function saveAcknowledgmentsConfig(config) {
+  set('acknowledgments_config', config)
+}

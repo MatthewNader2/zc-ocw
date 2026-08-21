@@ -30,7 +30,8 @@
     @apply bg-surface text-ink font-body antialiased transition-colors duration-300;
   }
   .dark body {
-    @apply bg-slate-950 text-slate-100;
+    background-color: #000000 !important;
+    color: #f8fafc !important;
   }
   h1,
   h2,
@@ -44,7 +45,7 @@
     color: #03045e;
   }
   .dark ::selection {
-    background: rgba(0, 180, 216, 0.45);
+    background: rgba(0, 245, 212, 0.35);
     color: #ffffff;
   }
 }
@@ -59,19 +60,19 @@
   }
   .btn-primary {
     @apply btn px-5 py-2.5 text-sm text-white
-           bg-gradient-to-r from-ocean-600 to-ocean-500
-           shadow-[0_2px_12px_rgba(0,150,199,0.35)]
-           hover:shadow-[0_4px_20px_rgba(0,150,199,0.50)]
+           bg-gradient-to-r from-ocean-600 via-ocean-500 to-cyan-500
+           shadow-[0_4px_16px_rgba(0,180,216,0.35)]
+           hover:shadow-[0_6px_24px_rgba(0,245,212,0.50)]
            hover:brightness-110;
   }
   .btn-outline {
-    @apply btn px-5 py-2.5 text-sm text-ocean-700
-           border border-ocean-300 bg-white
-           hover:bg-ocean-50 hover:border-ocean-400;
+    @apply btn px-5 py-2.5 text-sm text-ocean-700 dark:text-cyan-400
+           border border-ocean-300 dark:border-cyan-500/30 bg-white dark:bg-[#0c0c0e]
+           hover:bg-ocean-50 dark:hover:bg-cyan-950/40 hover:border-ocean-400 dark:hover:border-cyan-400;
   }
   .btn-ghost {
-    @apply btn px-3 py-1.5 text-sm text-ocean-600
-           hover:bg-ocean-50 hover:text-ocean-700 rounded-lg;
+    @apply btn px-3 py-1.5 text-sm text-ocean-600 dark:text-cyan-400
+           hover:bg-ocean-50 dark:hover:bg-cyan-950/30 hover:text-ocean-700 dark:hover:text-cyan-300 rounded-lg;
   }
   .btn-danger {
     @apply btn px-4 py-2 text-sm text-white bg-red-500 hover:bg-red-600
@@ -90,8 +91,10 @@
            transition-all duration-300 ease-spring overflow-hidden;
   }
   .dark .card {
-    @apply bg-slate-900 border-slate-800/80 text-slate-100;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    background-color: #0c0c0f !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f8fafc !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
   }
   .card:hover {
     box-shadow:
@@ -100,13 +103,16 @@
     transform: translateY(-3px);
   }
   .dark .card:hover {
-    box-shadow: 0 8px 30px rgba(0, 180, 216, 0.18);
+    border-color: rgba(0, 245, 212, 0.4) !important;
+    box-shadow: 0 12px 36px rgba(0, 180, 216, 0.22);
   }
   .card-flat {
     @apply bg-white rounded-[1.25rem] border border-slate-100 p-6;
   }
   .dark .card-flat {
-    @apply bg-slate-900 border-slate-800 text-slate-100;
+    background-color: #0c0c0f !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f8fafc !important;
   }
   .card-ocean {
     @apply bg-gradient-to-br from-ocean-950 to-ocean-900 rounded-[1.25rem] p-6 text-white;
@@ -118,6 +124,10 @@
   }
   .page-header {
     @apply bg-gradient-to-br from-ocean-950 via-ocean-900 to-ocean-700 text-white py-14 md:py-16;
+  }
+  .dark .page-header {
+    background: linear-gradient(135deg, #000000 0%, #050b14 50%, #09172a 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
   /* Badge */
@@ -134,7 +144,12 @@
            transition-all duration-200;
   }
   .dark .input {
-    @apply bg-slate-900 border-slate-700 text-white placeholder:text-slate-500;
+    background-color: #121218 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+  }
+  .dark .input::placeholder {
+    color: #64748b !important;
   }
   .input-dark {
     @apply w-full px-4 py-2.5 rounded-xl border border-white/15 bg-white/10 text-white

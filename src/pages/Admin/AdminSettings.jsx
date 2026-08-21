@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
-import { Settings, ArrowLeft, Download, Upload, Trash2, Key, Youtube, Plus, GraduationCap, BookOpen, CheckCircle2 } from 'lucide-react'
+import { Settings, ArrowLeft, Download, Upload, Trash2, Key, Youtube, Plus, GraduationCap, BookOpen, CheckCircle2, Image as ImageIcon, Heart } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useAdminData } from '@/context/AdminDataContext'
 import * as storage from '@/services/storage'
@@ -16,12 +16,18 @@ export default function AdminSettings() {
     addCustomSchool,
     deleteCustomSchool,
     addCustomProgram,
-    deleteCustomProgram
+    deleteCustomProgram,
+    acknowledgmentsConfig,
+    updateAcknowledgmentsConfig
   } = useAdminData()
 
   const [exported, setExported] = useState(false)
   const [imported, setImported] = useState(false)
   const [cleared,  setCleared]  = useState(false)
+
+  // Slide form state
+  const [slideForm, setSlideForm] = useState({ url: '', title: '', caption: '' })
+  const [ackSaved, setAckSaved] = useState(false)
 
   // School form state
   const [schoolForm, setSchoolForm] = useState({
@@ -149,6 +155,36 @@ export default function AdminSettings() {
     setTimeout(() => { setCleared(false); window.location.reload() }, 2000)
   }
 
+  function handleAddSlide(e) {
+    e.preventDefault()
+    if (!slideForm.url || !slideForm.title) {
+      alert('Please fill out Image URL and Title.')
+      return
+    }
+    const newSlide = {
+      id: `slide_${Date.now()}`,
+      url: slideForm.url,
+      title: slideForm.title,
+      caption: slideForm.caption,
+    }
+    const nextConfig = {
+      ...acknowledgmentsConfig,
+      slides: [...(acknowledgmentsConfig?.slides || []), newSlide],
+    }
+    updateAcknowledgmentsConfig(nextConfig)
+    setSlideForm({ url: '', title: '', caption: '' })
+    setAckSaved(true)
+    setTimeout(() => setAckSaved(false), 3000)
+  }
+
+  function handleDeleteSlide(slideId) {
+    const nextConfig = {
+      ...acknowledgmentsConfig,
+      slides: (acknowledgmentsConfig?.slides || []).filter((s) => s.id !== slideId),
+    }
+    updateAcknowledgmentsConfig(nextConfig)
+  }
+
   return (
     <>
       <Helmet><title>Admin Settings — ZC OCW</title></Helmet>
@@ -167,6 +203,99 @@ export default function AdminSettings() {
       </div>
 
       <div className="section py-10 max-w-4xl space-y-8">
+
+        {/* 🖼️ Acknowledgments & Image Carousel Manager */}
+        <div className="card-flat border border-slate-100 shadow-card">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
+                <ImageIcon className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-ink dark:text-white">Acknowledgments & Image Slides Manager</h2>
+                <p className="text-xs text-ink-ghost dark:text-slate-400">Add or edit image slides, headers, and captions for the Acknowledgments page.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Add Slide Form */}
+          <form onSubmit={handleAddSlide} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 mb-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
+                <Plus className="w-4 h-4 text-cyan-500" /> Add New Image Slide
+              </h3>
+              {ackSaved && <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Slide Saved!</span>}
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Image URL / Path</label>
+              <input
+                value={slideForm.url}
+                onChange={e => setSlideForm(f => ({ ...f, url: e.target.value }))}
+                placeholder="/acknowledgments-hero.jpg or https://..."
+                className="input text-xs"
+                required
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Slide Title</label>
+                <input
+                  value={slideForm.title}
+                  onChange={e => setSlideForm(f => ({ ...f, title: e.target.value }))}
+                  placeholder="Campus Research Labs"
+                  className="input text-xs"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Caption / Description</label>
+                <input
+                  value={slideForm.caption}
+                  onChange={e => setSlideForm(f => ({ ...f, caption: e.target.value }))}
+                  placeholder="Empowering open education across Egypt..."
+                  className="input text-xs"
+                />
+              </div>
+            </div>
+
+            <button type="submit" className="btn-primary text-xs w-full gap-2">
+              <Plus className="w-3.5 h-3.5" /> Add Slide to Acknowledgments
+            </button>
+          </form>
+
+          {/* Active Slides List */}
+          <div>
+            <h3 className="font-semibold text-sm text-ink dark:text-white mb-3">Active Acknowledgments Image Slides</h3>
+            {acknowledgmentsConfig?.slides?.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {acknowledgmentsConfig.slides.map((s, idx) => (
+                  <div key={s.id || idx} className="relative rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50 dark:bg-slate-900/80 group">
+                    <div className="aspect-video w-full overflow-hidden bg-black">
+                      <img src={s.url} alt={s.title} className="w-full h-full object-cover" />
+                    </div>
+                    <div className="p-3">
+                      <p className="font-bold text-xs text-ink dark:text-white truncate">{s.title}</p>
+                      <p className="text-[11px] text-ink-ghost dark:text-slate-400 line-clamp-2 mt-0.5">{s.caption || 'No caption provided'}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSlide(s.id)}
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500/90 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                      title="Delete Slide"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-ink-ghost">No image slides registered yet.</p>
+            )}
+          </div>
+        </div>
 
         {/* 🎓 Custom Schools & Majors Catalog Management */}
         <div className="card-flat border border-slate-100 shadow-card">
