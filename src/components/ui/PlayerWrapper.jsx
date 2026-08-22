@@ -328,12 +328,12 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
               {/* Visual track */}
               <div className="absolute inset-0 rounded-full overflow-hidden bg-white/15">
                 <div className="h-full rounded-full bg-ocean-400 transition-none"
-                     style={{ width: `${progressPct}%` }} />
+                     style={{ width: `${played * 100}%` }} />
               </div>
               {/* Thumb */}
               <div className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white dark:bg-night-200
                               shadow-glow opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none"
-                   style={{ left: `calc(${progressPct}% - 7px)` }} />
+                   style={{ left: `calc(${played * 100}% - 7px)` }} />
             </div>
             <span className="text-white/60 text-[11px] font-mono w-11 flex-shrink-0">
               {fmtTime(duration)}
