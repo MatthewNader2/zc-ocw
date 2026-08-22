@@ -21,7 +21,7 @@ const LEVELS = ["Undergraduate", "Graduate", "All levels"];
 function FieldLabel({ children, hint }) {
   return (
     <div className="mb-1.5">
-      <label className="block text-sm font-semibold text-ink">{children}</label>
+      <label className="block text-sm font-semibold text-ink dark:text-white">{children}</label>
       {hint && <p className="text-xs text-ink-ghost mt-0.5">{hint}</p>}
     </div>
   );
@@ -146,10 +146,10 @@ export default function AdminCourseEditor() {
         <div className="lg:col-span-3">
           <form
             onSubmit={handleSave}
-            className="card-flat border border-slate-100 shadow-card space-y-6"
+            className="card-flat border border-slate-100 dark:border-white/10 shadow-card space-y-6"
           >
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-              <h2 className="font-display text-xl font-bold text-ink">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/10">
+              <h2 className="font-display text-xl font-bold text-ink dark:text-white">
                 Course Metadata
               </h2>
               {auto && (
@@ -254,7 +254,7 @@ export default function AdminCourseEditor() {
                     className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${
                       form.level === l
                         ? "bg-ocean-950 text-white border-ocean-950"
-                        : "border-slate-200 text-ink-subtle hover:border-ocean-300 hover:text-ocean-600"
+                        : "border-slate-200 dark:border-white/10 text-ink-subtle hover:border-ocean-300 hover:text-ocean-600"
                     }`}
                   >
                     {l}
@@ -298,7 +298,7 @@ export default function AdminCourseEditor() {
             </div>
 
             {/* Save */}
-            <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
+            <div className="flex items-center gap-3 pt-2 border-t border-slate-100 dark:border-white/10">
               <button
                 type="submit"
                 className={`btn gap-2 ${saved ? "btn-outline border-green-300 text-green-600" : "btn-primary"}`}
@@ -323,27 +323,27 @@ export default function AdminCourseEditor() {
         {/* ── Materials + info (2 cols) ── */}
         <div className="lg:col-span-2 space-y-6">
           <ScrollReveal>
-            <div className="card-flat border border-slate-100 shadow-card">
+            <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
               <MaterialsPanel playlistId={playlistId} inAdmin />
             </div>
           </ScrollReveal>
 
           <ScrollReveal delay="0.1s">
-            <div className="card-flat border border-slate-100 shadow-card text-sm space-y-2">
-              <h3 className="font-semibold text-ink mb-3">Playlist Info</h3>
+            <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card text-sm space-y-2">
+              <h3 className="font-semibold text-ink dark:text-white mb-3">Playlist Info</h3>
               <p className="text-ink-ghost">ID:</p>
-              <code className="block bg-slate-50 rounded-lg px-3 py-2 text-xs font-mono text-ink-muted break-all">
+              <code className="block bg-slate-50 dark:bg-night-100 rounded-lg px-3 py-2 text-xs font-mono text-ink-muted dark:text-slate-300 break-all">
                 {playlistId}
               </code>
               <p className="text-ink-ghost mt-2">
                 Lectures:{" "}
-                <strong className="text-ink">
+                <strong className="text-ink dark:text-white">
                   {course.contentDetails.itemCount}
                 </strong>
               </p>
               {auto && (
-                <div className="mt-3 pt-3 border-t border-slate-100 space-y-1">
-                  <p className="text-xs font-semibold text-ink">
+                <div className="mt-3 pt-3 border-t border-slate-100 dark:border-white/10 space-y-1">
+                  <p className="text-xs font-semibold text-ink dark:text-white">
                     Auto-detection
                   </p>
                   <p className="text-xs text-ink-ghost">

@@ -17,7 +17,7 @@ export default function BookmarkButton({ playlistId, size = 'md', className = ''
         s,
         saved
           ? 'bg-ocean-500 text-white shadow-glow scale-105'
-          : 'bg-white/90 text-slate-400 hover:text-ocean-500 hover:bg-white backdrop-blur-sm hover:scale-105',
+          : 'bg-white/90 text-slate-400 hover:text-ocean-500 hover:bg-white dark:bg-night-200 backdrop-blur-sm hover:scale-105',
         className
       )}>
       <Bookmark className={clsx(i, 'transition-transform duration-200')} fill={saved ? 'currentColor' : 'none'} strokeWidth={2} />

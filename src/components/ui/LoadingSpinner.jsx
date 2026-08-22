@@ -8,7 +8,7 @@ export function LoadingSpinner({ size = 'md', className = '' }) {
 }
 export function CourseCardSkeleton() {
   return (
-    <div className="bg-white rounded-[1.25rem] border border-slate-100 overflow-hidden">
+    <div className="bg-white dark:bg-night-200 rounded-[1.25rem] border border-slate-100 dark:border-white/10 overflow-hidden">
       <div className="aspect-video skeleton" />
       <div className="p-4 space-y-3">
         <div className="skeleton h-3.5 w-16 rounded-full" />

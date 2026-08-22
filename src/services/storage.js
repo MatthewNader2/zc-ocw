@@ -219,6 +219,18 @@ export const DEFAULT_ACKNOWLEDGMENTS_CONFIG = {
       title: "Student & Faculty Collaboration",
       caption: "Special thanks to all student clubs, course TAs, and professors who dedicated hours to record and organize lecture series.",
     },
+    {
+      // Placeholder slide — drop a file named image1.jpg into the /public
+      // folder at the repo root (same level as acknowledgments-hero.jpg).
+      // Vite serves everything in /public from the site root, so
+      // /image1.jpg here resolves to yourdomain.com/image1.jpg.
+      // Admins can also replace this via the Acknowledgments editor in
+      // /admin/settings (upload a file or paste a URL) once deployed.
+      id: "slide_3",
+      url: "/image1.jpg",
+      title: "Add your photo",
+      caption: "Placeholder slide — upload image1.jpg to /public, or replace it from the admin panel.",
+    },
   ],
   team: [
     { id: "t1", name: "Matthew Nader", role: "Project Lead & Full-Stack Architect", school: "CSAI" },

@@ -2,6 +2,8 @@
  * ZC OCW — Cloudflare Worker API
  *
  * Routes:
+ * GET    /api/acknowledgments        → acknowledgments page config
+ * PUT    /api/acknowledgments        → save acknowledgments config [admin]
  * GET    /api/overrides              → all course overrides
  * GET    /api/overrides/:id          → one course override
  * PUT    /api/overrides/:id          → upsert course override  [admin]
@@ -21,11 +23,28 @@
  * GET    /api/profiles/:id          → get profile by playlist_id
  * PUT    /api/profiles              → bulk upsert profiles [admin]
  * PUT    /api/profiles/:id          → upsert single profile [admin]
+ * GET    /api/admins/me             → { isAdmin, email } for the caller's Firebase token
+ * GET    /api/admins                → list admin emails       [admin]
+ * POST   /api/admins                → grant admin by email    [admin]
+ * DELETE /api/admins/:email         → revoke admin by email   [admin]
  * GET    /api/health                → health check
  *
  * Authentication:
- * Admin routes require header: Authorization: Bearer YOUR_ADMIN_PASSWORD
+ * Admin routes require header: Authorization: Bearer <Firebase ID token>
+ * The token is verified against Firebase's public keys, then the caller's
+ * email is checked against the `admins` D1 table (or FIREBASE_SUPER_ADMIN_EMAIL,
+ * which always counts as admin — this is how you bootstrap the very first one).
  */
+
+import { jwtVerify, createRemoteJWKSet } from 'jose';
+
+// Firebase ID tokens are RS256-signed by Google; this is Google's fixed
+// public JWKS endpoint for "secure token" (Firebase Auth) — same for every
+// Firebase project, cached in-memory by `jose` across requests.
+const FIREBASE_JWKS = createRemoteJWKSet(
+	new URL('https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'),
+);
+
 
 // ── CORS headers — allow your frontend to call this API ────────────────────
 function corsHeaders(env, req) {
@@ -66,11 +85,43 @@ function sanitize(str) {
 }
 
 // ── Auth check ──────────────────────────────────────────────────────────────
-function isAdmin(req, env) {
+// Verifies the caller sent a real, valid Firebase ID token (signature +
+// expiry + project), then checks that the token's email is allowed to
+// administer this site. Returns the verified email on success, or null.
+async function verifyAdmin(req, env) {
 	const header = req.headers.get('Authorization') || '';
 	const token = header.replace('Bearer ', '').trim();
-	return token === env.ADMIN_PASSWORD;
+	if (!token) return null;
+
+	let payload;
+	try {
+		const result = await jwtVerify(token, FIREBASE_JWKS, {
+			issuer: `https://securetoken.google.com/${env.FIREBASE_PROJECT_ID}`,
+			audience: env.FIREBASE_PROJECT_ID,
+		});
+		payload = result.payload;
+	} catch {
+		return null; // bad signature, expired, wrong project, malformed, etc.
+	}
+
+	const email = (payload.email || '').toLowerCase();
+	if (!email || !payload.email_verified) return null;
+
+	// Bootstrap path: this email is always admin, even before the admins
+	// table has any rows — set once as a Worker secret, see DEPLOYMENT.md.
+	if (env.FIREBASE_SUPER_ADMIN_EMAIL && email === env.FIREBASE_SUPER_ADMIN_EMAIL.toLowerCase()) {
+		return email;
+	}
+
+	const row = await env.DB.prepare('SELECT email FROM admins WHERE email = ?').bind(email).first();
+	return row ? email : null;
 }
+
+// Convenience boolean wrapper for routes that only need a yes/no.
+async function isAdmin(req, env) {
+	return (await verifyAdmin(req, env)) !== null;
+}
+
 
 // ── Main router ─────────────────────────────────────────────────────────────
 export default {
@@ -167,7 +218,7 @@ export default {
 
 			// ── PUT /api/overrides/:playlistId ─────────────────────────────────
 			if (resource === 'overrides' && id && req.method === 'PUT') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				await env.DB.prepare(
 					`
@@ -202,6 +253,71 @@ export default {
 				return json({ ok: true }, 200, cors);
 			}
 
+			// ── GET /api/acknowledgments ─────────────────────────────────────────
+			if (resource === 'acknowledgments' && !id && req.method === 'GET') {
+				const row = await env.DB.prepare('SELECT config_json FROM acknowledgments WHERE id = 1').first();
+				if (!row) return json(null, 200, cors); // client falls back to its local default
+				return json(JSON.parse(row.config_json), 200, cors);
+			}
+
+			// ── PUT /api/acknowledgments ──────────────────────────────────────── [admin]
+			if (resource === 'acknowledgments' && !id && req.method === 'PUT') {
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				const body = await req.json();
+				await env.DB.prepare(
+					`
+          INSERT INTO acknowledgments (id, config_json, updated_at)
+          VALUES (1, ?, datetime('now'))
+          ON CONFLICT(id) DO UPDATE SET
+            config_json = excluded.config_json,
+            updated_at  = excluded.updated_at
+        `,
+				)
+					.bind(JSON.stringify(body))
+					.run();
+				return json({ ok: true }, 200, cors);
+			}
+
+			// ── GET /api/admins/me ──────────────────────────────────────────────
+			// Frontend calls this right after Firebase login to decide whether to
+			// show the admin UI. Never trust a client-side role check alone —
+			// every actual admin write below re-verifies via isAdmin() regardless.
+			if (resource === 'admins' && id === 'me' && req.method === 'GET') {
+				const email = await verifyAdmin(req, env);
+				return json({ isAdmin: !!email, email: email || null }, 200, cors);
+			}
+
+			// ── GET /api/admins ──────────────────────────────────────────────── [admin]
+			if (resource === 'admins' && !id && req.method === 'GET') {
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				const { results } = await env.DB.prepare('SELECT email, added_by, added_at FROM admins ORDER BY added_at').all();
+				return json(results, 200, cors);
+			}
+
+			// ── POST /api/admins ─────────────────────────────────────────────── [admin]
+			// Body: { email }. Grants admin access to another Firebase account.
+			if (resource === 'admins' && !id && req.method === 'POST') {
+				const grantedBy = await verifyAdmin(req, env);
+				if (!grantedBy) return err('Unauthorized', 401, cors);
+				const body = await req.json();
+				const email = (body.email || '').trim().toLowerCase();
+				if (!email || !email.includes('@')) return err('Valid email required', 400, cors);
+				await env.DB.prepare('INSERT OR IGNORE INTO admins (email, added_by) VALUES (?, ?)').bind(email, grantedBy).run();
+				return json({ ok: true, email }, 201, cors);
+			}
+
+			// ── DELETE /api/admins/:email ────────────────────────────────────── [admin]
+			if (resource === 'admins' && id && req.method === 'DELETE') {
+				const requester = await verifyAdmin(req, env);
+				if (!requester) return err('Unauthorized', 401, cors);
+				const targetEmail = decodeURIComponent(id).toLowerCase();
+				if (env.FIREBASE_SUPER_ADMIN_EMAIL && targetEmail === env.FIREBASE_SUPER_ADMIN_EMAIL.toLowerCase()) {
+					return err('Cannot remove the super admin', 400, cors);
+				}
+				await env.DB.prepare('DELETE FROM admins WHERE email = ?').bind(targetEmail).run();
+				return json({ ok: true }, 200, cors);
+			}
+
 			// ── GET /api/materials/:playlistId ─────────────────────────────────
 			if (resource === 'materials' && id && req.method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM materials WHERE playlist_id = ? ORDER BY added_at').bind(id).all();
@@ -211,7 +327,9 @@ export default {
 					results.map(async (row) => {
 						if (row.file_key && !row.url) {
 							// Public R2 URL (if bucket is public) or signed URL
-							row.url = `https://pub-${env.R2_PUBLIC_ID}.r2.dev/${row.file_key}`;
+							// R2_PUBLIC_ID is already the full https://pub-xxxx.r2.dev base URL
+						// (see wrangler.jsonc) — do not re-wrap it in https://pub-…/.r2.dev.
+						row.url = `${env.R2_PUBLIC_ID}/${row.file_key}`;
 						}
 						return row;
 					}),
@@ -221,7 +339,7 @@ export default {
 
 			// ── POST /api/materials/:playlistId ────────────────────────────────
 			if (resource === 'materials' && id && req.method === 'POST') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				const newId = crypto.randomUUID();
 				await env.DB.prepare(
@@ -246,7 +364,7 @@ export default {
 
 			// ── DELETE /api/materials/:id ──────────────────────────────────────
 			if (resource === 'materials' && id && req.method === 'DELETE') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 				// If file was in R2, delete it too
 				const row = await env.DB.prepare('SELECT file_key FROM materials WHERE id = ?').bind(id).first();
 				if (row?.file_key) {
@@ -258,7 +376,7 @@ export default {
 
 			// ── POST /api/upload/:playlistId ───────────────────────────────────
 			if (resource === 'upload' && id && req.method === 'POST') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 
 				const contentType = req.headers.get('Content-Type') || '';
 				if (!contentType.includes('multipart/form-data')) {
@@ -291,7 +409,11 @@ export default {
 					.bind(newId, id, type, label, fileKey, file.size, file.type)
 					.run();
 
-				return json({ id: newId, fileKey, size: file.size }, 201, cors);
+				return json(
+					{ id: newId, fileKey, size: file.size, publicUrl: `${env.R2_PUBLIC_ID}/${fileKey}` },
+					201,
+					cors,
+				);
 			}
 
 			// ── GET /api/books/:playlistId ─────────────────────────────────────
@@ -302,7 +424,7 @@ export default {
 
 			// ── POST /api/books/:playlistId ────────────────────────────────────
 			if (resource === 'books' && id && req.method === 'POST') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				const newId = crypto.randomUUID();
 				await env.DB.prepare(
@@ -318,7 +440,7 @@ export default {
 
 			// ── DELETE /api/books/:id ──────────────────────────────────────────
 			if (resource === 'books' && id && req.method === 'DELETE') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 				await env.DB.prepare('DELETE FROM books WHERE id = ?').bind(id).run();
 				return json({ ok: true }, 200, cors);
 			}
@@ -347,7 +469,7 @@ export default {
 			// ── PUT /api/profiles ──────────────────────────────────────────────────────
 			// Bulk upsert (profiler script uses this)
 			if (resource === 'profiles' && !id && req.method === 'PUT') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				const profiles = Array.isArray(body) ? body : [body];
 
@@ -403,7 +525,7 @@ export default {
 
 			// ── PUT /api/profiles/:playlistId ──────────────────────────────────────────
 			if (resource === 'profiles' && id && req.method === 'PUT') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				await env.DB.prepare(
 					`
@@ -547,7 +669,7 @@ export default {
 
 			// ── GET /api/feedback ── Admin only: list all feedback ─────────────────────
 			if (resource === 'feedback' && !id && req.method === 'GET') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 
 				const type = url.searchParams.get('type');
 				let sql = 'SELECT * FROM feedback';
@@ -567,7 +689,7 @@ export default {
 
 			// ── GET /api/feedback/:id ── Admin only: get single feedback ───────────────
 			if (resource === 'feedback' && id && req.method === 'GET') {
-				if (!isAdmin(req, env)) return err('Unauthorized', 401, cors);
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
 
 				const row = await env.DB.prepare('SELECT * FROM feedback WHERE id = ?').bind(id).first();
 				if (!row) return err('Not found', 404, cors);

@@ -27,7 +27,7 @@ export default function ShareButton({ title, url }) {
         "inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all border",
         copied
           ? "bg-green-50 border-green-200 text-green-700"
-          : "bg-white border-slate-200 text-ink-subtle hover:border-ocean-400 hover:text-ocean-600",
+          : "bg-white dark:bg-night-200 border-slate-200 dark:border-white/10 text-ink-subtle hover:border-ocean-400 hover:text-ocean-600",
       )}
     >
       {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}

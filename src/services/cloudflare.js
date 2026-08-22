@@ -6,8 +6,9 @@
  * only one import line changed.
  */
 
+import { getIdToken } from "./firebase";
+
 const BASE = import.meta.env.VITE_WORKER_URL;
-const PASS = import.meta.env.VITE_ADMIN_PASSWORD;
 
 export const isConfigured = !!BASE;
 
@@ -17,7 +18,11 @@ async function call(path, { method = "GET", body, admin = false } = {}) {
   if (!isConfigured) throw new Error("VITE_WORKER_URL not set in .env");
 
   const headers = { "Content-Type": "application/json" };
-  if (admin) headers["Authorization"] = `Bearer ${PASS}`;
+  if (admin) {
+    const token = await getIdToken();
+    if (!token) throw new Error("Not signed in");
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   const res = await fetch(`${BASE}/api/${path}`, {
     method,
@@ -39,13 +44,16 @@ async function call(path, { method = "GET", body, admin = false } = {}) {
 export async function uploadFile(file, playlistId) {
   if (!isConfigured) throw new Error("VITE_WORKER_URL not set");
 
+  const token = await getIdToken();
+  if (!token) throw new Error("Not signed in");
+
   const formData = new FormData();
   formData.append("file", file);
   formData.append("label", file.name);
 
   const res = await fetch(`${BASE}/api/upload/${playlistId}`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${PASS}` },
+    headers: { Authorization: `Bearer ${token}` },
     body: formData,
     // Note: do NOT set Content-Type here — browser sets it automatically
     // with the correct multipart boundary
@@ -138,6 +146,37 @@ export async function insertBook(playlistId, book) {
 export async function deleteBook(id) {
   if (!isConfigured) return;
   await call(`books/${id}`, { method: "DELETE", admin: true });
+}
+
+// ── Acknowledgments page config ────────────────────────────────────────────
+// Single JSON blob (header text, image slides, team, sponsors) — synced so
+// every visitor sees what an admin published, not just the admin's own browser.
+
+export async function fetchAcknowledgments() {
+  if (!isConfigured) return null;
+  return call("acknowledgments");
+}
+
+export async function upsertAcknowledgments(config) {
+  if (!isConfigured) return;
+  await call("acknowledgments", { method: "PUT", body: config, admin: true });
+}
+
+// ── Admin team management ────────────────────────────────────────────────────
+// Distinct from the content sync above — this manages who is allowed into
+// /admin at all. All three require the caller to already be an admin
+// (enforced server-side); the Worker rejects otherwise.
+
+export async function fetchAdmins() {
+  return call("admins", { admin: true });
+}
+
+export async function grantAdmin(email) {
+  return call("admins", { method: "POST", body: { email }, admin: true });
+}
+
+export async function revokeAdmin(email) {
+  return call(`admins/${encodeURIComponent(email)}`, { method: "DELETE", admin: true });
 }
 
 // ── Playlist Profiles ────────────────────────────────────────────────────────

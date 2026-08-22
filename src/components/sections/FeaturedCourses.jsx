@@ -20,7 +20,7 @@ export default function FeaturedCourses() {
             <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">
               Open CourseWare
             </p>
-            <h2 className="font-display text-4xl md:text-5xl text-ink font-bold">
+            <h2 className="font-display text-4xl md:text-5xl text-ink dark:text-white font-bold">
               Latest Courses
             </h2>
           </div>

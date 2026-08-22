@@ -72,7 +72,7 @@ export default function ReportBug() {
     return (
       <div className="section py-24 text-center max-w-md mx-auto">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h1 className="font-display text-2xl font-bold text-ink mb-2">
+        <h1 className="font-display text-2xl font-bold text-ink dark:text-white mb-2">
           Bug Report Sent
         </h1>
         <p className="text-ink-muted">
@@ -107,7 +107,7 @@ export default function ReportBug() {
                 <input
                   id="bug-name"
                   required
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-night-100 px-4 py-2.5 text-sm text-ink dark:text-white placeholder:text-ink-ghost dark:placeholder:text-slate-500 focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                   value={form.name}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, name: e.target.value }))
@@ -122,7 +122,7 @@ export default function ReportBug() {
                   id="bug-email"
                   required
                   type="email"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
+                  className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-night-100 px-4 py-2.5 text-sm text-ink dark:text-white placeholder:text-ink-ghost dark:placeholder:text-slate-500 focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                   value={form.email}
                   onChange={(e) =>
                     setForm((f) => ({ ...f, email: e.target.value }))
@@ -136,7 +136,7 @@ export default function ReportBug() {
               </label>
               <select
                 id="bug-category"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-night-100 px-4 py-2.5 text-sm text-ink dark:text-white focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 value={form.category}
                 onChange={(e) =>
                   setForm((f) => ({ ...f, category: e.target.value }))
@@ -154,7 +154,7 @@ export default function ReportBug() {
               <input
                 id="bug-title"
                 required
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-night-100 px-4 py-2.5 text-sm text-ink dark:text-white placeholder:text-ink-ghost dark:placeholder:text-slate-500 focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 placeholder="e.g. Search results empty"
                 value={form.title}
                 onChange={(e) =>
@@ -170,7 +170,7 @@ export default function ReportBug() {
                 id="bug-steps"
                 required
                 rows={4}
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-night-100 px-4 py-2.5 text-sm text-ink dark:text-white placeholder:text-ink-ghost dark:placeholder:text-slate-500 focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 placeholder="1. Go to... 2. Click..."
                 value={form.steps}
                 onChange={(e) =>
@@ -184,7 +184,7 @@ export default function ReportBug() {
               </label>
               <input
                 id="bug-browser"
-                className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-ghost focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
+                className="w-full rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-night-100 px-4 py-2.5 text-sm text-ink dark:text-white placeholder:text-ink-ghost dark:placeholder:text-slate-500 focus:border-ocean-500 focus:outline-none focus:ring-2 focus:ring-ocean-500/20 transition-all"
                 placeholder="Chrome 120 on Windows 11"
                 value={form.browser}
                 onChange={(e) =>

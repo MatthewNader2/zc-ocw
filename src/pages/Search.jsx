@@ -99,7 +99,7 @@ export default function Search() {
                     className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                       tab === id
                         ? 'bg-ocean-600 text-white shadow-glow'
-                        : 'bg-white border border-slate-200 text-ink-subtle hover:border-ocean-300 hover:text-ocean-600'
+                        : 'bg-white dark:bg-night-200 border border-slate-200 dark:border-white/10 text-ink-subtle hover:border-ocean-300 hover:text-ocean-600'
                     }`}>
               <Icon className="w-4 h-4" />
               {label}
@@ -146,12 +146,12 @@ export default function Search() {
                    href={`https://www.youtube.com/watch?v=${vid}`}
                    target="_blank" rel="noopener noreferrer"
                    className="card flex gap-4 p-4 hover:shadow-card-hover group">
-                  <div className="w-36 aspect-video rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
+                  <div className="w-36 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-night-100 flex-shrink-0">
                     <img src={getThumbnail(item.snippet, 'medium')} alt={item.snippet.title}
                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-display font-semibold text-sm text-ink group-hover:text-ocean-600 transition-colors line-clamp-2 mb-1">
+                    <p className="font-display font-semibold text-sm text-ink dark:text-white group-hover:text-ocean-600 transition-colors line-clamp-2 mb-1">
                       {item.snippet.title}
                     </p>
                     <p className="text-xs text-ink-ghost line-clamp-2">{item.snippet.description}</p>

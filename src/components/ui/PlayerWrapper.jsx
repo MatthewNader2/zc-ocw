@@ -331,7 +331,7 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
                      style={{ width: `${progressPct}%` }} />
               </div>
               {/* Thumb */}
-              <div className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white
+              <div className="absolute top-1/2 -translate-y-1/2 w-3.5 h-3.5 rounded-full bg-white dark:bg-night-200
                               shadow-glow opacity-0 group-hover/seek:opacity-100 transition-opacity pointer-events-none"
                    style={{ left: `calc(${progressPct}% - 7px)` }} />
             </div>

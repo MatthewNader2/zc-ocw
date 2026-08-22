@@ -18,7 +18,7 @@ function Toggle({ checked, onChange }) {
                   cursor-pointer flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-ocean-400/40
                   ${checked ? 'bg-ocean-500' : 'bg-slate-200'}`}
     >
-      <span className={`pointer-events-none absolute top-1 h-4 w-4 rounded-full bg-white
+      <span className={`pointer-events-none absolute top-1 h-4 w-4 rounded-full bg-white dark:bg-night-200
                         shadow-sm transition-transform duration-300
                         ${checked ? 'translate-x-6' : 'translate-x-1'}`} />
     </button>
@@ -29,7 +29,7 @@ function Toggle({ checked, onChange }) {
 function SettingRow({ label, desc, children }) {
   return (
     <div className="flex items-center justify-between gap-6 py-4
-                    border-b border-slate-100 dark:border-slate-800 last:border-0">
+                    border-b border-slate-100 dark:border-white/10 last:border-0">
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm text-ink dark:text-white">{label}</p>
         {desc && <p className="text-xs text-ink-ghost dark:text-slate-400 mt-0.5 leading-relaxed">{desc}</p>}
@@ -42,8 +42,8 @@ function SettingRow({ label, desc, children }) {
 /* ── Section card ────────────────────────────────────────────────────────────── */
 function Section({ icon: Icon, iconColor, title, children }) {
   return (
-    <div className="card-flat border border-slate-100 dark:border-slate-800 dark:bg-slate-900 shadow-card">
-      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800">
+    <div className="card-flat border border-slate-100 dark:border-white/10 dark:bg-night-200 shadow-card">
+      <div className="flex items-center gap-3 mb-5 pb-4 border-b border-slate-100 dark:border-white/10">
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${iconColor}`}>
           <Icon className="w-4.5 h-4.5" strokeWidth={1.8} />
         </div>

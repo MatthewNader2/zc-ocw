@@ -238,14 +238,14 @@ export default function CourseDetail() {
         {/* Lecture list */}
         <div className="lg:col-span-2">
           <ScrollReveal>
-            <h2 className="font-display text-2xl font-bold text-ink mb-5">
+            <h2 className="font-display text-2xl font-bold text-ink dark:text-white mb-5">
               Lectures
               <span className="ml-2 text-base font-body text-ink-ghost font-normal">
                 ({contentDetails.itemCount})
               </span>
             </h2>
           </ScrollReveal>
-          <div className="space-y-1 bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden p-2">
+          <div className="space-y-1 bg-white dark:bg-night-200 rounded-2xl border border-slate-100 dark:border-white/10 shadow-card overflow-hidden p-2">
             {ll ? (
               Array.from({ length: 8 }).map((_, i) => (
                 <VideoCardSkeleton key={i} />
@@ -268,13 +268,13 @@ export default function CourseDetail() {
         {/* Sidebar */}
         <aside className="space-y-6">
           <ScrollReveal>
-            <div className="card-flat border border-slate-100 shadow-card">
+            <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
               <MaterialsPanel playlistId={playlistId} />
             </div>
           </ScrollReveal>
           <ScrollReveal delay="0.1s">
-            <div className="card-flat border border-slate-100 shadow-card">
-              <h3 className="font-display text-base font-bold text-ink mb-4">
+            <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+              <h3 className="font-display text-base font-bold text-ink dark:text-white mb-4">
                 Course Info
               </h3>
               <dl className="space-y-3 text-sm">
@@ -300,7 +300,7 @@ export default function CourseDetail() {
                       className="flex justify-between gap-2 pb-2.5 border-b border-slate-50 last:border-0 last:pb-0"
                     >
                       <dt className="text-ink-ghost">{label}</dt>
-                      <dd className="font-semibold text-ink text-right">
+                      <dd className="font-semibold text-ink dark:text-white text-right">
                         {val}
                       </dd>
                     </div>

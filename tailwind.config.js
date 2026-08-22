@@ -35,6 +35,16 @@ export default {
           subtle:  '#64748b',
           ghost:   '#94a3b8',
         },
+        // True-black dark mode surface scale — every dark: bg in the app
+        // should come from this scale so nothing reads as "off-black" navy.
+        night: {
+          DEFAULT: '#000000',
+          50:  '#16161b', // hover / nested elements, lightest panel
+          100: '#121218', // inputs, raised chips
+          200: '#0c0c0f', // cards, page panels
+          300: '#09090b', // subtle elevation
+          400: '#000000', // true black — page/app background
+        },
       },
       fontFamily: {
         display: ['"Sora"', 'sans-serif'],

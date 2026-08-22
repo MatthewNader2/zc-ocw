@@ -9,11 +9,11 @@ export default function DepartmentGrid() {
   const { allSchools } = useAdminData()
 
   return (
-    <section className="py-20 bg-slate-50/60">
+    <section className="py-20 bg-slate-50/60 dark:bg-night-200/40">
       <div className="section">
         <ScrollReveal className="text-center mb-12">
           <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">Explore by field</p>
-          <h2 className="font-display text-4xl md:text-5xl text-ink font-bold">Schools &amp; Programs</h2>
+          <h2 className="font-display text-4xl md:text-5xl text-ink dark:text-white font-bold">Schools &amp; Programs</h2>
         </ScrollReveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -38,7 +38,7 @@ export default function DepartmentGrid() {
                   </div>
 
                   <div className="flex-1">
-                    <h3 className="font-display font-bold text-lg text-ink mb-1.5 leading-snug
+                    <h3 className="font-display font-bold text-lg text-ink dark:text-white mb-1.5 leading-snug
                                    group-hover:transition-colors duration-200"
                         style={{ '--tw-text-opacity': 1 }}
                         onMouseEnter={e => e.currentTarget.style.color = accent}

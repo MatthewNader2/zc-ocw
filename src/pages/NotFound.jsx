@@ -7,7 +7,7 @@ export default function NotFound() {
       <Helmet><title>404 — ZC OCW</title></Helmet>
       <div className="flex flex-col items-center justify-center min-h-[75vh] text-center px-4">
         <p className="font-mono text-[9rem] font-bold text-ocean-100 leading-none mb-2 select-none">404</p>
-        <h1 className="font-display text-3xl font-bold text-ink mb-3">Page not found</h1>
+        <h1 className="font-display text-3xl font-bold text-ink dark:text-white mb-3">Page not found</h1>
         <p className="text-ink-ghost max-w-sm mb-10 leading-relaxed">
           The page you're looking for doesn't exist or may have been moved.
         </p>

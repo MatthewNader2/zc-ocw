@@ -37,9 +37,25 @@ export function AdminDataProvider({ children }) {
 
   const updateAcknowledgmentsConfig = useCallback((config) => {
     setAcknowledgmentsConfig(config);
-    storage.saveAcknowledgmentsConfig(config);
+    storage.saveAcknowledgmentsConfig(config); // instant local reflect + offline fallback
+    if (useCloud) {
+      cloudflare.upsertAcknowledgments(config).catch(() => {
+        // Cloud write failed (offline / API down) — local copy above still
+        // means this admin sees their edit; it just won't be visible to
+        // other visitors until the next successful sync.
+      });
+    }
     bump();
-  }, [bump]);
+  }, [bump, useCloud]);
+
+  // Upload an image for the Acknowledgments page slideshow. Reuses the same
+  // R2-backed /api/upload/:playlistId endpoint materials use, under a fixed
+  // pseudo course id — no separate storage bucket/route needed.
+  const uploadAcknowledgmentImage = useCallback(async (file) => {
+    if (!useCloud) throw new Error("Cloud storage isn't configured (VITE_WORKER_URL missing) — paste a URL instead.");
+    const { publicUrl } = await cloudflare.uploadFile(file, "acknowledgments");
+    return publicUrl;
+  }, [useCloud]);
 
   // ── Custom Schools & Programs CRUD ────────────────────────────────────────
 
@@ -112,8 +128,14 @@ export function AdminDataProvider({ children }) {
       Promise.allSettled([
         cloudflare.fetchProfiles(),
         cloudflare.fetchAllOverrides(),
-      ]).then(([profilesResult, overridesResult]) => {
+        cloudflare.fetchAcknowledgments(),
+      ]).then(([profilesResult, overridesResult, ackResult]) => {
         if (!active) return;
+
+        if (ackResult.status === "fulfilled" && ackResult.value) {
+          setAcknowledgmentsConfig(ackResult.value);
+          storage.saveAcknowledgmentsConfig(ackResult.value);
+        }
 
         if (profilesResult.status === "fulfilled" && profilesResult.value?.length) {
           setProfiles(profilesResult.value);
@@ -370,6 +392,7 @@ export function AdminDataProvider({ children }) {
       customPrograms,
       acknowledgmentsConfig,
       updateAcknowledgmentsConfig,
+      uploadAcknowledgmentImage,
       allSchools,
       allPrograms,
       addCustomSchool,
@@ -398,6 +421,7 @@ export function AdminDataProvider({ children }) {
       customPrograms,
       acknowledgmentsConfig,
       updateAcknowledgmentsConfig,
+      uploadAcknowledgmentImage,
       allSchools,
       allPrograms,
       addCustomSchool,

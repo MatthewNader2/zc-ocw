@@ -40,7 +40,7 @@ export default function About() {
                 { label:'Subscribers', value: Number(stats.subscriberCount).toLocaleString() },
                 { label:'Free',        value: '100%'                                          },
               ].map(({ label, value }) => (
-                <div key={label} className="card-flat border border-slate-100 shadow-card text-center">
+                <div key={label} className="card-flat border border-slate-100 dark:border-white/10 shadow-card text-center">
                   <p className="font-display text-3xl font-bold text-ocean-600">{value}</p>
                   <p className="text-sm text-ink-ghost mt-1">{label}</p>
                 </div>
@@ -51,7 +51,7 @@ export default function About() {
 
         {/* Mission */}
         <ScrollReveal delay="0.1s" className="space-y-4">
-          <h2 className="font-display text-3xl font-bold text-ink">Our Mission</h2>
+          <h2 className="font-display text-3xl font-bold text-ink dark:text-white">Our Mission</h2>
           <p className="text-ink-muted leading-relaxed">
             Zewail City was founded on the belief that access to world-class education is a right, not a privilege.
             ZC OCW extends that mission to the digital world — making our courses available to students across Egypt,
@@ -62,7 +62,7 @@ export default function About() {
         {/* Features */}
         <div>
           <ScrollReveal>
-            <h2 className="font-display text-3xl font-bold text-ink mb-8">What We Offer</h2>
+            <h2 className="font-display text-3xl font-bold text-ink dark:text-white mb-8">What We Offer</h2>
           </ScrollReveal>
           <div className="grid sm:grid-cols-2 gap-4">
             {[
@@ -77,7 +77,7 @@ export default function About() {
                     <Icon className="w-5 h-5" strokeWidth={1.8} />
                   </div>
                   <div>
-                    <h3 className="font-display font-bold text-ink mb-1">{title}</h3>
+                    <h3 className="font-display font-bold text-ink dark:text-white mb-1">{title}</h3>
                     <p className="text-sm text-ink-ghost leading-relaxed">{body}</p>
                   </div>
                 </div>
@@ -89,7 +89,7 @@ export default function About() {
         {/* License */}
         <ScrollReveal delay="0.1s">
           <div className="bg-ocean-50 border border-ocean-200/60 rounded-2xl p-6">
-            <h2 className="font-display text-2xl font-bold text-ink mb-3">License</h2>
+            <h2 className="font-display text-2xl font-bold text-ink dark:text-white mb-3">License</h2>
             <p className="text-ink-muted leading-relaxed text-sm">
               All course materials on ZC OCW are shared under a{' '}
               <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer"

@@ -33,7 +33,7 @@ export default function Departments() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-4 flex-wrap">
-                    <h2 className="font-display text-2xl md:text-3xl font-bold text-ink">{school.label}</h2>
+                    <h2 className="font-display text-2xl md:text-3xl font-bold text-ink dark:text-white">{school.label}</h2>
                     <Link to={`/departments/${school.id}`}
                           className="text-xs font-semibold flex items-center gap-1 transition-colors"
                           style={{ color: accent }}>
@@ -48,9 +48,9 @@ export default function Departments() {
                 {programs.map((prog, pi) => (
                   <ScrollReveal key={prog.id} delay={`${pi * 0.04}s`}>
                     <Link to={`/departments/${school.id}/${prog.id}`}
-                          className="group flex flex-col gap-1.5 bg-white rounded-2xl p-4 border border-slate-100
+                          className="group flex flex-col gap-1.5 bg-white dark:bg-night-200 rounded-2xl p-4 border border-slate-100 dark:border-white/10
                                      shadow-card hover:shadow-card-hover transition-all duration-300 hover:-translate-y-0.5">
-                      <span className="font-display font-semibold text-[13px] text-ink leading-snug
+                      <span className="font-display font-semibold text-[13px] text-ink dark:text-white leading-snug
                                        transition-colors duration-200 group-hover:text-[color:var(--accent)]"
                             style={{ '--accent': accent }}>
                         {prog.label}

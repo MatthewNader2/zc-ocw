@@ -34,7 +34,7 @@ export default function Bookmarks() {
             <div className="w-20 h-20 rounded-2xl bg-ocean-50 flex items-center justify-center mb-5">
               <Bookmark className="w-9 h-9 text-ocean-300" strokeWidth={1.5} />
             </div>
-            <h2 className="font-display text-2xl font-bold text-ink mb-3">No bookmarks yet</h2>
+            <h2 className="font-display text-2xl font-bold text-ink dark:text-white mb-3">No bookmarks yet</h2>
             <p className="text-sm text-ink-ghost max-w-xs mb-8 leading-relaxed">
               Tap the bookmark icon on any course card to save it here for quick access.
             </p>

@@ -1,36 +1,86 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import {
-  getAdminSession,
-  setAdminSession,
-  clearAdminSession,
-} from "@/services/storage";
+  isFirebaseConfigured,
+  watchAuthState,
+  signInWithGoogle,
+  signInWithEmail,
+  signUpWithEmail,
+  signOutUser,
+  getIdToken,
+} from "@/services/firebase";
 
 const AuthContext = createContext(null);
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
+const WORKER_URL = import.meta.env.VITE_WORKER_URL;
 
 export function AuthProvider({ children }) {
-  const [isAdmin, setIsAdmin] = useState(() => {
-    const session = getAdminSession();
-    return session === "authenticated";
-  });
+  const [user, setUser] = useState(null);       // Firebase user, or null
+  const [isAdmin, setIsAdmin] = useState(false); // server-verified role
+  const [loading, setLoading] = useState(true);  // true until first auth check resolves
 
-  const login = useCallback((password) => {
-    if (password === ADMIN_PASSWORD) {
-      setAdminSession("authenticated");
-      setIsAdmin(true);
-      return true;
+  // Ask the Worker whether the current token belongs to an admin. This is
+  // the source of truth — never trust a client-side flag for this, since
+  // it gates admin-only routes that themselves re-check the token anyway.
+  const refreshRole = useCallback(async () => {
+    if (!WORKER_URL) return setIsAdmin(false);
+    try {
+      const token = await getIdToken();
+      const res = await fetch(`${WORKER_URL}/api/admins/me`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const data = await res.json();
+      setIsAdmin(!!data.isAdmin);
+    } catch {
+      setIsAdmin(false);
     }
-    return false;
   }, []);
 
-  const logout = useCallback(() => {
-    clearAdminSession();
+  useEffect(() => {
+    const unsubscribe = watchAuthState(async (firebaseUser) => {
+      setUser(firebaseUser);
+      if (firebaseUser) {
+        await refreshRole();
+      } else {
+        setIsAdmin(false);
+      }
+      setLoading(false);
+    });
+    return unsubscribe;
+  }, [refreshRole]);
+
+  const loginWithGoogle = useCallback(async () => {
+    await signInWithGoogle();
+    await refreshRole();
+  }, [refreshRole]);
+
+  const loginWithEmail = useCallback(async (email, password) => {
+    await signInWithEmail(email, password);
+    await refreshRole();
+  }, [refreshRole]);
+
+  const signup = useCallback(async (email, password, displayName) => {
+    await signUpWithEmail(email, password, displayName);
+    await refreshRole();
+  }, [refreshRole]);
+
+  const logout = useCallback(async () => {
+    await signOutUser();
     setIsAdmin(false);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAdmin, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isAdmin,
+        loading,
+        isFirebaseConfigured,
+        loginWithGoogle,
+        loginWithEmail,
+        signup,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

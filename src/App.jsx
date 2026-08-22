@@ -28,7 +28,8 @@ const AdminCourseEditor = lazy(() => import("@/pages/Admin/CourseEditor"));
 const AdminSettings = lazy(() => import("@/pages/Admin/AdminSettings"));
 
 function ProtectedAdmin({ children }) {
-  const { isAdmin } = useAuth();
+  const { isAdmin, loading } = useAuth();
+  if (loading) return null; // brief — avoids flashing a redirect before the role check resolves
   return isAdmin ? children : <Navigate to="/admin/login" replace />;
 }
 

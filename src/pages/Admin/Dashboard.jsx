@@ -83,12 +83,12 @@ export default function AdminDashboard() {
               <Layers className="w-5 h-5 text-ocean-600" />
             </div>
             <div className="text-sm text-ink-muted space-y-1">
-              <p className="font-semibold text-ink">Smart Auto-Detection</p>
+              <p className="font-semibold text-ink dark:text-white">Smart Auto-Detection</p>
               <p className="leading-relaxed">
                 Playlist titles are scanned for course codes (e.g. "PHYS 323").
                 When matched, school, program, and tags are set automatically.
                 Use the Edit button to override anything and add materials. Run{" "}
-                <code className="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-xs">
+                <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">
                   npm run profile
                 </code>{" "}
                 in terminal to see a full detection table.
@@ -108,7 +108,7 @@ export default function AdminDashboard() {
             ].map(({ label, value, icon: Icon }) => (
               <div
                 key={label}
-                className="card-flat border border-slate-100 shadow-card text-center"
+                className="card-flat border border-slate-100 dark:border-white/10 shadow-card text-center"
               >
                 <Icon
                   className="w-5 h-5 text-ocean-500 mx-auto mb-2"
@@ -125,16 +125,16 @@ export default function AdminDashboard() {
 
         {/* Quick Actions */}
         <ScrollReveal delay="0.15s">
-          <h2 className="font-display text-2xl text-ink mb-4">Quick Actions</h2>
+          <h2 className="font-display text-2xl text-ink dark:text-white mb-4">Quick Actions</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
             <Link
               to="/admin/feedback"
-              className="card p-6 hover:shadow-lg transition-all group border border-slate-100"
+              className="card p-6 hover:shadow-lg transition-all group border border-slate-100 dark:border-white/10"
             >
               <div className="w-12 h-12 rounded-2xl bg-ocean-500/10 flex items-center justify-center mb-4 group-hover:bg-ocean-500/20 transition-colors">
                 <Mail className="w-6 h-6 text-ocean-600" />
               </div>
-              <h3 className="font-display font-bold text-ink mb-1">Feedback</h3>
+              <h3 className="font-display font-bold text-ink dark:text-white mb-1">Feedback</h3>
               <p className="text-sm text-ink-ghost">
                 View bug reports and contact messages
               </p>
@@ -142,12 +142,12 @@ export default function AdminDashboard() {
 
             <Link
               to="/admin/courses"
-              className="card p-6 hover:shadow-lg transition-all group border border-slate-100"
+              className="card p-6 hover:shadow-lg transition-all group border border-slate-100 dark:border-white/10"
             >
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
                 <Edit2 className="w-6 h-6 text-emerald-600" />
               </div>
-              <h3 className="font-display font-bold text-ink mb-1">
+              <h3 className="font-display font-bold text-ink dark:text-white mb-1">
                 Manage Courses
               </h3>
               <p className="text-sm text-ink-ghost">
@@ -157,12 +157,12 @@ export default function AdminDashboard() {
 
             <Link
               to="/admin/settings"
-              className="card p-6 hover:shadow-lg transition-all group border border-slate-100"
+              className="card p-6 hover:shadow-lg transition-all group border border-slate-100 dark:border-white/10"
             >
               <div className="w-12 h-12 rounded-2xl bg-slate-500/10 flex items-center justify-center mb-4 group-hover:bg-slate-500/20 transition-colors">
                 <Settings className="w-6 h-6 text-slate-600" />
               </div>
-              <h3 className="font-display font-bold text-ink mb-1">Settings</h3>
+              <h3 className="font-display font-bold text-ink dark:text-white mb-1">Settings</h3>
               <p className="text-sm text-ink-ghost">
                 Configure API keys, domains & preferences
               </p>
@@ -172,7 +172,7 @@ export default function AdminDashboard() {
 
         {/* Course list */}
         <ScrollReveal delay="0.2s">
-          <h2 className="font-display text-2xl text-ink mb-5">All Courses</h2>
+          <h2 className="font-display text-2xl text-ink dark:text-white mb-5">All Courses</h2>
         </ScrollReveal>
 
         {isLoading ? (
@@ -211,7 +211,7 @@ export default function AdminDashboard() {
                     <img
                       src={getThumbnail(playlist.snippet, "medium")}
                       alt={playlist.snippet.title}
-                      className="w-20 aspect-video object-cover rounded-xl flex-shrink-0 bg-slate-100"
+                      className="w-20 aspect-video object-cover rounded-xl flex-shrink-0 bg-slate-100 dark:bg-night-100"
                     />
 
                     {/* Info */}
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
                           </span>
                         )}
                       </div>
-                      <p className="font-semibold text-sm text-ink truncate">
+                      <p className="font-semibold text-sm text-ink dark:text-white truncate">
                         {playlist.snippet.title}
                       </p>
                       <p className="text-xs text-ink-ghost mt-0.5">

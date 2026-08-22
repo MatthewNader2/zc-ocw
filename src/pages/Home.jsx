@@ -20,12 +20,12 @@ function ContinueSection() {
     .map(id => all.find(c => c.id === id)).filter(Boolean)
   if (!courses.length) return null
   return (
-    <section className="py-16 bg-white border-b border-slate-100">
+    <section className="py-16 bg-white dark:bg-night-200 border-b border-slate-100 dark:border-white/10">
       <div className="section">
         <ScrollReveal className="flex items-end justify-between mb-8">
           <div>
             <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-2">Continue learning</p>
-            <h2 className="font-display text-3xl font-bold text-ink">Pick Up Where You Left Off</h2>
+            <h2 className="font-display text-3xl font-bold text-ink dark:text-white">Pick Up Where You Left Off</h2>
           </div>
           <Link to="/bookmarks" className="btn-ghost hidden sm:inline-flex gap-1.5">
             Bookmarks <ArrowRight className="w-4 h-4" />

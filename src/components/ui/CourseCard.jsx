@@ -75,7 +75,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
               background: `conic-gradient(${accent.bg} ${progress * 3.6}deg, rgba(255,255,255,0.15) 0deg)`,
             }}
           >
-            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full bg-white dark:bg-night-200 flex items-center justify-center">
               <span
                 className="text-[7px] font-mono font-bold"
                 style={{ color: accent.bg }}
@@ -139,7 +139,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
       </div>
 
       {/* Body */}
-      <div className="flex-1 flex flex-col p-4 gap-2 bg-white dark:bg-slate-900/90 transition-colors duration-300">
+      <div className="flex-1 flex flex-col p-4 gap-2 bg-white dark:bg-night-200/95 transition-colors duration-300">
         {/* School badge + code */}
         <div className="flex items-center gap-2 flex-wrap">
           {school && schoolId !== "general" && (
@@ -156,7 +156,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
             </span>
           )}
           {level && (
-            <span className="ml-auto text-[11px] font-semibold text-ink-ghost dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+            <span className="ml-auto text-[11px] font-semibold text-ink-ghost dark:text-slate-300 bg-slate-100 dark:bg-night-100 px-2 py-0.5 rounded-full">
               {level}
             </span>
           )}
@@ -205,7 +205,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
                 {progress}%
               </span>
             </div>
-            <div className="progress-track dark:bg-slate-800">
+            <div className="progress-track dark:bg-night-100">
               <div
                 className="progress-fill"
                 style={{ width: `${progress}%`, background: accent.bg }}
@@ -215,7 +215,7 @@ export default function CourseCard({ playlist, className, lectureIds = [] }) {
         )}
 
         {/* Footer */}
-        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 mt-auto text-xs">
+        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/10 mt-auto text-xs">
           <span className="text-ink-ghost dark:text-slate-400">
             {contentDetails.itemCount} lectures
           </span>

@@ -24,9 +24,9 @@ export default function RelatedCourses({ currentPlaylistId }) {
   if (!related.length) return null;
 
   return (
-    <section className="py-12 border-t border-slate-100">
+    <section className="py-12 border-t border-slate-100 dark:border-white/10">
       <div className="section">
-        <h2 className="font-display text-2xl font-bold text-ink mb-6">
+        <h2 className="font-display text-2xl font-bold text-ink dark:text-white mb-6">
           Related Courses
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

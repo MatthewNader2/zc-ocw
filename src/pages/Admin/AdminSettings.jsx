@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
-import { Settings, ArrowLeft, Download, Upload, Trash2, Key, Youtube, Plus, GraduationCap, BookOpen, CheckCircle2, Image as ImageIcon, Heart } from 'lucide-react'
+import { Settings, ArrowLeft, Download, Upload, Trash2, Key, Youtube, Plus, GraduationCap, BookOpen, CheckCircle2, Image as ImageIcon, Heart, Users, Award, Loader2, UserPlus, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useAdminData } from '@/context/AdminDataContext'
 import * as storage from '@/services/storage'
+import * as cloudflare from '@/services/cloudflare'
 
 export default function AdminSettings() {
   const { logout } = useAuth()
@@ -18,7 +19,8 @@ export default function AdminSettings() {
     addCustomProgram,
     deleteCustomProgram,
     acknowledgmentsConfig,
-    updateAcknowledgmentsConfig
+    updateAcknowledgmentsConfig,
+    uploadAcknowledgmentImage,
   } = useAdminData()
 
   const [exported, setExported] = useState(false)
@@ -28,6 +30,68 @@ export default function AdminSettings() {
   // Slide form state
   const [slideForm, setSlideForm] = useState({ url: '', title: '', caption: '' })
   const [ackSaved, setAckSaved] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState('')
+
+  // Header form state
+  const [headerForm, setHeaderForm] = useState({
+    headerTitle: acknowledgmentsConfig?.headerTitle || '',
+    headerSubtitle: acknowledgmentsConfig?.headerSubtitle || '',
+  })
+  const [headerSaved, setHeaderSaved] = useState(false)
+
+  // Team member form state
+  const [teamForm, setTeamForm] = useState({ name: '', role: '', school: '' })
+  const [teamSaved, setTeamSaved] = useState(false)
+
+  // Sponsor form state
+  const [sponsorForm, setSponsorForm] = useState({ name: '', contribution: '' })
+  const [sponsorSaved, setSponsorSaved] = useState(false)
+
+  // Admin team management
+  const [admins, setAdmins] = useState([])
+  const [adminsLoading, setAdminsLoading] = useState(true)
+  const [adminsError, setAdminsError] = useState('')
+  const [newAdminEmail, setNewAdminEmail] = useState('')
+  const [grantingAdmin, setGrantingAdmin] = useState(false)
+
+  useEffect(() => {
+    let active = true
+    cloudflare.fetchAdmins()
+      .then((rows) => { if (active) setAdmins(rows || []) })
+      .catch((e) => { if (active) setAdminsError(e.message) })
+      .finally(() => { if (active) setAdminsLoading(false) })
+    return () => { active = false }
+  }, [])
+
+  async function handleGrantAdmin(e) {
+    e.preventDefault()
+    const email = newAdminEmail.trim().toLowerCase()
+    if (!email || !email.includes('@')) return
+    setGrantingAdmin(true)
+    setAdminsError('')
+    try {
+      await cloudflare.grantAdmin(email)
+      setAdmins((prev) => [...prev, { email, added_at: new Date().toISOString() }])
+      setNewAdminEmail('')
+    } catch (e) {
+      setAdminsError(e.message)
+    } finally {
+      setGrantingAdmin(false)
+    }
+  }
+
+  async function handleRevokeAdmin(email) {
+    if (!confirm(`Remove admin access for ${email}?`)) return
+    try {
+      await cloudflare.revokeAdmin(email)
+      setAdmins((prev) => prev.filter((a) => a.email !== email))
+    } catch (e) {
+      setAdminsError(e.message)
+    }
+  }
+
+
 
   // School form state
   const [schoolForm, setSchoolForm] = useState({
@@ -185,6 +249,79 @@ export default function AdminSettings() {
     updateAcknowledgmentsConfig(nextConfig)
   }
 
+  async function handleSlideFileChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setUploadError('')
+    try {
+      const url = await uploadAcknowledgmentImage(file)
+      setSlideForm((f) => ({ ...f, url }))
+    } catch (err) {
+      setUploadError(err.message || 'Upload failed')
+    } finally {
+      setUploading(false)
+      e.target.value = '' // allow re-selecting the same file later
+    }
+  }
+
+  function handleSaveHeader(e) {
+    e.preventDefault()
+    updateAcknowledgmentsConfig({
+      ...acknowledgmentsConfig,
+      headerTitle: headerForm.headerTitle,
+      headerSubtitle: headerForm.headerSubtitle,
+    })
+    setHeaderSaved(true)
+    setTimeout(() => setHeaderSaved(false), 3000)
+  }
+
+  function handleAddTeamMember(e) {
+    e.preventDefault()
+    if (!teamForm.name || !teamForm.role) {
+      alert('Please fill out at least Name and Role.')
+      return
+    }
+    const newMember = { id: `team_${Date.now()}`, ...teamForm }
+    updateAcknowledgmentsConfig({
+      ...acknowledgmentsConfig,
+      team: [...(acknowledgmentsConfig?.team || []), newMember],
+    })
+    setTeamForm({ name: '', role: '', school: '' })
+    setTeamSaved(true)
+    setTimeout(() => setTeamSaved(false), 3000)
+  }
+
+  function handleDeleteTeamMember(id) {
+    updateAcknowledgmentsConfig({
+      ...acknowledgmentsConfig,
+      team: (acknowledgmentsConfig?.team || []).filter((m) => m.id !== id),
+    })
+  }
+
+  function handleAddSponsor(e) {
+    e.preventDefault()
+    if (!sponsorForm.name) {
+      alert('Please fill out at least Name.')
+      return
+    }
+    const newSponsor = { id: `sponsor_${Date.now()}`, ...sponsorForm }
+    updateAcknowledgmentsConfig({
+      ...acknowledgmentsConfig,
+      sponsors: [...(acknowledgmentsConfig?.sponsors || []), newSponsor],
+    })
+    setSponsorForm({ name: '', contribution: '' })
+    setSponsorSaved(true)
+    setTimeout(() => setSponsorSaved(false), 3000)
+  }
+
+  function handleDeleteSponsor(id) {
+    updateAcknowledgmentsConfig({
+      ...acknowledgmentsConfig,
+      sponsors: (acknowledgmentsConfig?.sponsors || []).filter((s) => s.id !== id),
+    })
+  }
+
   return (
     <>
       <Helmet><title>Admin Settings — ZC OCW</title></Helmet>
@@ -205,8 +342,8 @@ export default function AdminSettings() {
       <div className="section py-10 max-w-4xl space-y-8">
 
         {/* 🖼️ Acknowledgments & Image Carousel Manager */}
-        <div className="card-flat border border-slate-100 shadow-card">
-          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-slate-800">
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
                 <ImageIcon className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
@@ -218,8 +355,35 @@ export default function AdminSettings() {
             </div>
           </div>
 
+          {/* Header text form */}
+          <form onSubmit={handleSaveHeader} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm text-ink dark:text-white">Page Header</h3>
+              {headerSaved && <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Saved!</span>}
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Title</label>
+              <input
+                value={headerForm.headerTitle}
+                onChange={e => setHeaderForm(f => ({ ...f, headerTitle: e.target.value }))}
+                placeholder="Acknowledgments"
+                className="input text-xs"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Subtitle</label>
+              <input
+                value={headerForm.headerSubtitle}
+                onChange={e => setHeaderForm(f => ({ ...f, headerSubtitle: e.target.value }))}
+                placeholder="Built by students, for students."
+                className="input text-xs"
+              />
+            </div>
+            <button type="submit" className="btn-outline text-xs w-full">Save Header Text</button>
+          </form>
+
           {/* Add Slide Form */}
-          <form onSubmit={handleAddSlide} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 mb-6">
+          <form onSubmit={handleAddSlide} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
                 <Plus className="w-4 h-4 text-cyan-500" /> Add New Image Slide
@@ -236,6 +400,17 @@ export default function AdminSettings() {
                 className="input text-xs"
                 required
               />
+              <div className="flex items-center gap-3 mt-2">
+                <label className="btn-outline text-xs cursor-pointer gap-2 !py-1.5">
+                  {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
+                  {uploading ? 'Uploading…' : 'Upload image instead'}
+                  <input type="file" accept="image/*" onChange={handleSlideFileChange} disabled={uploading} className="hidden" />
+                </label>
+                {slideForm.url && (
+                  <img src={slideForm.url} alt="" className="h-8 w-14 object-cover rounded-md border border-slate-200 dark:border-white/10" />
+                )}
+              </div>
+              {uploadError && <p className="text-[11px] text-red-500 mt-1">{uploadError}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -266,13 +441,14 @@ export default function AdminSettings() {
             </button>
           </form>
 
+
           {/* Active Slides List */}
           <div>
             <h3 className="font-semibold text-sm text-ink dark:text-white mb-3">Active Acknowledgments Image Slides</h3>
             {acknowledgmentsConfig?.slides?.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {acknowledgmentsConfig.slides.map((s, idx) => (
-                  <div key={s.id || idx} className="relative rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden bg-slate-50 dark:bg-slate-900/80 group">
+                  <div key={s.id || idx} className="relative rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden bg-slate-50 dark:bg-night-200/80 group">
                     <div className="aspect-video w-full overflow-hidden bg-black">
                       <img src={s.url} alt={s.title} className="w-full h-full object-cover" />
                     </div>
@@ -297,15 +473,182 @@ export default function AdminSettings() {
           </div>
         </div>
 
+        {/* Team members manager */}
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
+            <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
+              <Users className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg font-bold text-ink dark:text-white">Team & Contributors</h2>
+              <p className="text-xs text-ink-ghost dark:text-slate-400">Shown as cards on the Acknowledgments page.</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleAddTeamMember} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
+                <Plus className="w-4 h-4 text-cyan-500" /> Add Team Member
+              </h3>
+              {teamSaved && <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Saved!</span>}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Name</label>
+                <input value={teamForm.name} onChange={e => setTeamForm(f => ({ ...f, name: e.target.value }))} className="input text-xs" required />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Role</label>
+                <input value={teamForm.role} onChange={e => setTeamForm(f => ({ ...f, role: e.target.value }))} placeholder="Project Lead" className="input text-xs" required />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">School (optional)</label>
+                <input value={teamForm.school} onChange={e => setTeamForm(f => ({ ...f, school: e.target.value }))} placeholder="CSAI" className="input text-xs" />
+              </div>
+            </div>
+            <button type="submit" className="btn-primary text-xs w-full gap-2"><Plus className="w-3.5 h-3.5" /> Add Member</button>
+          </form>
+
+          {acknowledgmentsConfig?.team?.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {acknowledgmentsConfig.team.map((m) => (
+                <div key={m.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+                  <div className="min-w-0">
+                    <p className="font-bold text-xs text-ink dark:text-white truncate">{m.name}</p>
+                    <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{m.role}{m.school ? ` · ${m.school}` : ''}</p>
+                  </div>
+                  <button type="button" onClick={() => handleDeleteTeamMember(m.id)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0" title="Remove">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-ink-ghost">No team members yet.</p>
+          )}
+        </div>
+
+        {/* Sponsors manager */}
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
+            <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
+              <Award className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg font-bold text-ink dark:text-white">Clubs, Initiatives & Sponsors</h2>
+              <p className="text-xs text-ink-ghost dark:text-slate-400">Shown as cards on the Acknowledgments page.</p>
+            </div>
+          </div>
+
+          <form onSubmit={handleAddSponsor} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
+                <Plus className="w-4 h-4 text-cyan-500" /> Add Sponsor
+              </h3>
+              {sponsorSaved && <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Saved!</span>}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Name</label>
+                <input value={sponsorForm.name} onChange={e => setSponsorForm(f => ({ ...f, name: e.target.value }))} className="input text-xs" required />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Contribution</label>
+                <input value={sponsorForm.contribution} onChange={e => setSponsorForm(f => ({ ...f, contribution: e.target.value }))} placeholder="Facility & Equipment" className="input text-xs" />
+              </div>
+            </div>
+            <button type="submit" className="btn-primary text-xs w-full gap-2"><Plus className="w-3.5 h-3.5" /> Add Sponsor</button>
+          </form>
+
+          {acknowledgmentsConfig?.sponsors?.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {acknowledgmentsConfig.sponsors.map((s) => (
+                <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+                  <div className="min-w-0">
+                    <p className="font-bold text-xs text-ink dark:text-white truncate">{s.name}</p>
+                    <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{s.contribution}</p>
+                  </div>
+                  <button type="button" onClick={() => handleDeleteSponsor(s.id)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0" title="Remove">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-ink-ghost">No sponsors yet.</p>
+          )}
+        </div>
+
+        {/* Admin team management */}
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
+            <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
+              <ShieldCheck className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg font-bold text-ink dark:text-white">Admin Team</h2>
+              <p className="text-xs text-ink-ghost dark:text-slate-400">
+                Who can access /admin. People must sign in at least once (Google or email) before you can add them.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handleGrantAdmin} className="flex items-end gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
+            <div className="flex-1">
+              <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Email address</label>
+              <input
+                type="email"
+                value={newAdminEmail}
+                onChange={e => setNewAdminEmail(e.target.value)}
+                placeholder="teammate@example.com"
+                className="input text-xs"
+                required
+              />
+            </div>
+            <button type="submit" disabled={grantingAdmin} className="btn-primary text-xs gap-2 !py-2.5 flex-shrink-0">
+              {grantingAdmin ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
+              Grant Access
+            </button>
+          </form>
+
+          {adminsError && <p className="text-xs text-red-500 mb-4">{adminsError}</p>}
+
+          {adminsLoading ? (
+            <p className="text-xs text-ink-ghost flex items-center gap-2"><Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading admins…</p>
+          ) : admins.length > 0 ? (
+            <div className="space-y-2">
+              {admins.map((a) => (
+                <div key={a.email} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+                  <div className="min-w-0">
+                    <p className="font-bold text-xs text-ink dark:text-white truncate">{a.email}</p>
+                    {a.added_at && (
+                      <p className="text-[11px] text-ink-ghost dark:text-slate-400">
+                        Added {new Date(a.added_at).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                  <button type="button" onClick={() => handleRevokeAdmin(a.email)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0" title="Revoke access">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-ink-ghost">
+              No admins granted via this panel yet — your super-admin email (set as a Worker secret) always has access regardless of what's listed here.
+            </p>
+          )}
+        </div>
+
         {/* 🎓 Custom Schools & Majors Catalog Management */}
-        <div className="card-flat border border-slate-100 shadow-card">
-          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100">
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-ocean-100 flex items-center justify-center">
                 <GraduationCap className="w-4.5 h-4.5 text-ocean-600" />
               </div>
               <div>
-                <h2 className="font-display text-lg font-bold text-ink">Schools & Majors Catalog Manager</h2>
+                <h2 className="font-display text-lg font-bold text-ink dark:text-white">Schools & Majors Catalog Manager</h2>
                 <p className="text-xs text-ink-ghost">Add new university schools or majors dynamically without modifying code.</p>
               </div>
             </div>
@@ -313,16 +656,16 @@ export default function AdminSettings() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Add School Form */}
-            <form onSubmit={handleAddSchool} className="space-y-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <form onSubmit={handleAddSchool} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-ink flex items-center gap-2">
+                <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
                   <GraduationCap className="w-4 h-4 text-ocean-500" /> Add New School
                 </h3>
                 {schoolSaved && <span className="text-xs text-green-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Added!</span>}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">School ID (slug)</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">School ID (slug)</label>
                 <input
                   value={schoolForm.id}
                   onChange={e => setSchoolForm(f => ({ ...f, id: e.target.value }))}
@@ -333,7 +676,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">School Full Name</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">School Full Name</label>
                 <input
                   value={schoolForm.label}
                   onChange={e => setSchoolForm(f => ({ ...f, label: e.target.value }))}
@@ -345,7 +688,7 @@ export default function AdminSettings() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Short Badge</label>
+                  <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Short Badge</label>
                   <input
                     value={schoolForm.short}
                     onChange={e => setSchoolForm(f => ({ ...f, short: e.target.value }))}
@@ -354,7 +697,7 @@ export default function AdminSettings() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-ink mb-1">Emoji Icon</label>
+                  <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Emoji Icon</label>
                   <input
                     value={schoolForm.icon}
                     onChange={e => setSchoolForm(f => ({ ...f, icon: e.target.value }))}
@@ -365,7 +708,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Description</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Description</label>
                 <textarea
                   value={schoolForm.description}
                   onChange={e => setSchoolForm(f => ({ ...f, description: e.target.value }))}
@@ -381,16 +724,16 @@ export default function AdminSettings() {
             </form>
 
             {/* Add Major / Program Form */}
-            <form onSubmit={handleAddProgram} className="space-y-4 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+            <form onSubmit={handleAddProgram} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-sm text-ink flex items-center gap-2">
+                <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-ocean-500" /> Add New Major / Program
                 </h3>
                 {programSaved && <span className="text-xs text-green-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Added!</span>}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Parent School</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Parent School</label>
                 <select
                   value={programForm.schoolId}
                   onChange={e => setProgramForm(f => ({ ...f, schoolId: e.target.value }))}
@@ -405,7 +748,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Major ID (slug)</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Major ID (slug)</label>
                 <input
                   value={programForm.id}
                   onChange={e => setProgramForm(f => ({ ...f, id: e.target.value }))}
@@ -416,7 +759,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Major Name</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Major Name</label>
                 <input
                   value={programForm.label}
                   onChange={e => setProgramForm(f => ({ ...f, label: e.target.value }))}
@@ -427,7 +770,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink mb-1">Course Code Prefixes (comma-separated)</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Course Code Prefixes (comma-separated)</label>
                 <input
                   value={programForm.prefixes}
                   onChange={e => setProgramForm(f => ({ ...f, prefixes: e.target.value }))}
@@ -444,16 +787,16 @@ export default function AdminSettings() {
 
           {/* List of Custom Registered Catalog Entries */}
           {(customSchools.length > 0 || Object.keys(customPrograms).length > 0) && (
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <h3 className="font-semibold text-sm text-ink mb-4">Active Custom Catalog Additions</h3>
+            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/10">
+              <h3 className="font-semibold text-sm text-ink dark:text-white mb-4">Active Custom Catalog Additions</h3>
               
               <div className="space-y-3">
                 {customSchools.map(s => (
-                  <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                  <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
                     <div className="flex items-center gap-3">
                       <span className="text-xl">{s.icon}</span>
                       <div>
-                        <p className="text-xs font-bold text-ink">{s.label} <span className="font-mono text-[10px] text-ocean-600 bg-ocean-50 px-1.5 py-0.5 rounded">ID: {s.id}</span></p>
+                        <p className="text-xs font-bold text-ink dark:text-white">{s.label} <span className="font-mono text-[10px] text-ocean-600 bg-ocean-50 px-1.5 py-0.5 rounded">ID: {s.id}</span></p>
                         <p className="text-[11px] text-ink-ghost">{s.description || 'Custom added school'}</p>
                       </div>
                     </div>
@@ -470,11 +813,11 @@ export default function AdminSettings() {
 
                 {Object.entries(customPrograms).map(([sId, progs]) =>
                   progs.map(p => (
-                    <div key={`${sId}-${p.id}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+                    <div key={`${sId}-${p.id}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
                       <div className="flex items-center gap-3">
                         <BookOpen className="w-4 h-4 text-ocean-500" />
                         <div>
-                          <p className="text-xs font-bold text-ink">{p.label} <span className="font-mono text-[10px] text-ocean-600 bg-ocean-50 px-1.5 py-0.5 rounded">Under School: {sId}</span></p>
+                          <p className="text-xs font-bold text-ink dark:text-white">{p.label} <span className="font-mono text-[10px] text-ocean-600 bg-ocean-50 px-1.5 py-0.5 rounded">Under School: {sId}</span></p>
                           {p.prefixes?.length > 0 && (
                             <p className="text-[11px] text-ink-ghost">Prefixes: {p.prefixes.join(', ')}</p>
                           )}
@@ -497,15 +840,15 @@ export default function AdminSettings() {
         </div>
 
         {/* YouTube config */}
-        <div className="card-flat border border-slate-100 shadow-card">
-          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100">
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100 dark:border-white/10">
             <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
               <Youtube className="w-4.5 h-4.5 text-red-600" />
             </div>
-            <h2 className="font-display text-lg font-bold text-ink">YouTube Configuration</h2>
+            <h2 className="font-display text-lg font-bold text-ink dark:text-white">YouTube Configuration</h2>
           </div>
           <p className="text-sm text-ink-muted mb-4 leading-relaxed">
-            These values are set in your <code className="bg-slate-100 px-1.5 py-0.5 rounded font-mono text-xs">.env</code> file.
+            These values are set in your <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">.env</code> file.
             Restart the dev server after changes.
           </p>
           <div className="space-y-3">
@@ -513,7 +856,7 @@ export default function AdminSettings() {
               { label: 'API Key', env: 'VITE_YOUTUBE_API_KEY', icon: Key },
               { label: 'Channel ID', env: 'VITE_YOUTUBE_CHANNEL_ID', icon: Youtube },
             ].map(({ label, env, icon: Icon }) => (
-              <div key={env} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+              <div key={env} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
                 <Icon className="w-4 h-4 text-ink-ghost flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-xs font-semibold text-ink-muted">{label}</p>
@@ -530,12 +873,12 @@ export default function AdminSettings() {
         </div>
 
         {/* Data management */}
-        <div className="card-flat border border-slate-100 shadow-card">
-          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100">
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100 dark:border-white/10">
             <div className="w-9 h-9 rounded-xl bg-ocean-100 flex items-center justify-center">
               <Download className="w-4.5 h-4.5 text-ocean-600" />
             </div>
-            <h2 className="font-display text-lg font-bold text-ink">Data Management</h2>
+            <h2 className="font-display text-lg font-bold text-ink dark:text-white">Data Management</h2>
           </div>
 
           <p className="text-sm text-ink-muted mb-5 leading-relaxed">

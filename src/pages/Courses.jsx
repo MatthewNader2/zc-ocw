@@ -149,7 +149,7 @@ export default function Courses() {
                       ? "text-white shadow-sm"
                       : schoolFilter === s.id
                         ? "bg-ocean-950 text-white"
-                        : "bg-slate-100 text-ink-subtle hover:bg-slate-200",
+                        : "bg-slate-100 dark:bg-night-100 text-ink-subtle dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-night-50",
                   )}
                   style={
                     schoolFilter === s.id && s.id !== "all"
@@ -173,7 +173,7 @@ export default function Courses() {
                   "px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all",
                   levelFilter === l
                     ? "bg-ocean-950 text-white border-ocean-950"
-                    : "border-slate-200 text-ink-subtle hover:border-ocean-400 hover:text-ocean-600",
+                    : "border-slate-200 dark:border-white/10 text-ink-subtle hover:border-ocean-400 hover:text-ocean-600",
                 )}
               >
                 {l}

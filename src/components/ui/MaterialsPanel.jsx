@@ -126,7 +126,7 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
       {/* ── Materials ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-display text-base font-semibold text-ink">Course Materials</h3>
+          <h3 className="font-display text-base font-semibold text-ink dark:text-white">Course Materials</h3>
           {canEdit && (
             <button onClick={() => setAddOpen(!addOpen)} type="button"
                     className={clsx('btn btn-sm', addOpen ? 'btn-outline' : 'btn-primary')}>
@@ -153,7 +153,7 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
                             'flex flex-col items-center gap-1 p-2 rounded-xl border text-[10px] font-semibold transition-all',
                             matForm.type === cat.id
                               ? `${cat.color} ${cat.border} scale-[1.04] shadow-sm`
-                              : 'border-slate-200 text-ink-ghost hover:border-slate-300 bg-white'
+                              : 'border-slate-200 dark:border-white/10 text-ink-ghost hover:border-slate-300 bg-white dark:bg-night-200'
                           )}>
                     <Icon className="w-4 h-4" />
                     <span className="leading-tight text-center">{cat.label.split(' ')[0]}</span>
@@ -180,10 +180,10 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
                         title={disabled ? 'Configure Supabase to enable file uploads' : ''}
                         className={clsx(
                           'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all',
-                          disabled ? 'opacity-40 cursor-not-allowed border-slate-200 text-ink-ghost' :
+                          disabled ? 'opacity-40 cursor-not-allowed border-slate-200 dark:border-white/10 text-ink-ghost' :
                           uploadMode === mode
                             ? 'bg-ocean-600 text-white border-ocean-600 shadow-sm'
-                            : 'border-slate-200 text-ink-subtle hover:border-ocean-300 bg-white'
+                            : 'border-slate-200 dark:border-white/10 text-ink-subtle hover:border-ocean-300 bg-white dark:bg-night-200'
                         )}>
                   <Icon className="w-3.5 h-3.5" />
                   {label}
@@ -199,7 +199,7 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
                      className="input" required />
             ) : (
               <div className="border-2 border-dashed border-ocean-200 rounded-xl p-4 text-center cursor-pointer
-                              hover:border-ocean-400 transition-colors bg-white"
+                              hover:border-ocean-400 transition-colors bg-white dark:bg-night-200"
                    onClick={() => fileRef.current?.click()}>
                 <Upload className="w-6 h-6 text-ocean-400 mx-auto mb-2" />
                 <p className="text-sm text-ink-muted">Click to select file</p>
@@ -233,22 +233,22 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
               const Icon  = cat.icon
               const open  = openGroups[cat.id] !== false
               return (
-                <div key={cat.id} className="border border-slate-100 rounded-2xl overflow-hidden bg-white">
+                <div key={cat.id} className="border border-slate-100 dark:border-white/10 rounded-2xl overflow-hidden bg-white dark:bg-night-200">
                   <button type="button" onClick={() => toggleGroup(cat.id)}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 transition-colors">
+                          className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-night-100 transition-colors">
                     <span className={clsx('w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-sm', cat.color)}>
                       <Icon className="w-3.5 h-3.5" />
                     </span>
-                    <span className="font-semibold text-sm text-ink flex-1">{cat.label}</span>
+                    <span className="font-semibold text-sm text-ink dark:text-white flex-1">{cat.label}</span>
                     <span className="text-xs text-ink-ghost font-mono mr-1">{items.length}</span>
                     <ChevronDown className={clsx('w-4 h-4 text-ink-ghost transition-transform duration-200', open && 'rotate-180')} />
                   </button>
                   {open && (
-                    <div className="border-t border-slate-100 divide-y divide-slate-50">
+                    <div className="border-t border-slate-100 dark:border-white/10 divide-y divide-slate-50">
                       {items.map(mat => (
                         <div key={mat.id} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors group">
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-ink truncate">{mat.label}</p>
+                            <p className="text-sm font-semibold text-ink dark:text-white truncate">{mat.label}</p>
                             {mat.file_size && (
                               <p className="text-xs text-ink-ghost">{fmtSize(mat.file_size)}</p>
                             )}
@@ -278,7 +278,7 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
       {/* ── Books / Textbooks ── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-display text-base font-semibold text-ink">Textbooks</h3>
+          <h3 className="font-display text-base font-semibold text-ink dark:text-white">Textbooks</h3>
           {canEdit && (
             <button onClick={() => setAddBookOpen(!addBookOpen)} type="button"
                     className={clsx('btn btn-sm', addBookOpen ? 'btn-outline' : 'btn-primary')}>
@@ -313,12 +313,12 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
         ) : (
           <div className="space-y-2">
             {books.map(book => (
-              <div key={book.id} className="flex items-start gap-3 p-4 rounded-2xl bg-white border border-slate-100 group hover:shadow-card transition-all">
+              <div key={book.id} className="flex items-start gap-3 p-4 rounded-2xl bg-white dark:bg-night-200 border border-slate-100 dark:border-white/10 group hover:shadow-card transition-all">
                 <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
                   <Book className="w-4.5 h-4.5 text-emerald-600" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-ink">{book.title}</p>
+                  <p className="font-semibold text-sm text-ink dark:text-white">{book.title}</p>
                   {book.author  && <p className="text-xs text-ink-subtle mt-0.5">{book.author}</p>}
                   {book.edition && <p className="text-xs text-ink-ghost">{book.edition} edition</p>}
                   {book.isbn    && <p className="text-xs text-ink-ghost font-mono">ISBN: {book.isbn}</p>}

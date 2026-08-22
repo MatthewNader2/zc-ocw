@@ -42,7 +42,7 @@ export default function Acknowledgments() {
         {/* Interactive Image Carousel / Hero Slideshow */}
         {slides.length > 0 && (
           <ScrollReveal>
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800/80 bg-slate-900 group">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200 dark:border-white/10 bg-slate-900 group">
               <div className="relative aspect-[16/9] w-full overflow-hidden">
                 {slides.map((slide, idx) => (
                   <div
@@ -147,7 +147,7 @@ export default function Acknowledgments() {
                       {m.role}
                     </p>
                     {m.school && (
-                      <span className="badge bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 mt-3 text-xs">
+                      <span className="badge bg-slate-100 dark:bg-night-100 text-slate-600 dark:text-slate-300 mt-3 text-xs">
                         {m.school}
                       </span>
                     )}

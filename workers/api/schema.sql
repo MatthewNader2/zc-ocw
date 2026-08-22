@@ -88,3 +88,22 @@ CREATE TABLE IF NOT EXISTS feedback (
 );
 CREATE INDEX IF NOT EXISTS idx_feedback_type ON feedback(type);
 CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback(created_at);
+
+-- Acknowledgments page config — single row (id = 1), whole page as JSON
+-- so admins can edit header text / slides / team / sponsors without a
+-- migration every time the shape changes.
+CREATE TABLE IF NOT EXISTS acknowledgments (
+  id            INTEGER PRIMARY KEY CHECK (id = 1),
+  config_json   TEXT NOT NULL,
+  updated_at    TEXT DEFAULT (datetime('now'))
+);
+
+-- Admin allowlist — Firebase-authenticated emails allowed into /admin.
+-- The very first admin is set via the FIREBASE_SUPER_ADMIN_EMAIL secret
+-- (see DEPLOYMENT.md); every admin after that is granted through the
+-- Admin > Team panel, which adds a row here.
+CREATE TABLE IF NOT EXISTS admins (
+  email       TEXT PRIMARY KEY,
+  added_by    TEXT,
+  added_at    TEXT DEFAULT (datetime('now'))
+);

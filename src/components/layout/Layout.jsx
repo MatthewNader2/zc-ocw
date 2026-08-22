@@ -11,7 +11,7 @@ export default function Layout() {
   useEffect(() => { window.scrollTo(0, 0) }, [pathname])
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-surface dark:bg-slate-950 text-ink dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
+    <div className="relative flex flex-col min-h-screen bg-surface dark:bg-night text-ink dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
       {/* Dynamic Cursor-Active Particle Background */}
       <ParticleBackground isFixed={true} />
 

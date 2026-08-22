@@ -24,7 +24,7 @@ export default function VideoCard({ item, playlistId, index, active = false }) {
         }
         {watched && !active && <CheckCircle2 className="w-3 h-3 text-ocean-400 dark:text-ocean-300" />}
       </div>
-      <div className="w-24 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0">
+      <div className="w-24 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-night-100 flex-shrink-0">
         <img src={getThumbnail(snippet, 'medium')} alt={snippet.title}
              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
              loading="lazy" />

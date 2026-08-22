@@ -117,9 +117,9 @@ export default function VideoPlayer() {
               />
 
               {/* Title + meta */}
-              <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-card">
+              <div className="bg-white dark:bg-night-200 rounded-2xl border border-slate-100 dark:border-white/10 p-5 shadow-card">
                 <div className="flex items-start justify-between gap-4 mb-2">
-                  <h1 className="font-display text-xl md:text-2xl text-ink font-bold leading-snug flex-1">
+                  <h1 className="font-display text-xl md:text-2xl text-ink dark:text-white font-bold leading-snug flex-1">
                     {title}
                   </h1>
                   {watched && (
@@ -131,7 +131,7 @@ export default function VideoPlayer() {
                 </div>
 
                 {/* Nav prev/next */}
-                <div className="flex items-center gap-3 mt-4 pt-4 border-t border-slate-100">
+                <div className="flex items-center gap-3 mt-4 pt-4 border-t border-slate-100 dark:border-white/10">
                   {prevId ? (
                     <Link to={`/courses/${playlistId}/watch/${prevId}`}
                           className="btn-outline btn-sm gap-1.5">
@@ -155,16 +155,16 @@ export default function VideoPlayer() {
               </div>
 
               {/* Notes */}
-              <div className="bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden">
+              <div className="bg-white dark:bg-night-200 rounded-2xl border border-slate-100 dark:border-white/10 shadow-card overflow-hidden">
                 <button onClick={() => setNoteOpen(!noteOpen)}
-                        className="flex items-center gap-3 w-full px-5 py-4 text-left hover:bg-slate-50 transition-colors">
+                        className="flex items-center gap-3 w-full px-5 py-4 text-left hover:bg-slate-50 dark:hover:bg-night-100 transition-colors">
                   <NotebookPen className="w-4.5 h-4.5 text-ocean-500" />
-                  <span className="font-display font-semibold text-ink">My Notes</span>
+                  <span className="font-display font-semibold text-ink dark:text-white">My Notes</span>
                   {note && <span className="ml-1 badge bg-ocean-100 text-ocean-600">Saved</span>}
                   <ChevronDown className={clsx('w-4 h-4 text-ink-ghost ml-auto transition-transform', noteOpen && 'rotate-180')} />
                 </button>
                 {noteOpen && (
-                  <div className="px-5 pb-5 border-t border-slate-100 pt-4 animate-slide-up-in">
+                  <div className="px-5 pb-5 border-t border-slate-100 dark:border-white/10 pt-4 animate-slide-up-in">
                     <textarea
                       value={note}
                       onChange={e => { setNote(e.target.value); setNoteDirty(true) }}
@@ -183,14 +183,14 @@ export default function VideoPlayer() {
 
               {/* Description */}
               {desc && (
-                <div className="bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden">
+                <div className="bg-white dark:bg-night-200 rounded-2xl border border-slate-100 dark:border-white/10 shadow-card overflow-hidden">
                   <button onClick={() => setDescOpen(!descOpen)}
-                          className="flex items-center gap-3 w-full px-5 py-4 text-left hover:bg-slate-50 transition-colors">
-                    <span className="font-display font-semibold text-ink">Description</span>
+                          className="flex items-center gap-3 w-full px-5 py-4 text-left hover:bg-slate-50 dark:hover:bg-night-100 transition-colors">
+                    <span className="font-display font-semibold text-ink dark:text-white">Description</span>
                     <ChevronDown className={clsx('w-4 h-4 text-ink-ghost ml-auto transition-transform', descOpen && 'rotate-180')} />
                   </button>
                   {descOpen && (
-                    <div className="px-5 pb-5 border-t border-slate-100 pt-4 text-sm text-ink-muted leading-relaxed whitespace-pre-line animate-slide-up-in">
+                    <div className="px-5 pb-5 border-t border-slate-100 dark:border-white/10 pt-4 text-sm text-ink-muted leading-relaxed whitespace-pre-line animate-slide-up-in">
                       {desc}
                     </div>
                   )}
@@ -202,7 +202,7 @@ export default function VideoPlayer() {
 
         {/* ── Sidebar playlist ── */}
         <aside>
-          <div className="sticky top-20 bg-white rounded-2xl border border-slate-100 shadow-card overflow-hidden">
+          <div className="sticky top-20 bg-white dark:bg-night-200 rounded-2xl border border-slate-100 dark:border-white/10 shadow-card overflow-hidden">
             {/* Header */}
             <div className="bg-gradient-to-br from-ocean-950 to-ocean-900 p-4">
               <Link to={`/courses/${playlistId}`}
@@ -245,7 +245,7 @@ export default function VideoPlayer() {
                             to={`/courses/${playlistId}/watch/${id}`}
                             className={clsx(
                               'flex gap-3 p-3 transition-all group',
-                              active ? 'bg-ocean-50 border-l-2 border-ocean-500' : 'hover:bg-slate-50 border-l-2 border-transparent'
+                              active ? 'bg-ocean-50 border-l-2 border-ocean-500' : 'hover:bg-slate-50 dark:hover:bg-night-100 border-l-2 border-transparent'
                             )}>
                         <div className="w-7 pt-1 flex-shrink-0 flex items-start justify-center">
                           {active
@@ -256,7 +256,7 @@ export default function VideoPlayer() {
                               </div>
                           }
                         </div>
-                        <div className="w-24 aspect-video rounded-xl overflow-hidden bg-slate-100 flex-shrink-0">
+                        <div className="w-24 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-night-100 flex-shrink-0">
                           <img src={getThumbnail(item.snippet, 'medium')}
                                alt={item.snippet.title}
                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -265,7 +265,7 @@ export default function VideoPlayer() {
                         <div className="flex-1 min-w-0">
                           <p className={clsx(
                             'text-xs font-semibold leading-snug line-clamp-2 transition-colors',
-                            active ? 'text-ocean-700' : 'text-ink group-hover:text-ocean-600'
+                            active ? 'text-ocean-700' : 'text-ink dark:text-white group-hover:text-ocean-600'
                           )}>
                             {item.snippet.title}
                           </p>

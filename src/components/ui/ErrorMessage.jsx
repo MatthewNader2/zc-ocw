@@ -5,7 +5,7 @@ export default function ErrorMessage({ title = 'Something went wrong', message, 
       <div className="w-16 h-16 rounded-2xl bg-red-50 flex items-center justify-center mb-5">
         <AlertTriangle className="w-8 h-8 text-red-400" strokeWidth={1.5} />
       </div>
-      <h3 className="font-display text-xl text-ink mb-2">{title}</h3>
+      <h3 className="font-display text-xl text-ink dark:text-white mb-2">{title}</h3>
       <p className="text-sm text-ink-ghost max-w-sm mb-6 leading-relaxed">
         {message ?? 'This may be a YouTube API quota issue (10,000 units/day free). Try again later or check your API key in .env'}
       </p>
