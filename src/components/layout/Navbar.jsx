@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { Search, Bookmark, Settings, LayoutDashboard, Menu, X, Sun, Moon } from 'lucide-react'
+import { Search, Bookmark, Settings, LayoutDashboard, Menu, X, Sun, Moon, User, LogOut, ChevronDown } from 'lucide-react'
 import { useProgress } from '@/context/ProgressContext'
 import { useAuth }     from '@/context/AuthContext'
 import { useSettings } from '@/context/SettingsContext'
@@ -17,8 +17,10 @@ export default function Navbar() {
   const [open,    setOpen]    = useState(false)
   const [scrolled,setScrolled] = useState(false)
   const [query,   setQuery]   = useState('')
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef(null)
   const { getBookmarks } = useProgress()
-  const { isAdmin }      = useAuth()
+  const { isAdmin, user, logout } = useAuth()
   const { settings, update } = useSettings()
   const navigate         = useNavigate()
   const bmCount          = getBookmarks().length
@@ -33,6 +35,16 @@ export default function Navbar() {
     const h = () => setScrolled(window.scrollY > 16)
     window.addEventListener('scroll', h, { passive: true })
     return () => window.removeEventListener('scroll', h)
+  }, [])
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setUserMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   useEffect(() => {
@@ -140,6 +152,47 @@ export default function Navbar() {
               Admin
             </Link>
           )}
+
+          {user ? (
+            <div className="relative ml-1" ref={userMenuRef}>
+              <button
+                onClick={() => setUserMenuOpen(o => !o)}
+                className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-xl hover:bg-white/8 transition-all"
+              >
+                {user.photoURL ? (
+                  <img src={user.photoURL} alt="" className="w-7 h-7 rounded-full" referrerPolicy="no-referrer" />
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-ocean-500/20 text-ocean-300 flex items-center justify-center">
+                    <User className="w-3.5 h-3.5" />
+                  </div>
+                )}
+                <ChevronDown className="w-3.5 h-3.5 text-white/50" />
+              </button>
+              {userMenuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-white dark:bg-night-200 border border-slate-200 dark:border-white/10 shadow-deep py-1.5 z-50">
+                  <div className="px-3.5 py-2 border-b border-slate-100 dark:border-white/10">
+                    <p className="text-xs font-semibold text-ink dark:text-white truncate">{user.displayName || 'Signed in'}</p>
+                    <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{user.email}</p>
+                  </div>
+                  <button
+                    onClick={() => { setUserMenuOpen(false); logout() }}
+                    className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/admin/login"
+                  className="ml-1 flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold
+                             text-white bg-ocean-500/20 border border-ocean-400/25
+                             hover:bg-ocean-500/30 transition-all">
+              <User className="w-3.5 h-3.5" />
+              Sign In
+            </Link>
+          )}
         </div>
 
         {/* Mobile burger */}
@@ -183,6 +236,21 @@ export default function Navbar() {
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-ocean-300 hover:bg-ocean-500/15 transition-all">
               <LayoutDashboard className="w-4 h-4" />
               Admin Dashboard
+            </Link>
+          )}
+          {user ? (
+            <button
+              onClick={() => { setOpen(false); logout() }}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out ({user.email})
+            </button>
+          ) : (
+            <Link to="/admin/login" onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-white bg-ocean-500/20 hover:bg-ocean-500/30 transition-all">
+              <User className="w-4 h-4" />
+              Sign In
             </Link>
           )}
         </div>
