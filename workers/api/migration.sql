@@ -17,3 +17,33 @@ CREATE TABLE IF NOT EXISTS admins (
   added_by    TEXT,
   added_at    TEXT DEFAULT (datetime('now'))
 );
+
+-- Added: Custom schools & programs catalog config
+CREATE TABLE IF NOT EXISTS schools_programs (
+  id          INTEGER PRIMARY KEY CHECK (id = 1),
+  config_json TEXT NOT NULL,
+  updated_at  TEXT DEFAULT (datetime('now'))
+);
+
+-- Added: Per-account user data
+CREATE TABLE IF NOT EXISTS user_data (
+  uid         TEXT NOT NULL,
+  key         TEXT NOT NULL,
+  value_json  TEXT NOT NULL,
+  updated_at  TEXT DEFAULT (datetime('now')),
+  PRIMARY KEY (uid, key)
+);
+
+-- Added: Generic page content CMS
+CREATE TABLE IF NOT EXISTS page_content (
+  page_slug   TEXT PRIMARY KEY,
+  content_json TEXT NOT NULL,
+  updated_at  TEXT DEFAULT (datetime('now'))
+);
+
+-- Added: Site activity & stats counter
+CREATE TABLE IF NOT EXISTS site_stats (
+  key         TEXT PRIMARY KEY,
+  value       INTEGER DEFAULT 0,
+  updated_at  TEXT DEFAULT (datetime('now'))
+);

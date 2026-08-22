@@ -1,0 +1,154 @@
+{
+  "stars": [
+    { "id": "polaris", "name": "Polaris", "ra": 2.53, "dec": 89.26, "mag": 1.97 },
+    { "id": "betelgeuse", "name": "Betelgeuse", "ra": 5.92, "dec": 7.41, "mag": 0.50 },
+    { "id": "rigel", "name": "Rigel", "ra": 5.24, "dec": -8.20, "mag": 0.12 },
+    { "id": "bellatrix", "name": "Bellatrix", "ra": 5.42, "dec": 6.35, "mag": 1.64 },
+    { "id": "saiph", "name": "Saiph", "ra": 5.79, "dec": -9.67, "mag": 2.07 },
+    { "id": "alnitak", "name": "Alnitak", "ra": 5.68, "dec": -1.94, "mag": 1.77 },
+    { "id": "alnilam", "name": "Alnilam", "ra": 5.60, "dec": -1.20, "mag": 1.69 },
+    { "id": "mintaka", "name": "Mintaka", "ra": 5.53, "dec": -0.30, "mag": 2.23 },
+    { "id": "dubhe", "name": "Dubhe", "ra": 11.06, "dec": 61.75, "mag": 1.79 },
+    { "id": "merak", "name": "Merak", "ra": 11.03, "dec": 56.38, "mag": 2.37 },
+    { "id": "phecda", "name": "Phecda", "ra": 11.90, "dec": 53.69, "mag": 2.44 },
+    { "id": "megrez", "name": "Megrez", "ra": 12.25, "dec": 57.03, "mag": 3.31 },
+    { "id": "alioth", "name": "Alioth", "ra": 12.90, "dec": 55.96, "mag": 1.77 },
+    { "id": "mizar", "name": "Mizar", "ra": 13.40, "dec": 54.92, "mag": 2.23 },
+    { "id": "alkaid", "name": "Alkaid", "ra": 13.79, "dec": 49.31, "mag": 1.86 },
+    { "id": "schedar", "name": "Schedar", "ra": 0.68, "dec": 56.54, "mag": 2.23 },
+    { "id": "caph", "name": "Caph", "ra": 0.15, "dec": 59.15, "mag": 2.27 },
+    { "id": "gamma_cas", "name": "Gamma Cas", "ra": 0.94, "dec": 60.72, "mag": 2.15 },
+    { "id": "ruchbah", "name": "Ruchbah", "ra": 1.43, "dec": 60.24, "mag": 2.68 },
+    { "id": "segin", "name": "Segin", "ra": 1.90, "dec": 63.67, "mag": 3.37 },
+    { "id": "deneb", "name": "Deneb", "ra": 20.69, "dec": 45.28, "mag": 1.25 },
+    { "id": "albireo", "name": "Albireo", "ra": 19.51, "dec": 27.96, "mag": 3.05 },
+    { "id": "sadr", "name": "Sadr", "ra": 20.37, "dec": 40.26, "mag": 2.23 },
+    { "id": "gienah_cyg", "name": "Gienah Cyg", "ra": 20.77, "dec": 33.97, "mag": 2.48 },
+    { "id": "delta_cyg", "name": "Delta Cyg", "ra": 19.75, "dec": 45.13, "mag": 2.87 },
+    { "id": "vega", "name": "Vega", "ra": 18.62, "dec": 38.78, "mag": 0.03 },
+    { "id": "sheliak", "name": "Sheliak", "ra": 18.83, "dec": 33.36, "mag": 3.52 },
+    { "id": "sulafat", "name": "Sulafat", "ra": 18.98, "dec": 32.69, "mag": 3.24 },
+    { "id": "altair", "name": "Altair", "ra": 19.84, "dec": 8.87, "mag": 0.77 },
+    { "id": "tarazed", "name": "Tarazed", "ra": 19.77, "dec": 10.61, "mag": 2.72 },
+    { "id": "alshain", "name": "Alshain", "ra": 19.92, "dec": 6.41, "mag": 3.71 },
+    { "id": "antares", "name": "Antares", "ra": 16.49, "dec": -26.43, "mag": 1.06 },
+    { "id": "graffias", "name": "Graffias", "ra": 16.09, "dec": -19.80, "mag": 2.56 },
+    { "id": "dschubba", "name": "Dschubba", "ra": 16.00, "dec": -22.62, "mag": 2.29 },
+    { "id": "sargas", "name": "Sargas", "ra": 17.62, "dec": -42.99, "mag": 1.86 },
+    { "id": "shaula", "name": "Shaula", "ra": 17.56, "dec": -37.10, "mag": 1.62 },
+    { "id": "arcturus", "name": "Arcturus", "ra": 14.26, "dec": 19.18, "mag": -0.05 },
+    { "id": "izar", "name": "Izar", "ra": 14.75, "dec": 27.07, "mag": 2.35 },
+    { "id": "muphrid", "name": "Muphrid", "ra": 13.91, "dec": 18.39, "mag": 2.68 },
+    { "id": "capella", "name": "Capella", "ra": 5.28, "dec": 45.99, "mag": 0.08 },
+    { "id": "menkalinan", "name": "Menkalinan", "ra": 5.99, "dec": 44.95, "mag": 1.90 },
+    { "id": "alderamin", "name": "Alderamin", "ra": 21.31, "dec": 62.59, "mag": 2.45 },
+    { "id": "alfirk", "name": "Alfirk", "ra": 21.48, "dec": 70.56, "mag": 3.23 },
+    { "id": "errai", "name": "Errai", "ra": 23.65, "dec": 77.63, "mag": 3.21 },
+    { "id": "sirius", "name": "Sirius", "ra": 6.75, "dec": -16.72, "mag": -1.46 },
+    { "id": "procyon", "name": "Procyon", "ra": 7.65, "dec": 5.22, "mag": 0.34 },
+    { "id": "pollux", "name": "Pollux", "ra": 7.76, "dec": 28.03, "mag": 1.14 },
+    { "id": "castor", "name": "Castor", "ra": 7.58, "dec": 31.89, "mag": 1.58 },
+    { "id": "aldebaran", "name": "Aldebaran", "ra": 4.60, "dec": 16.51, "mag": 0.87 },
+    { "id": "alnath", "name": "Elnath", "ra": 5.44, "dec": 28.61, "mag": 1.65 },
+    { "id": "regulus", "name": "Regulus", "ra": 10.14, "dec": 11.97, "mag": 1.36 },
+    { "id": "denebola", "name": "Denebola", "ra": 11.82, "dec": 14.57, "mag": 2.14 },
+    { "id": "algieba", "name": "Algieba", "ra": 10.33, "dec": 19.84, "mag": 2.01 },
+    { "id": "spica", "name": "Spica", "ra": 13.42, "dec": -11.16, "mag": 0.98 },
+    { "id": "fomalhaut", "name": "Fomalhaut", "ra": 22.96, "dec": -29.62, "mag": 1.17 },
+    { "id": "markab", "name": "Markab", "ra": 23.08, "dec": 15.21, "mag": 2.49 },
+    { "id": "scheat", "name": "Scheat", "ra": 23.06, "dec": 28.08, "mag": 2.44 },
+    { "id": "algenib", "name": "Algenib", "ra": 0.22, "dec": 15.18, "mag": 2.84 },
+    { "id": "alpheratz", "name": "Alpheratz", "ra": 0.14, "dec": 29.09, "mag": 2.07 },
+    { "id": "mirfak", "name": "Mirfak", "ra": 3.41, "dec": 49.86, "mag": 1.79 },
+    { "id": "algol", "name": "Algol", "ra": 3.14, "dec": 40.96, "mag": 2.12 }
+  ],
+  "constellations": [
+    {
+      "name": "Orion",
+      "lines": [
+        ["betelgeuse", "bellatrix"],
+        ["bellatrix", "mintaka"],
+        ["mintaka", "alnilam"],
+        ["alnilam", "alnitak"],
+        ["alnitak", "saiph"],
+        ["betelgeuse", "alnitak"],
+        ["mintaka", "rigel"]
+      ]
+    },
+    {
+      "name": "Ursa Major",
+      "lines": [
+        ["dubhe", "merak"],
+        ["merak", "phecda"],
+        ["phecda", "megrez"],
+        ["megrez", "dubhe"],
+        ["megrez", "alioth"],
+        ["alioth", "mizar"],
+        ["mizar", "alkaid"]
+      ]
+    },
+    {
+      "name": "Cassiopeia",
+      "lines": [
+        ["caph", "schedar"],
+        ["schedar", "gamma_cas"],
+        ["gamma_cas", "ruchbah"],
+        ["ruchbah", "segin"]
+      ]
+    },
+    {
+      "name": "Cygnus",
+      "lines": [
+        ["deneb", "sadr"],
+        ["sadr", "albireo"],
+        ["delta_cyg", "sadr"],
+        ["sadr", "gienah_cyg"]
+      ]
+    },
+    {
+      "name": "Lyra",
+      "lines": [
+        ["vega", "sheliak"],
+        ["sheliak", "sulafat"],
+        ["sulafat", "vega"]
+      ]
+    },
+    {
+      "name": "Scorpius",
+      "lines": [
+        ["graffias", "dschubba"],
+        ["dschubba", "antares"],
+        ["antares", "shaula"],
+        ["shaula", "sargas"]
+      ]
+    },
+    {
+      "name": "Gemini",
+      "lines": [
+        ["castor", "pollux"]
+      ]
+    },
+    {
+      "name": "Taurus",
+      "lines": [
+        ["aldebaran", "alnath"]
+      ]
+    },
+    {
+      "name": "Leo",
+      "lines": [
+        ["regulus", "algieba"],
+        ["algieba", "denebola"]
+      ]
+    },
+    {
+      "name": "Pegasus",
+      "lines": [
+        ["markab", "scheat"],
+        ["scheat", "alpheratz"],
+        ["alpheratz", "algenib"],
+        ["algenib", "markab"]
+      ]
+    }
+  ]
+}

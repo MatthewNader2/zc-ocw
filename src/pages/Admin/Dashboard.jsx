@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -11,12 +11,15 @@ import {
   BookOpen,
   FileText,
   Mail,
-} from "lucide-react"; // ← Added Mail
+  RefreshCw,
+  AlertCircle
+} from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useAdminData } from "@/context/AdminDataContext";
 import { usePlaylists } from "@/hooks/useYouTube";
 import { detectFromTitle, getSchool } from "@/data/coursesCatalog";
-import { getThumbnail } from "@/services/youtube";
+import { getThumbnail, fetchPlaylists } from "@/services/youtube";
+import * as cloudflare from "@/services/cloudflare";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import clsx from "clsx";
@@ -30,22 +33,70 @@ const SCHOOL_ACCENT = {
 
 export default function AdminDashboard() {
   const { logout } = useAuth();
-  const { getCourseData, getMaterials, getBooks, version } = useAdminData();
-  const { data, isLoading } = usePlaylists();
+  const { getCourseData, getMaterials, getBooks, isSpecialPlaylist, version } = useAdminData();
+  const { data, isLoading, refetch } = usePlaylists();
   const courses = data?.pages?.flatMap((p) => p.items) ?? [];
 
-  const { enrichedCount, matCount, bookCount } = useMemo(() => {
+  const [syncing, setSyncing] = useState(false);
+  const [syncMsg, setSyncMsg] = useState("");
+  const [filterNeedsReview, setFilterNeedsReview] = useState(false);
+
+  const { enrichedCount, matCount, bookCount, needsReviewCount } = useMemo(() => {
     let enriched = 0;
     let mats = 0;
     let books = 0;
+    let needsReview = 0;
     for (const c of courses) {
       const cd = getCourseData(c.id);
       if (cd?.instructor || cd?.schoolId) enriched++;
+      else needsReview++;
       if (getMaterials(c.id).length > 0) mats++;
       if (getBooks(c.id).length > 0) books++;
     }
-    return { enrichedCount: enriched, matCount: mats, bookCount: books };
+    return { enrichedCount: enriched, matCount: mats, bookCount: books, needsReviewCount: needsReview };
   }, [courses, getCourseData, getMaterials, getBooks, version]);
+
+  async function handleSyncYouTube() {
+    setSyncing(true);
+    setSyncMsg("");
+    try {
+      const ytData = await fetchPlaylists({ maxResults: 50 });
+      const ytItems = ytData?.items || [];
+      let newCount = 0;
+
+      for (const item of ytItems) {
+        const cd = getCourseData(item.id);
+        if (!cd || Object.keys(cd).length === 0) {
+          const auto = detectFromTitle(item.snippet.title);
+          await cloudflare.upsertProfile(item.id, {
+            category: "course",
+            schoolId: auto?.schoolId || null,
+            programId: auto?.programId || null,
+            courseCode: auto?.code || null,
+            courseName: auto?.name || item.snippet.title,
+            isIncomplete: true,
+            lectureCount: item.contentDetails?.itemCount || 0,
+          });
+          newCount++;
+        }
+      }
+
+      await refetch();
+      setSyncMsg(newCount > 0 ? `Synced! Found ${newCount} new playlist(s).` : "Channel already up-to-date!");
+    } catch (e) {
+      setSyncMsg(`Sync error: ${e.message}`);
+    } finally {
+      setSyncing(false);
+    }
+  }
+
+  const displayedCourses = useMemo(() => {
+    if (!filterNeedsReview) return courses;
+    return courses.filter((c) => {
+      const cd = getCourseData(c.id);
+      return !cd?.instructor && !cd?.schoolId;
+    });
+  }, [courses, filterNeedsReview, getCourseData]);
 
   return (
     <>
@@ -64,7 +115,15 @@ export default function AdminDashboard() {
               {courses.length} playlists from YouTube
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={handleSyncYouTube}
+              disabled={syncing}
+              className="btn-primary gap-2 text-xs"
+            >
+              <RefreshCw className={clsx("w-3.5 h-3.5", syncing && "animate-spin")} />
+              {syncing ? "Syncing YouTube…" : "Sync from YouTube Now"}
+            </button>
             <Link to="/admin/settings" className="btn-outline-dark gap-2">
               <Settings className="w-4 h-4" /> Settings
             </Link>
@@ -76,6 +135,12 @@ export default function AdminDashboard() {
       </div>
 
       <div className="section py-10">
+        {syncMsg && (
+          <div className="mb-6 p-4 rounded-2xl bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-500/30 text-cyan-800 dark:text-cyan-200 text-sm font-semibold flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-cyan-500 flex-shrink-0" />
+            {syncMsg}
+          </div>
+        )}
         {/* Info */}
         <ScrollReveal>
           <div className="bg-ocean-50 border border-ocean-200/60 rounded-2xl p-5 mb-8 flex gap-4">

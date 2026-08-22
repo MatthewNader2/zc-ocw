@@ -7,22 +7,23 @@ import { SettingsProvider } from "@/context/SettingsContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Layout from "@/components/layout/Layout";
 import Home from "@/pages/Home";
-import Courses from "@/pages/Courses";
-import CourseDetail from "@/pages/CourseDetail";
-import VideoPlayer from "@/pages/VideoPlayer";
-import Departments from "@/pages/Departments";
-import About from "@/pages/About";
-import Search from "@/pages/Search";
-import Bookmarks from "@/pages/Bookmarks";
-import SettingsPage from "@/pages/Settings";
-import Interviews from "@/pages/Interviews";
-import ReportBug from "@/pages/ReportBug";
-import ContactUs from "@/pages/ContactUs";
-import Acknowledgments from "@/pages/Acknowledgments";
-import NotFound from "@/pages/NotFound";
-import AdminLogin from "@/pages/Admin/Login";
-import FeedbackViewer from "@/pages/Admin/FeedbackViewer";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
+const Courses = lazy(() => import("@/pages/Courses"));
+const CourseDetail = lazy(() => import("@/pages/CourseDetail"));
+const VideoPlayer = lazy(() => import("@/pages/VideoPlayer"));
+const Departments = lazy(() => import("@/pages/Departments"));
+const About = lazy(() => import("@/pages/About"));
+const Search = lazy(() => import("@/pages/Search"));
+const Bookmarks = lazy(() => import("@/pages/Bookmarks"));
+const SettingsPage = lazy(() => import("@/pages/Settings"));
+const Interviews = lazy(() => import("@/pages/Interviews"));
+const ReportBug = lazy(() => import("@/pages/ReportBug"));
+const ContactUs = lazy(() => import("@/pages/ContactUs"));
+const Acknowledgments = lazy(() => import("@/pages/Acknowledgments"));
+const NotFound = lazy(() => import("@/pages/NotFound"));
+const AdminLogin = lazy(() => import("@/pages/Admin/Login"));
+const FeedbackViewer = lazy(() => import("@/pages/Admin/FeedbackViewer"));
 const AdminDashboard = lazy(() => import("@/pages/Admin/Dashboard"));
 const AdminCourseEditor = lazy(() => import("@/pages/Admin/CourseEditor"));
 const AdminSettings = lazy(() => import("@/pages/Admin/AdminSettings"));
@@ -35,8 +36,9 @@ function ProtectedAdmin({ children }) {
 
 function AppRoutes() {
   return (
-    <Routes>
-      <Route element={<Layout />}>
+    <Suspense fallback={<div className="py-20 flex items-center justify-center"><LoadingSpinner /></div>}>
+      <Routes>
+        <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/courses" element={<Courses />} />
         <Route path="/courses/:playlistId" element={<CourseDetail />} />
@@ -121,6 +123,7 @@ function AppRoutes() {
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
+    </Suspense>
   );
 }
 

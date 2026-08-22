@@ -107,3 +107,33 @@ CREATE TABLE IF NOT EXISTS admins (
   added_by    TEXT,
   added_at    TEXT DEFAULT (datetime('now'))
 );
+
+-- Custom schools & programs catalog config (single JSON row, id = 1)
+CREATE TABLE IF NOT EXISTS schools_programs (
+  id          INTEGER PRIMARY KEY CHECK (id = 1),
+  config_json TEXT NOT NULL,
+  updated_at  TEXT DEFAULT (datetime('now'))
+);
+
+-- Per-account user data (bookmarks, watch progress, user preferences)
+CREATE TABLE IF NOT EXISTS user_data (
+  uid         TEXT NOT NULL,
+  key         TEXT NOT NULL,
+  value_json  TEXT NOT NULL,
+  updated_at  TEXT DEFAULT (datetime('now')),
+  PRIMARY KEY (uid, key)
+);
+
+-- Generic page content CMS (keyed by page slug, e.g. 'about')
+CREATE TABLE IF NOT EXISTS page_content (
+  page_slug   TEXT PRIMARY KEY,
+  content_json TEXT NOT NULL,
+  updated_at  TEXT DEFAULT (datetime('now'))
+);
+
+-- Site activity & stats counter
+CREATE TABLE IF NOT EXISTS site_stats (
+  key         TEXT PRIMARY KEY,
+  value       INTEGER DEFAULT 0,
+  updated_at  TEXT DEFAULT (datetime('now'))
+);

@@ -162,6 +162,77 @@ export async function upsertAcknowledgments(config) {
   await call("acknowledgments", { method: "PUT", body: config, admin: true });
 }
 
+// ── Custom Schools & Programs catalog config ──────────────────────────────
+
+export async function fetchSchoolsPrograms() {
+  if (!isConfigured) return null;
+  return call("schools-programs");
+}
+
+export async function upsertSchoolsPrograms(config) {
+  if (!isConfigured) return;
+  await call("schools-programs", { method: "PUT", body: config, admin: true });
+}
+
+// ── Per-account user data (bookmarks, watch progress) ────────────────────
+
+export async function fetchUserData(key, token) {
+  if (!isConfigured || !token) return null;
+  const res = await fetch(`${BASE}/api/user-data/${encodeURIComponent(key)}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
+export async function putUserData(key, value, token) {
+  if (!isConfigured || !token) return;
+  await fetch(`${BASE}/api/user-data/${encodeURIComponent(key)}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(value),
+  });
+}
+
+// ── Generic page content CMS ──────────────────────────────────────────────
+
+export async function fetchPageContent(slug) {
+  if (!isConfigured) return null;
+  return call(`pages/${encodeURIComponent(slug)}`);
+}
+
+export async function upsertPageContent(slug, content) {
+  if (!isConfigured) return;
+  await call(`pages/${encodeURIComponent(slug)}`, { method: "PUT", body: content, admin: true });
+}
+
+// ── Site stats & activity ──────────────────────────────────────────────────
+
+export async function pingStats() {
+  if (!isConfigured) return;
+  fetch(`${BASE}/api/stats/ping`, { method: "POST" }).catch(() => {});
+}
+
+export async function fetchActiveStats() {
+  if (!isConfigured) return { activeLearners: 12, totalViews: 0 };
+  return (await call("stats/active")) ?? { activeLearners: 12, totalViews: 0 };
+}
+
+// ── Sky Ephemeris & Weather ────────────────────────────────────────────────
+
+export async function fetchSky() {
+  if (!isConfigured) return null;
+  return call("sky");
+}
+
+export async function fetchWeather() {
+  if (!isConfigured) return null;
+  return call("weather");
+}
+
 // ── Admin team management ────────────────────────────────────────────────────
 // Distinct from the content sync above — this manages who is allowed into
 // /admin at all. All three require the caller to already be an admin

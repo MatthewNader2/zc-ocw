@@ -82,6 +82,23 @@ export default function CourseDetail() {
 
   const pageUrl = `${window.location.origin}/courses/${playlistId}`;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    "name": snippet.title,
+    "description": description?.slice(0, 250),
+    "provider": {
+      "@type": "CollegeOrUniversity",
+      "name": "Zewail City of Science and Technology",
+      "sameAs": "https://www.zewailcity.edu.eg"
+    },
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "Online",
+      "instructor": instructor ? { "@type": "Person", "name": instructor } : undefined
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -94,6 +111,7 @@ export default function CourseDetail() {
         {snippet.thumbnails?.high?.url && (
           <meta property="og:image" content={snippet.thumbnails.high.url} />
         )}
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
       {/* Thin accent line */}

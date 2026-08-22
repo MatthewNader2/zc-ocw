@@ -57,53 +57,69 @@ export function AdminDataProvider({ children }) {
     return publicUrl;
   }, [useCloud]);
 
+  // Helper to persist schools & programs to D1 cloud
+  const persistSchoolsPrograms = useCallback((schools, programs) => {
+    if (useCloud) {
+      cloudflare.upsertSchoolsPrograms({ schools, programs }).catch(() => {});
+    }
+  }, [useCloud]);
+
   // ── Custom Schools & Programs CRUD ────────────────────────────────────────
 
   const addCustomSchool = useCallback((school) => {
+    let nextSchools = [];
     setCustomSchools((prev) => {
-      const next = [...prev.filter((s) => s.id !== school.id), school];
-      storage.saveCustomSchools(next);
-      return next;
+      nextSchools = [...prev.filter((s) => s.id !== school.id), school];
+      storage.saveCustomSchools(nextSchools);
+      return nextSchools;
     });
+    persistSchoolsPrograms(nextSchools, customPrograms);
     bump();
-  }, [bump]);
+  }, [bump, customPrograms, persistSchoolsPrograms]);
 
   const deleteCustomSchool = useCallback((schoolId) => {
+    let nextSchools = [];
+    let nextPrograms = {};
     setCustomSchools((prev) => {
-      const next = prev.filter((s) => s.id !== schoolId);
-      storage.saveCustomSchools(next);
-      return next;
+      nextSchools = prev.filter((s) => s.id !== schoolId);
+      storage.saveCustomSchools(nextSchools);
+      return nextSchools;
     });
     setCustomPrograms((prev) => {
-      const next = { ...prev };
-      delete next[schoolId];
-      storage.saveCustomPrograms(next);
-      return next;
+      nextPrograms = { ...prev };
+      delete nextPrograms[schoolId];
+      storage.saveCustomPrograms(nextPrograms);
+      return nextPrograms;
     });
+    persistSchoolsPrograms(nextSchools, nextPrograms);
     bump();
-  }, [bump]);
+  }, [bump, persistSchoolsPrograms]);
 
   const addCustomProgram = useCallback((schoolId, program) => {
+    let nextPrograms = {};
     setCustomPrograms((prev) => {
       const schoolProgs = prev[schoolId] ?? [];
       const nextProgs = [...schoolProgs.filter((p) => p.id !== program.id), program];
-      const next = { ...prev, [schoolId]: nextProgs };
-      storage.saveCustomPrograms(next);
-      return next;
+      nextPrograms = { ...prev, [schoolId]: nextProgs };
+      storage.saveCustomPrograms(nextPrograms);
+      return nextPrograms;
     });
+    persistSchoolsPrograms(customSchools, nextPrograms);
     bump();
-  }, [bump]);
+  }, [bump, customSchools, persistSchoolsPrograms]);
 
   const deleteCustomProgram = useCallback((schoolId, programId) => {
+    let nextPrograms = {};
     setCustomPrograms((prev) => {
       const schoolProgs = prev[schoolId] ?? [];
       const nextProgs = schoolProgs.filter((p) => p.id !== programId);
-      const next = { ...prev, [schoolId]: nextProgs };
-      storage.saveCustomPrograms(next);
-      return next;
+      nextPrograms = { ...prev, [schoolId]: nextProgs };
+      storage.saveCustomPrograms(nextPrograms);
+      return nextPrograms;
     });
+    persistSchoolsPrograms(customSchools, nextPrograms);
     bump();
-  }, [bump]);
+  }, [bump, customSchools, persistSchoolsPrograms]);
 
   const allSchools = useMemo(
     () => getCombinedSchools(customSchools),
@@ -115,7 +131,7 @@ export function AdminDataProvider({ children }) {
     [customPrograms]
   );
 
-  // ── On mount: pull profiles and overrides from Cloudflare ─────────────────
+  // ── On mount: pull profiles, overrides, ack, and schools/programs ─────────
   useEffect(() => {
     if (!cloudflare.isConfigured) {
       setSynced(true);
@@ -129,8 +145,20 @@ export function AdminDataProvider({ children }) {
         cloudflare.fetchProfiles(),
         cloudflare.fetchAllOverrides(),
         cloudflare.fetchAcknowledgments(),
-      ]).then(([profilesResult, overridesResult, ackResult]) => {
+        cloudflare.fetchSchoolsPrograms(),
+      ]).then(([profilesResult, overridesResult, ackResult, spResult]) => {
         if (!active) return;
+
+        if (spResult.status === "fulfilled" && spResult.value) {
+          if (spResult.value.schools) {
+            setCustomSchools(spResult.value.schools);
+            storage.saveCustomSchools(spResult.value.schools);
+          }
+          if (spResult.value.programs) {
+            setCustomPrograms(spResult.value.programs);
+            storage.saveCustomPrograms(spResult.value.programs);
+          }
+        }
 
         if (ackResult.status === "fulfilled" && ackResult.value) {
           setAcknowledgmentsConfig(ackResult.value);

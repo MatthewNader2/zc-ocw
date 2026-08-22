@@ -2,10 +2,20 @@ import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { Youtube, Globe, BookOpen, PlayCircle, Search, Smartphone, ArrowRight } from 'lucide-react'
 import { useChannelStats } from '@/hooks/useYouTube'
+import { useEditablePage } from '@/hooks/useEditablePage'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+
+const DEFAULT_ABOUT = {
+  headerSubtitle: "ZC OCW makes Zewail City's academic content freely available — lecture videos, course materials, and more — inspired by MIT OpenCourseWare and the global open education movement.",
+  missionTitle: "Our Mission",
+  missionBody: "Zewail City was founded on the belief that access to world-class education is a right, not a privilege. ZC OCW extends that mission to the digital world — making our courses available to students across Egypt, the Arab world, and beyond.",
+  licenseTitle: "License",
+  licenseBody: "All course materials on ZC OCW are shared under a Creative Commons BY-NC-SA 4.0 license. You are free to use, adapt, and share them for non-commercial purposes with proper attribution.",
+}
 
 export default function About() {
   const { data: ch } = useChannelStats()
+  const { content } = useEditablePage('about', DEFAULT_ABOUT)
   const stats = ch?.statistics
   return (
     <>
@@ -23,8 +33,7 @@ export default function About() {
             </div>
           </div>
           <p className="text-white/65 text-lg leading-relaxed max-w-2xl">
-            ZC OCW makes Zewail City's academic content freely available — lecture videos,
-            course materials, and more — inspired by MIT OpenCourseWare and the global open education movement.
+            {content?.headerSubtitle || DEFAULT_ABOUT.headerSubtitle}
           </p>
         </div>
       </div>
@@ -42,7 +51,7 @@ export default function About() {
               ].map(({ label, value }) => (
                 <div key={label} className="card-flat border border-slate-100 dark:border-white/10 shadow-card text-center">
                   <p className="font-display text-3xl font-bold text-ocean-600">{value}</p>
-                  <p className="text-sm text-ink-ghost mt-1">{label}</p>
+                  <p className="text-sm text-ink-ghost dark:text-slate-400 mt-1">{label}</p>
                 </div>
               ))}
             </div>
@@ -51,11 +60,11 @@ export default function About() {
 
         {/* Mission */}
         <ScrollReveal delay="0.1s" className="space-y-4">
-          <h2 className="font-display text-3xl font-bold text-ink dark:text-white">Our Mission</h2>
-          <p className="text-ink-muted leading-relaxed">
-            Zewail City was founded on the belief that access to world-class education is a right, not a privilege.
-            ZC OCW extends that mission to the digital world — making our courses available to students across Egypt,
-            the Arab world, and beyond.
+          <h2 className="font-display text-3xl font-bold text-ink dark:text-white">
+            {content?.missionTitle || DEFAULT_ABOUT.missionTitle}
+          </h2>
+          <p className="text-ink-muted dark:text-slate-300 leading-relaxed">
+            {content?.missionBody || DEFAULT_ABOUT.missionBody}
           </p>
         </ScrollReveal>
 

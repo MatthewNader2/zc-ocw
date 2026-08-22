@@ -1,16 +1,78 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import * as cloudflare from '@/services/cloudflare'
+import { julianDate, lstHours, altAz, getSolarTimes } from '@/utils/astro'
+import starCatalog from '@/data/stars.json'
 
-/**
- * Layered particle field:
- *  - Layer 0: slow-drifting "nebula" blobs (very subtle, adds depth)
- *  - Layer 1: distant twinkling stars (small, dim, no interaction — parallax)
- *  - Layer 2: the original orbiting "constellation" particles + connecting web,
- *             now with mouse-repel/attract, click ripple, and shooting stars
- * Everything is skipped/reduced under prefers-reduced-motion, and the whole
- * canvas pauses via requestAnimationFrame when the tab is hidden.
- */
+const ZEWAIL_LAT = 30.03
+const ZEWAIL_LON = 30.95
+
+function getTimeOfDayPalette() {
+  const hour = new Date().getHours()
+  if (hour >= 5 && hour < 8) {
+    return {
+      name: 'dawn',
+      primaryDark: '251, 146, 60',
+      primaryLight: '234, 88, 12',
+      secondaryDark: '244, 114, 182',
+      secondaryLight: '217, 70, 239',
+      nebulaDark: '251, 146, 60',
+      nebulaLight: '254, 215, 170',
+    }
+  } else if (hour >= 8 && hour < 17) {
+    return {
+      name: 'day',
+      primaryDark: '0, 245, 212',
+      primaryLight: '0, 150, 199',
+      secondaryDark: '0, 180, 216',
+      secondaryLight: '3, 4, 94',
+      nebulaDark: '0, 245, 212',
+      nebulaLight: '144, 224, 239',
+    }
+  } else if (hour >= 17 && hour < 20) {
+    return {
+      name: 'dusk',
+      primaryDark: '168, 85, 247',
+      primaryLight: '126, 34, 206',
+      secondaryDark: '245, 158, 11',
+      secondaryLight: '217, 119, 6',
+      nebulaDark: '168, 85, 247',
+      nebulaLight: '233, 213, 255',
+    }
+  } else {
+    return {
+      name: 'night',
+      primaryDark: '56, 189, 248',
+      primaryLight: '2, 132, 199',
+      secondaryDark: '129, 140, 248',
+      secondaryLight: '67, 56, 202',
+      nebulaDark: '56, 189, 248',
+      nebulaLight: '186, 230, 253',
+    }
+  }
+}
+
 export default function ParticleBackground({ className = '', isFixed = false }) {
   const canvasRef = useRef(null)
+  const [skyData, setSkyData] = useState(null)
+  const [sunTimes, setSunTimes] = useState(null)
+
+  useEffect(() => {
+    cloudflare.pingStats()
+
+    // Fetch optional planetary positions from worker API
+    cloudflare.fetchSky().then(data => { if (data) setSkyData(data) }).catch(() => {})
+
+    // Fetch sunrise/sunset for Zewail City
+    cloudflare.fetchWeather().then(w => {
+      if (w && w.sunrise && w.sunset) {
+        setSunTimes({ sunrise: new Date(w.sunrise), sunset: new Date(w.sunset) })
+      } else {
+        setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
+      }
+    }).catch(() => {
+      setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
+    })
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -19,6 +81,7 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
     if (!ctx) return
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const palette = getTimeOfDayPalette()
 
     let animId = null
     let width = (canvas.width = canvas.parentElement?.clientWidth || window.innerWidth)
@@ -28,19 +91,11 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
     let targetMouseY = height / 2
     let mouseX = targetMouseX
     let mouseY = targetMouseY
-    let isMouseActive = false
-    const ripples = []
 
     const handleMouseMove = (e) => {
       const rect = canvas.getBoundingClientRect()
       targetMouseX = e.clientX - rect.left
       targetMouseY = e.clientY - rect.top
-      isMouseActive = true
-    }
-    const handleMouseLeave = () => { isMouseActive = false }
-    const handleClick = (e) => {
-      const rect = canvas.getBoundingClientRect()
-      ripples.push({ x: e.clientX - rect.left, y: e.clientY - rect.top, r: 0, alpha: 0.5 })
     }
     const handleResize = () => {
       if (!canvas.parentElement) return
@@ -50,47 +105,20 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
 
     window.addEventListener('resize', handleResize)
     window.addEventListener('mousemove', handleMouseMove, { passive: true })
-    window.addEventListener('mouseleave', handleMouseLeave)
-    canvas.addEventListener('click', handleClick)
 
     const isMobile = width < 640
-    const particleCount = isMobile ? 24 : 48
-    const starCount = reduceMotion ? 0 : (isMobile ? 30 : 70)
     const nebulaCount = isMobile ? 2 : 3
 
-    const particles = Array.from({ length: particleCount }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      vx: (Math.random() - 0.5) * 0.6,
-      vy: (Math.random() - 0.5) * 0.6,
-      radius: Math.random() * 2.2 + 1.0,
-      baseAlpha: Math.random() * 0.45 + 0.25,
-      pulseSpeed: Math.random() * 0.03 + 0.01,
-      angle: Math.random() * Math.PI * 2,
-    }))
-
-    const stars = Array.from({ length: starCount }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height,
-      radius: Math.random() * 1.1 + 0.3,
-      baseAlpha: Math.random() * 0.5 + 0.15,
-      twinkleSpeed: Math.random() * 0.02 + 0.005,
-      angle: Math.random() * Math.PI * 2,
-      depth: Math.random() * 0.5 + 0.15,
-    }))
-
-    const nebulae = Array.from({ length: nebulaCount }, (_, i) => ({
+    const nebulae = Array.from({ length: nebulaCount }, () => ({
       x: Math.random() * width,
       y: Math.random() * height,
       r: Math.max(width, height) * (0.28 + Math.random() * 0.15),
       vx: (Math.random() - 0.5) * 0.08,
       vy: (Math.random() - 0.5) * 0.08,
-      hueDark: i % 2 === 0 ? '0, 245, 212' : '0, 180, 216',
-      hueLight: i % 2 === 0 ? '0, 150, 199' : '72, 202, 228',
+      hueDark: palette.nebulaDark,
+      hueLight: palette.nebulaLight,
     }))
 
-    let shootingStar = null
-    let shootingStarCooldown = 200 + Math.random() * 300
     let time = 0
 
     const render = () => {
@@ -101,8 +129,18 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
       mouseY += (targetMouseY - mouseY) * 0.1
 
       const isDark = document.documentElement.classList.contains('dark')
+      const now = new Date()
 
-      // Layer 0: nebula blobs
+      // Calculate Day/Night state
+      let isNight = true
+      if (sunTimes) {
+        isNight = now < sunTimes.sunrise || now > sunTimes.sunset
+      } else {
+        const h = now.getHours()
+        isNight = h < 6 || h >= 18
+      }
+
+      // Layer 0: Ambient Nebula
       for (const n of nebulae) {
         if (!reduceMotion) {
           n.x += n.vx
@@ -114,7 +152,7 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
         }
         const hue = isDark ? n.hueDark : n.hueLight
         const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.r)
-        grad.addColorStop(0, `rgba(${hue}, ${isDark ? 0.05 : 0.035})`)
+        grad.addColorStop(0, `rgba(${hue}, ${isDark ? (isNight ? 0.06 : 0.03) : 0.025})`)
         grad.addColorStop(1, 'rgba(0,0,0,0)')
         ctx.fillStyle = grad
         ctx.beginPath()
@@ -122,146 +160,96 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
         ctx.fill()
       }
 
-      // Layer 1: twinkling parallax stars
-      const parallaxX = isMouseActive ? (mouseX - width / 2) / width : 0
-      const parallaxY = isMouseActive ? (mouseY - height / 2) / height : 0
-      for (const s of stars) {
-        s.angle += s.twinkleSpeed
-        const a = Math.max(0, s.baseAlpha + Math.sin(s.angle) * 0.25)
-        const sx = s.x - parallaxX * 30 * s.depth
-        const sy = s.y - parallaxY * 30 * s.depth
-        ctx.beginPath()
-        ctx.arc(sx, sy, s.radius, 0, Math.PI * 2)
-        ctx.fillStyle = isDark ? `rgba(255, 255, 255, ${a})` : `rgba(3, 4, 94, ${a * 0.5})`
-        ctx.fill()
+      // Layer 1: Real-time Live Constellation Sky Calculation
+      const jd = julianDate(now)
+      const lst = lstHours(jd, ZEWAIL_LON)
+
+      const starPosMap = new Map()
+
+      // Calculate visible stars (> 0° altitude)
+      const visibleStars = []
+      for (const star of starCatalog.stars) {
+        const { alt, az } = altAz(star.ra, star.dec, ZEWAIL_LAT, lst)
+        if (alt > 0) {
+          // Map Azimuth & Altitude to screen (X, Y)
+          const px = (az / 360) * width
+          const py = height * (1 - alt / 90) * 0.85 + height * 0.1
+          const radius = Math.max(1, (3.5 - star.mag * 0.6))
+          const starObj = { ...star, px, py, alt, az, radius }
+          visibleStars.push(starObj)
+          starPosMap.set(star.id, starObj)
+        }
       }
 
-      // Occasional shooting star (dark mode only)
-      if (isDark && !reduceMotion) {
-        if (!shootingStar) {
-          shootingStarCooldown -= 1
-          if (shootingStarCooldown <= 0) {
-            shootingStar = {
-              x: Math.random() * width * 0.6,
-              y: Math.random() * height * 0.3,
-              vx: 6 + Math.random() * 4,
-              vy: 3 + Math.random() * 2,
-              life: 0,
+      // Base opacity depending on day/night and light/dark theme
+      const skyOpacity = isDark
+        ? (isNight ? 0.85 : 0.25)
+        : (isNight ? 0.35 : 0.15)
+
+      // Draw constellation connecting lines
+      ctx.lineWidth = 0.8
+      for (const constel of starCatalog.constellations) {
+        for (const [idA, idB] of constel.lines) {
+          const sA = starPosMap.get(idA)
+          const sB = starPosMap.get(idB)
+          if (sA && sB) {
+            const dist = Math.hypot(sA.px - sB.px, sA.py - sB.py)
+            if (dist < width * 0.45) { // Only connect if reasonable screen distance
+              ctx.beginPath()
+              ctx.moveTo(sA.px, sA.py)
+              ctx.lineTo(sB.px, sB.py)
+              ctx.strokeStyle = isDark
+                ? `rgba(72, 202, 228, ${0.22 * skyOpacity})`
+                : `rgba(0, 150, 199, ${0.15 * skyOpacity})`
+              ctx.stroke()
             }
           }
-        } else {
-          shootingStar.x += shootingStar.vx
-          shootingStar.y += shootingStar.vy
-          shootingStar.life += 1
-          const grad = ctx.createLinearGradient(
-            shootingStar.x, shootingStar.y,
-            shootingStar.x - shootingStar.vx * 8, shootingStar.y - shootingStar.vy * 8
-          )
-          grad.addColorStop(0, 'rgba(255,255,255,0.9)')
-          grad.addColorStop(1, 'rgba(255,255,255,0)')
-          ctx.strokeStyle = grad
-          ctx.lineWidth = 1.5
+        }
+      }
+
+      // Draw stars
+      for (const s of visibleStars) {
+        const twinkle = reduceMotion ? 1 : (0.75 + Math.sin(time * 2 + s.az) * 0.25)
+        const alpha = Math.min(1, Math.max(0.2, (1 - s.mag / 4.5) * skyOpacity * twinkle))
+
+        ctx.beginPath()
+        ctx.arc(s.px, s.py, s.radius, 0, Math.PI * 2)
+        ctx.fillStyle = isDark
+          ? `rgba(255, 255, 255, ${alpha})`
+          : `rgba(15, 23, 42, ${alpha})`
+        ctx.fill()
+
+        // Subtle glow for brightest stars
+        if (s.mag < 1.0) {
+          const grad = ctx.createRadialGradient(s.px, s.py, 0, s.px, s.py, s.radius * 3)
+          grad.addColorStop(0, `rgba(0, 245, 212, ${alpha * 0.4})`)
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)')
+          ctx.fillStyle = grad
           ctx.beginPath()
-          ctx.moveTo(shootingStar.x, shootingStar.y)
-          ctx.lineTo(shootingStar.x - shootingStar.vx * 8, shootingStar.y - shootingStar.vy * 8)
-          ctx.stroke()
-          if (shootingStar.life > 60 || shootingStar.x > width || shootingStar.y > height) {
-            shootingStar = null
-            shootingStarCooldown = 300 + Math.random() * 400
-          }
+          ctx.arc(s.px, s.py, s.radius * 3, 0, Math.PI * 2)
+          ctx.fill()
         }
       }
 
-      // Cursor aura (dark mode)
-      if (isDark && isMouseActive) {
-        const aura = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 320)
-        aura.addColorStop(0, 'rgba(0, 245, 212, 0.12)')
-        aura.addColorStop(0.4, 'rgba(0, 180, 216, 0.06)')
-        aura.addColorStop(1, 'rgba(0, 0, 0, 0)')
-        ctx.fillStyle = aura
-        ctx.beginPath()
-        ctx.arc(mouseX, mouseY, 320, 0, Math.PI * 2)
-        ctx.fill()
-      }
+      // Layer 2: Render wandering planets & Moon if available from Astronomy API
+      if (skyData?.table?.rows) {
+        for (const row of skyData.table.rows) {
+          const bodyId = row.entry?.id
+          const pos = row.cells?.[0]?.position?.horizontal
+          if (pos && pos.altitude?.degrees) {
+            const alt = parseFloat(pos.altitude.degrees)
+            const az = parseFloat(pos.azimuth.degrees)
+            if (alt > 0) {
+              const px = (az / 360) * width
+              const py = height * (1 - alt / 90) * 0.85 + height * 0.1
 
-      // Click ripples
-      for (let i = ripples.length - 1; i >= 0; i--) {
-        const r = ripples[i]
-        r.r += 6
-        r.alpha *= 0.94
-        if (r.alpha < 0.02) { ripples.splice(i, 1); continue }
-        ctx.beginPath()
-        ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2)
-        ctx.strokeStyle = isDark
-          ? `rgba(0, 245, 212, ${r.alpha})`
-          : `rgba(0, 150, 199, ${r.alpha * 0.6})`
-        ctx.lineWidth = 1.2
-        ctx.stroke()
-      }
-
-      // Layer 2: main constellation particles
-      const primaryRgb = isDark ? '0, 245, 212' : '0, 150, 199'
-      const secondaryRgb = isDark ? '0, 180, 216' : '3, 4, 94'
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]
-        p.angle += p.pulseSpeed
-        const pulsingAlpha = p.baseAlpha + Math.sin(p.angle) * 0.15
-
-        if (!reduceMotion) {
-          p.x += p.vx
-          p.y += p.vy
-
-          if (isMouseActive) {
-            const dx = mouseX - p.x
-            const dy = mouseY - p.y
-            const dist = Math.sqrt(dx * dx + dy * dy)
-            if (dist < 220 && dist > 10) {
-              const force = (1 - dist / 220) * 0.4
-              p.x += (dx / dist) * force + Math.cos(time + i) * 0.2
-              p.y += (dy / dist) * force + Math.sin(time + i) * 0.2
+              ctx.beginPath()
+              ctx.arc(px, py, bodyId === 'moon' ? 5 : 3.5, 0, Math.PI * 2)
+              ctx.fillStyle = bodyId === 'sun'
+                ? `rgba(251, 146, 60, ${skyOpacity})`
+                : (bodyId === 'moon' ? `rgba(254, 240, 138, ${skyOpacity})` : `rgba(192, 132, 252, ${skyOpacity})`)
+              ctx.fill()
             }
-          }
-
-          if (p.x < -20) p.x = width + 20
-          if (p.x > width + 20) p.x = -20
-          if (p.y < -20) p.y = height + 20
-          if (p.y > height + 20) p.y = -20
-        }
-
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(${primaryRgb}, ${Math.max(0.1, pulsingAlpha)})`
-        ctx.shadowColor = isDark ? 'rgba(0, 245, 212, 0.6)' : 'transparent'
-        ctx.shadowBlur = isDark ? 8 : 0
-        ctx.fill()
-        ctx.shadowBlur = 0
-
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j]
-          const dx = p.x - p2.x
-          const dy = p.y - p2.y
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          const linkMaxDist = 135
-
-          if (dist < linkMaxDist) {
-            const midX = (p.x + p2.x) / 2
-            const midY = (p.y + p2.y) / 2
-            const cursorDist = isMouseActive
-              ? Math.sqrt((midX - mouseX) ** 2 + (midY - mouseY) ** 2)
-              : 999
-
-            let lineAlpha = (1 - dist / linkMaxDist) * (isDark ? 0.25 : 0.1)
-            if (cursorDist < 200) lineAlpha *= 1 + (1 - cursorDist / 200) * 2.0
-
-            ctx.beginPath()
-            ctx.moveTo(p.x, p.y)
-            ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = cursorDist < 200
-              ? `rgba(${primaryRgb}, ${Math.min(lineAlpha, 0.6)})`
-              : `rgba(${secondaryRgb}, ${Math.min(lineAlpha, 0.3)})`
-            ctx.lineWidth = cursorDist < 200 ? 1.0 : 0.6
-            ctx.stroke()
           }
         }
       }
@@ -269,33 +257,19 @@ export default function ParticleBackground({ className = '', isFixed = false }) 
       animId = requestAnimationFrame(render)
     }
 
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (animId) cancelAnimationFrame(animId)
-      } else {
-        animId = requestAnimationFrame(render)
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    animId = requestAnimationFrame(render)
+    render()
 
     return () => {
       if (animId) cancelAnimationFrame(animId)
       window.removeEventListener('resize', handleResize)
       window.removeEventListener('mousemove', handleMouseMove)
-      window.removeEventListener('mouseleave', handleMouseLeave)
-      canvas.removeEventListener('click', handleClick)
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
-  }, [])
+  }, [skyData, sunTimes])
 
   return (
     <canvas
       ref={canvasRef}
-      className={`${
-        isFixed ? 'fixed inset-0 z-0 pointer-events-none' : 'absolute inset-0 z-0 pointer-events-none'
-      } transition-opacity duration-700 opacity-90 ${className}`}
+      className={`${isFixed ? 'fixed' : 'absolute'} inset-0 pointer-events-none z-0 ${className}`}
     />
   )
 }

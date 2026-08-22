@@ -122,6 +122,41 @@ async function isAdmin(req, env) {
 	return (await verifyAdmin(req, env)) !== null;
 }
 
+// Verifies caller sent any valid Firebase ID token (user or admin). Returns { uid, email } or null.
+async function verifyUser(req, env) {
+	const header = req.headers.get('Authorization') || '';
+	const token = header.replace('Bearer ', '').trim();
+	if (!token) return null;
+
+	try {
+		const result = await jwtVerify(token, FIREBASE_JWKS, {
+			issuer: `https://securetoken.google.com/${env.FIREBASE_PROJECT_ID}`,
+			audience: env.FIREBASE_PROJECT_ID,
+		});
+		const payload = result.payload;
+		const uid = payload.sub || payload.user_id;
+		if (!uid) return null;
+		return { uid, email: payload.email || null };
+	} catch {
+		return null;
+	}
+}
+
+// In-memory rate limiting map per IP (per worker isolate)
+const ipHits = new Map();
+function isRateLimited(req, limit = 60, windowMs = 60000) {
+	const ip = req.headers.get('CF-Connecting-IP') || req.headers.get('X-Forwarded-For') || 'unknown';
+	const now = Date.now();
+	const record = ipHits.get(ip) || { count: 0, reset: now + windowMs };
+	if (now > record.reset) {
+		record.count = 0;
+		record.reset = now + windowMs;
+	}
+	record.count++;
+	ipHits.set(ip, record);
+	return record.count > limit;
+}
+
 
 // ── Main router ─────────────────────────────────────────────────────────────
 export default {
@@ -695,6 +730,182 @@ export default {
 				if (!row) return err('Not found', 404, cors);
 
 				return json(row, 200, cors);
+			}
+
+			// ── GET /api/schools-programs ─────────────────────────────────────────
+			if (resource === 'schools-programs' && !id && req.method === 'GET') {
+				const row = await env.DB.prepare('SELECT config_json FROM schools_programs WHERE id = 1').first();
+				if (!row) return json(null, 200, cors);
+				return json(JSON.parse(row.config_json), 200, cors);
+			}
+
+			// ── PUT /api/schools-programs ───────────────────────────────────────── [admin]
+			if (resource === 'schools-programs' && !id && req.method === 'PUT') {
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				const body = await req.json();
+				await env.DB.prepare(
+					`
+					INSERT INTO schools_programs (id, config_json, updated_at)
+					VALUES (1, ?, datetime('now'))
+					ON CONFLICT(id) DO UPDATE SET
+						config_json = excluded.config_json,
+						updated_at  = excluded.updated_at
+				`,
+				)
+					.bind(JSON.stringify(body))
+					.run();
+				return json({ ok: true }, 200, cors);
+			}
+
+			// ── GET /api/user-data/:key ─────────────────────────────────────────── [auth user]
+			if (resource === 'user-data' && id && req.method === 'GET') {
+				const user = await verifyUser(req, env);
+				if (!user) return err('Unauthorized', 401, cors);
+				const row = await env.DB.prepare('SELECT value_json FROM user_data WHERE uid = ? AND key = ?')
+					.bind(user.uid, id)
+					.first();
+				if (!row) return json(null, 200, cors);
+				return json(JSON.parse(row.value_json), 200, cors);
+			}
+
+			// ── PUT /api/user-data/:key ─────────────────────────────────────────── [auth user]
+			if (resource === 'user-data' && id && req.method === 'PUT') {
+				if (isRateLimited(req, 120)) return err('Too many requests', 429, cors);
+				const user = await verifyUser(req, env);
+				if (!user) return err('Unauthorized', 401, cors);
+				const body = await req.json();
+				await env.DB.prepare(
+					`
+					INSERT INTO user_data (uid, key, value_json, updated_at)
+					VALUES (?, ?, ?, datetime('now'))
+					ON CONFLICT(uid, key) DO UPDATE SET
+						value_json = excluded.value_json,
+						updated_at = excluded.updated_at
+				`,
+				)
+					.bind(user.uid, id, JSON.stringify(body))
+					.run();
+				return json({ ok: true }, 200, cors);
+			}
+
+			// ── GET /api/pages/:slug ──────────────────────────────────────────────
+			if (resource === 'pages' && id && req.method === 'GET') {
+				const row = await env.DB.prepare('SELECT content_json FROM page_content WHERE page_slug = ?').bind(id).first();
+				if (!row) return json(null, 200, cors);
+				return json(JSON.parse(row.content_json), 200, cors);
+			}
+
+			// ── PUT /api/pages/:slug ────────────────────────────────────────────── [admin]
+			if (resource === 'pages' && id && req.method === 'PUT') {
+				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				const body = await req.json();
+				await env.DB.prepare(
+					`
+					INSERT INTO page_content (page_slug, content_json, updated_at)
+					VALUES (?, ?, datetime('now'))
+					ON CONFLICT(page_slug) DO UPDATE SET
+						content_json = excluded.content_json,
+						updated_at   = excluded.updated_at
+				`,
+				)
+					.bind(id, JSON.stringify(body))
+					.run();
+				return json({ ok: true }, 200, cors);
+			}
+
+			// ── POST /api/stats/ping ───────────────────────────────────────────── [public activity ping]
+			if (resource === 'stats' && id === 'ping' && req.method === 'POST') {
+				if (isRateLimited(req, 120)) return json({ ok: true }, 200, cors);
+				await env.DB.prepare(
+					`
+					INSERT INTO site_stats (key, value, updated_at)
+					VALUES ('page_views', 1, datetime('now'))
+					ON CONFLICT(key) DO UPDATE SET
+						value = value + 1,
+						updated_at = datetime('now')
+				`,
+				).run();
+				return json({ ok: true }, 200, cors);
+			}
+
+			// ── GET /api/stats/active ──────────────────────────────────────────── [active session estimation]
+			if (resource === 'stats' && id === 'active' && req.method === 'GET') {
+				const row = await env.DB.prepare("SELECT value FROM site_stats WHERE key = 'page_views'").first();
+				const totalViews = row ? row.value : 0;
+				// Synthetic active estimate based on total activity (or fallback baseline)
+				const activeCount = Math.max(1, Math.min(42, Math.floor(totalViews / 50) + 3));
+				return json({ activeLearners: activeCount, totalViews }, 200, cors);
+			}
+
+			// ── GET /api/sky ────────────────────────────────────────────────────── [astronomyapi.com real-time ephemeris]
+			if (url.pathname === '/api/sky' && req.method === 'GET') {
+				if (env.ASTRONOMY_API_APP_ID && env.ASTRONOMY_API_APP_SECRET) {
+					try {
+						const auth = btoa(`${env.ASTRONOMY_API_APP_ID}:${env.ASTRONOMY_API_APP_SECRET}`);
+						const now = new Date();
+						const dateStr = now.toISOString().split('T')[0];
+						const timeStr = now.toTimeString().split(' ')[0];
+						const astroUrl = `https://api.astronomyapi.com/api/v2/bodies/positions?latitude=30.03&longitude=30.95&elevation=50&from_date=${dateStr}&to_date=${dateStr}&time=${timeStr}`;
+						const res = await fetch(astroUrl, {
+							headers: { Authorization: `Basic ${auth}` },
+						});
+						if (res.ok) {
+							const data = await res.json();
+							return json(data.data, 200, cors);
+						}
+					} catch (e) {
+						console.warn('Astronomy API error:', e);
+					}
+				}
+				// Graceful fallback when credentials missing or API unavailable
+				return json({ bodies: [], moonPhase: null, source: 'fallback' }, 200, cors);
+			}
+
+			// ── GET /api/weather ────────────────────────────────────────────────── [Open-Meteo sunrise / sunset]
+			if (url.pathname === '/api/weather' && req.method === 'GET') {
+				try {
+					const weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=30.03&longitude=30.95&daily=sunrise,sunset&timezone=Africa%2FCairo';
+					const res = await fetch(weatherUrl);
+					if (res.ok) {
+						const data = await res.json();
+						return json({
+							sunrise: data.daily?.sunrise?.[0] || null,
+							sunset:  data.daily?.sunset?.[0]  || null,
+						}, 200, cors);
+					}
+				} catch (e) {
+					console.warn('Open-Meteo error:', e);
+				}
+				return json({ sunrise: null, sunset: null }, 200, cors);
+			}
+
+			// ── GET /sitemap.xml ───────────────────────────────────────────────── [Dynamic XML Sitemap]
+			if (url.pathname === '/sitemap.xml' && req.method === 'GET') {
+				const profiles = await env.DB.prepare('SELECT id FROM course_profiles').all();
+				const courseIds = (profiles.results || []).map(p => p.id);
+				const baseUrl = 'https://zc-ocw.vercel.app';
+				const now = new Date().toISOString().split('T')[0];
+
+				const staticRoutes = ['', '/courses', '/departments', '/interviews', '/about', '/acknowledgments', '/contact', '/privacy'];
+				const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticRoutes.map(route => `  <url><loc>${baseUrl}${route}</loc><lastmod>${now}</lastmod><changefreq>weekly</changefreq></url>`).join('\n')}
+${courseIds.map(id => `  <url><loc>${baseUrl}/courses/${id}</loc><lastmod>${now}</lastmod><changefreq>monthly</changefreq></url>`).join('\n')}
+</urlset>`;
+
+				return new Response(xml, {
+					status: 200,
+					headers: { ...cors, 'Content-Type': 'application/xml; charset=utf-8' },
+				});
+			}
+
+			// ── GET /robots.txt ──────────────────────────────────────────────────
+			if (url.pathname === '/robots.txt' && req.method === 'GET') {
+				const txt = `User-agent: *\nAllow: /\nSitemap: https://zc-ocw.vercel.app/sitemap.xml\n`;
+				return new Response(txt, {
+					status: 200,
+					headers: { ...cors, 'Content-Type': 'text/plain; charset=utf-8' },
+				});
 			}
 
 			// ── Health check ───────────────────────────────────────────────────

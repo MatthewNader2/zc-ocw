@@ -2,24 +2,30 @@ import {
 	env,
 	createExecutionContext,
 	waitOnExecutionContext,
-	SELF,
 } from "cloudflare:test";
 import { describe, it, expect } from "vitest";
 import worker from "../src";
 
-describe("Hello World worker", () => {
-	it("responds with Hello World! (unit style)", async () => {
-		const request = new Request("http://example.com");
-		// Create an empty context to pass to `worker.fetch()`.
+describe("ZC OCW Worker API", () => {
+	it("returns health status ok", async () => {
+		const request = new Request("http://localhost/api/health");
 		const ctx = createExecutionContext();
 		const response = await worker.fetch(request, env, ctx);
-		// Wait for all `Promise`s passed to `ctx.waitUntil()` to settle before running test assertions
 		await waitOnExecutionContext(ctx);
-		expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`);
+		
+		expect(response.status).toBe(200);
+		const data = await response.json();
+		expect(data.status).toBe("ok");
 	});
 
-	it("responds with Hello World! (integration style)", async () => {
-		const response = await SELF.fetch("http://example.com");
-		expect(await response.text()).toMatchInlineSnapshot(`"Hello World!"`);
+	it("returns 401 on protected admin endpoints without auth", async () => {
+		const request = new Request("http://localhost/api/admins/me");
+		const ctx = createExecutionContext();
+		const response = await worker.fetch(request, env, ctx);
+		await waitOnExecutionContext(ctx);
+
+		expect(response.status).toBe(200);
+		const data = await response.json();
+		expect(data.isAdmin).toBe(false);
 	});
 });

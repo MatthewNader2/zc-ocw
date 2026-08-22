@@ -848,27 +848,32 @@ export default function AdminSettings() {
             <h2 className="font-display text-lg font-bold text-ink dark:text-white">YouTube Configuration</h2>
           </div>
           <p className="text-sm text-ink-muted mb-4 leading-relaxed">
-            These values are set in your <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">.env</code> file.
-            Restart the dev server after changes.
+            YouTube API calls are safely proxied through the Cloudflare Worker using the <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">YOUTUBE_API_KEY</code> secret.
+            The frontend only requires <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">VITE_YOUTUBE_CHANNEL_ID</code>.
           </p>
-          <div className="space-y-3">
-            {[
-              { label: 'API Key', env: 'VITE_YOUTUBE_API_KEY', icon: Key },
-              { label: 'Channel ID', env: 'VITE_YOUTUBE_CHANNEL_ID', icon: Youtube },
-            ].map(({ label, env, icon: Icon }) => (
-              <div key={env} className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
-                <Icon className="w-4 h-4 text-ink-ghost flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-semibold text-ink-muted">{label}</p>
-                  <p className="font-mono text-xs text-ink-ghost truncate">{env}</p>
-                </div>
-                <span className={`badge text-[10px] ${
-                  import.meta.env[env] ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                }`}>
-                  {import.meta.env[env] ? '✓ Set' : '✗ Missing'}
-                </span>
+          <div className="space-y-3 mb-6">
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+              <Youtube className="w-4 h-4 text-ink-ghost flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-ink-muted">Channel ID</p>
+                <p className="font-mono text-xs text-ink-ghost truncate">VITE_YOUTUBE_CHANNEL_ID</p>
               </div>
-            ))}
+              <span className={`badge text-[10px] ${
+                import.meta.env.VITE_YOUTUBE_CHANNEL_ID ? 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-300' : 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-300'
+              }`}>
+                {import.meta.env.VITE_YOUTUBE_CHANNEL_ID ? '✓ Set' : '✗ Missing'}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+              <Key className="w-4 h-4 text-ink-ghost flex-shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-ink-muted">API Key Secret (Worker)</p>
+                <p className="font-mono text-xs text-ink-ghost truncate">YOUTUBE_API_KEY (Cloudflare Worker Secret)</p>
+              </div>
+              <span className="badge text-[10px] bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300">
+                🔒 Backend Secret
+              </span>
+            </div>
           </div>
         </div>
 

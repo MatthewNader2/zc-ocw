@@ -177,7 +177,7 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
                 <button key={mode} type="button"
                         disabled={disabled}
                         onClick={() => setUploadMode(mode)}
-                        title={disabled ? 'Configure Supabase to enable file uploads' : ''}
+                        title={disabled ? 'Cloud storage not configured (VITE_WORKER_URL missing)' : ''}
                         className={clsx(
                           'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all',
                           disabled ? 'opacity-40 cursor-not-allowed border-slate-200 dark:border-white/10 text-ink-ghost' :
@@ -187,7 +187,7 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
                         )}>
                   <Icon className="w-3.5 h-3.5" />
                   {label}
-                  {disabled && <span className="ml-1 text-[9px] opacity-60">(needs Supabase)</span>}
+                  {disabled && <span className="ml-1 text-[9px] opacity-60">(cloud disabled)</span>}
                 </button>
               ))}
             </div>

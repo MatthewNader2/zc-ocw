@@ -115,7 +115,7 @@ function SettingsPanel({ quality, setQuality, speed, setSpeed, onClose }) {
 }
 
 /* ── Main player ─────────────────────────────────────────────────────────────── */
-export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded, autoplay = false }) {
+export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded, autoplay = false, initialSeconds = 0 }) {
   const { settings, update } = useSettings()
 
   const playerRef     = useRef(null)
@@ -134,6 +134,7 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
   const [ready,       setReady]       = useState(false)
   const [error,       setError]       = useState(false)
   const [showSettings,setShowSettings]= useState(false)
+  const [showResume,  setShowResume]  = useState(initialSeconds > 5)
 
   // Use quality/speed from user settings
   const [quality, setQuality] = useState(settings.defaultQuality)
@@ -154,6 +155,14 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
     setReady(true)
     const yt = playerRef.current?.getInternalPlayer?.()
     if (yt?.setPlaybackQuality) yt.setPlaybackQuality(quality)
+  }
+
+  function handleResumeConfirm() {
+    if (initialSeconds && playerRef.current) {
+      playerRef.current.seekTo(initialSeconds, 'seconds')
+    }
+    setShowResume(false)
+    setPlaying(true)
   }
 
   // Fullscreen change listener
@@ -196,14 +205,16 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
     bumpCtrl()
   }
 
-  // Keyboard shortcuts
+  // Keyboard shortcuts (Space/K, Left/Right 5s, J/L 10s, Up/Down vol, M mute, F fs)
   useEffect(() => {
     function onKey(e) {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return
       if (e.code === 'Escape')     { setShowSettings(false); return }
-      if (e.code === 'Space')      { e.preventDefault(); togglePlay() }
-      if (e.code === 'ArrowRight') { playerRef.current?.seekTo(played * duration + 10, 'seconds') }
-      if (e.code === 'ArrowLeft')  { playerRef.current?.seekTo(played * duration - 10, 'seconds') }
+      if (e.code === 'Space' || e.code === 'KeyK') { e.preventDefault(); togglePlay() }
+      if (e.code === 'ArrowRight') { playerRef.current?.seekTo(played * duration + 5, 'seconds') }
+      if (e.code === 'ArrowLeft')  { playerRef.current?.seekTo(played * duration - 5, 'seconds') }
+      if (e.code === 'KeyL')       { playerRef.current?.seekTo(played * duration + 10, 'seconds') }
+      if (e.code === 'KeyJ')       { playerRef.current?.seekTo(played * duration - 10, 'seconds') }
       if (e.code === 'ArrowUp')    { setVolume(v => Math.min(1, v + 0.1)) }
       if (e.code === 'ArrowDown')  { setVolume(v => Math.max(0, v - 0.1)) }
       if (e.code === 'KeyM')       { setMuted(m => !m) }
@@ -286,7 +297,7 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
       )}
 
       {/* Center play button when paused */}
-      {!playing && ready && (
+      {!playing && ready && !showResume && (
         <button onClick={togglePlay}
                 className="absolute inset-0 flex items-center justify-center bg-black/25 z-20">
           <div className="w-20 h-20 rounded-full bg-ocean-500 flex items-center justify-center
@@ -294,6 +305,24 @@ export default function PlayerWrapper({ videoId, title = '', onProgress, onEnded
             <Play className="w-8 h-8 text-white ml-1" fill="white" strokeWidth={0} />
           </div>
         </button>
+      )}
+
+      {/* Resume playback banner prompt */}
+      {ready && showResume && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/70 backdrop-blur-sm z-30 animate-fade-in p-4">
+          <div className="bg-ocean-950/90 border border-ocean-400/30 rounded-2xl p-6 text-center max-w-sm shadow-2xl">
+            <p className="text-white font-display font-semibold text-base mb-1">Resume Playback?</p>
+            <p className="text-white/60 text-xs mb-5">You previously watched up to {fmtTime(initialSeconds)}.</p>
+            <div className="flex gap-2 justify-center">
+              <button onClick={handleResumeConfirm} className="btn-primary py-2 px-4 text-xs">
+                Resume from {fmtTime(initialSeconds)}
+              </button>
+              <button onClick={() => { setShowResume(false); togglePlay() }} className="btn-outline-dark py-2 px-4 text-xs">
+                Start Over
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Controls bar */}

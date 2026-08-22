@@ -133,15 +133,27 @@ export default function Acknowledgments() {
               {team.map((m, i) => (
                 <ScrollReveal key={m.id || m.name} delay={`${i * 0.1}s`}>
                   <div className="card text-center p-6 hover:-translate-y-1 transition-all duration-300">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500 to-ocean-600 text-white font-display text-xl font-bold flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20">
-                      {m.name
-                        ? m.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .slice(0, 2)
-                        : "ZC"}
-                    </div>
+                    {m.photoUrl ? (
+                      <img
+                        src={m.photoUrl}
+                        alt={m.name}
+                        loading="lazy"
+                        className="w-16 h-16 rounded-full object-cover mx-auto mb-4 shadow-lg shadow-cyan-500/20"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-500 to-ocean-600 text-white font-display text-xl font-bold flex items-center justify-center mx-auto mb-4 shadow-lg shadow-cyan-500/20">
+                        {m.name
+                          ? m.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .slice(0, 2)
+                          : "ZC"}
+                      </div>
+                    )}
                     <h3 className="font-bold text-ink dark:text-white text-lg">{m.name}</h3>
                     <p className="text-sm text-cyan-600 dark:text-cyan-400 font-medium mt-1">
                       {m.role}
