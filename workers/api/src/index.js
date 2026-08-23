@@ -431,32 +431,44 @@ export default {
 
 				const formData = await req.formData();
 				const file = formData.get('file');
-				const label = formData.get('label') || file.name;
+				const label = formData.get('label') || file?.name || 'file';
 				const type = formData.get('type') || 'other';
 
 				if (!file) return err('No file in request', 400, cors);
 
-				const ext = file.name.split('.').pop();
+				const ext = (file.name || 'image.png').split('.').pop();
 				const fileKey = `${id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
-				// Upload to R2
-				await env.STORAGE.put(fileKey, file.stream(), {
-					httpMetadata: { contentType: file.type },
-				});
+				const r2Base = (env.R2_PUBLIC_URL || env.R2_PUBLIC_ID || '').replace(/\/$/, '');
 
-				// Save metadata to D1
+				// Upload to R2 if configured
+				if (env.STORAGE) {
+					await env.STORAGE.put(fileKey, file.stream(), {
+						httpMetadata: { contentType: file.type },
+					});
+				}
+
+				const publicUrl = r2Base ? `${r2Base}/${fileKey}` : fileKey;
 				const newId = crypto.randomUUID();
-				await env.DB.prepare(
-					`
-          INSERT INTO materials (id, playlist_id, type, label, file_key, file_size, mime_type)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `,
-				)
-					.bind(newId, id, type, label, fileKey, file.size, file.type)
-					.run();
+
+				// If this is a course playlist material upload, save metadata to D1
+				if (id !== 'acknowledgments' && id !== 'images' && id !== 'general') {
+					try {
+						await env.DB.prepare(
+							`
+			  INSERT INTO materials (id, playlist_id, type, label, file_key, file_size, mime_type)
+			  VALUES (?, ?, ?, ?, ?, ?, ?)
+			`,
+						)
+							.bind(newId, id, type, label, fileKey, file.size, file.type)
+							.run();
+					} catch (e) {
+						console.warn('Materials D1 insert warning:', e.message);
+					}
+				}
 
 				return json(
-					{ id: newId, fileKey, size: file.size, publicUrl: `${env.R2_PUBLIC_ID}/${fileKey}` },
+					{ id: newId, fileKey, size: file.size, publicUrl },
 					201,
 					cors,
 				);

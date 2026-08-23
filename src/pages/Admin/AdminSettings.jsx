@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Settings, ArrowLeft, Download, Upload, Trash2, Key, Youtube, Plus, GraduationCap, BookOpen, CheckCircle2, Image as ImageIcon, Heart, Users, Award, Loader2, UserPlus, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useAdminData } from '@/context/AdminDataContext'
+import ImageCropperModal from '@/components/ui/ImageCropperModal'
 import * as storage from '@/services/storage'
 import * as cloudflare from '@/services/cloudflare'
 
@@ -45,16 +46,31 @@ export default function AdminSettings() {
   const [teamSaved, setTeamSaved] = useState(false)
   const [uploadingTeamPhoto, setUploadingTeamPhoto] = useState(false)
   const [teamPhotoError, setTeamPhotoError] = useState('')
+  const [cropImageSrc, setCropImageSrc] = useState(null)
 
-  async function handleTeamPhotoFileChange(e) {
+  function handleTeamPhotoFileChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
+    setTeamPhotoError('')
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      setCropImageSrc(ev.target.result)
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ''
+  }
+
+  async function handleCroppedUpload(croppedBlob) {
     setUploadingTeamPhoto(true)
     setTeamPhotoError('')
     try {
+      const file = new File([croppedBlob], `avatar_${Date.now()}.png`, { type: 'image/png' })
       const res = await uploadAcknowledgmentImage(file)
       if (res?.publicUrl) {
         setTeamForm((f) => ({ ...f, photoUrl: res.publicUrl }))
+        setCropImageSrc(null)
+      } else {
+        throw new Error('Upload did not return a valid public URL')
       }
     } catch (err) {
       setTeamPhotoError(err.message || 'Photo upload failed')
@@ -1179,6 +1195,15 @@ export default function AdminSettings() {
           </div>
         </div>
       </div>
+
+      {/* Profile Photo Cropper Modal */}
+      {cropImageSrc && (
+        <ImageCropperModal
+          imageSrc={cropImageSrc}
+          onClose={() => setCropImageSrc(null)}
+          onCropComplete={handleCroppedUpload}
+        />
+      )}
     </>
   )
 }
