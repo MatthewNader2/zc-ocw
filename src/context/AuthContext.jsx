@@ -75,6 +75,7 @@ export function AuthProvider({ children }) {
         isAdmin,
         loading,
         isFirebaseConfigured,
+        getIdToken,
         loginWithGoogle,
         loginWithEmail,
         signup,

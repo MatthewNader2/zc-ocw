@@ -41,8 +41,9 @@ export default function AdminSettings() {
   const [headerSaved, setHeaderSaved] = useState(false)
 
   // Team member form state
-  const [teamForm, setTeamForm] = useState({ name: '', role: '', school: '' })
+  const [teamForm, setTeamForm] = useState({ name: '', role: '', school: '', photoUrl: '' })
   const [teamSaved, setTeamSaved] = useState(false)
+  const [uploadingTeamPhoto, setUploadingTeamPhoto] = useState(false)
 
   // Sponsor form state
   const [sponsorForm, setSponsorForm] = useState({ name: '', contribution: '' })

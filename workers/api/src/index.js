@@ -734,38 +734,50 @@ export default {
 
 			// ── GET /api/schools-programs ─────────────────────────────────────────
 			if (resource === 'schools-programs' && !id && req.method === 'GET') {
-				const row = await env.DB.prepare('SELECT config_json FROM schools_programs WHERE id = 1').first();
-				if (!row) return json(null, 200, cors);
-				return json(JSON.parse(row.config_json), 200, cors);
+				try {
+					const row = await env.DB.prepare('SELECT config_json FROM schools_programs WHERE id = 1').first();
+					if (!row) return json(null, 200, cors);
+					return json(JSON.parse(row.config_json), 200, cors);
+				} catch {
+					return json(null, 200, cors);
+				}
 			}
 
 			// ── PUT /api/schools-programs ───────────────────────────────────────── [admin]
 			if (resource === 'schools-programs' && !id && req.method === 'PUT') {
 				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
-				const body = await req.json();
-				await env.DB.prepare(
-					`
-					INSERT INTO schools_programs (id, config_json, updated_at)
-					VALUES (1, ?, datetime('now'))
-					ON CONFLICT(id) DO UPDATE SET
-						config_json = excluded.config_json,
-						updated_at  = excluded.updated_at
-				`,
-				)
-					.bind(JSON.stringify(body))
-					.run();
-				return json({ ok: true }, 200, cors);
+				try {
+					const body = await req.json();
+					await env.DB.prepare(
+						`
+						INSERT INTO schools_programs (id, config_json, updated_at)
+						VALUES (1, ?, datetime('now'))
+						ON CONFLICT(id) DO UPDATE SET
+							config_json = excluded.config_json,
+							updated_at  = excluded.updated_at
+					`,
+					)
+						.bind(JSON.stringify(body))
+						.run();
+					return json({ ok: true }, 200, cors);
+				} catch (e) {
+					return err(e.message || 'Database error', 500, cors);
+				}
 			}
 
 			// ── GET /api/user-data/:key ─────────────────────────────────────────── [auth user]
 			if (resource === 'user-data' && id && req.method === 'GET') {
 				const user = await verifyUser(req, env);
 				if (!user) return err('Unauthorized', 401, cors);
-				const row = await env.DB.prepare('SELECT value_json FROM user_data WHERE uid = ? AND key = ?')
-					.bind(user.uid, id)
-					.first();
-				if (!row) return json(null, 200, cors);
-				return json(JSON.parse(row.value_json), 200, cors);
+				try {
+					const row = await env.DB.prepare('SELECT value_json FROM user_data WHERE uid = ? AND key = ?')
+						.bind(user.uid, id)
+						.first();
+					if (!row) return json(null, 200, cors);
+					return json(JSON.parse(row.value_json), 200, cors);
+				} catch {
+					return json(null, 200, cors);
+				}
 			}
 
 			// ── PUT /api/user-data/:key ─────────────────────────────────────────── [auth user]
@@ -773,65 +785,82 @@ export default {
 				if (isRateLimited(req, 120)) return err('Too many requests', 429, cors);
 				const user = await verifyUser(req, env);
 				if (!user) return err('Unauthorized', 401, cors);
-				const body = await req.json();
-				await env.DB.prepare(
-					`
-					INSERT INTO user_data (uid, key, value_json, updated_at)
-					VALUES (?, ?, ?, datetime('now'))
-					ON CONFLICT(uid, key) DO UPDATE SET
-						value_json = excluded.value_json,
-						updated_at = excluded.updated_at
-				`,
-				)
-					.bind(user.uid, id, JSON.stringify(body))
-					.run();
-				return json({ ok: true }, 200, cors);
+				try {
+					const body = await req.json();
+					await env.DB.prepare(
+						`
+						INSERT INTO user_data (uid, key, value_json, updated_at)
+						VALUES (?, ?, ?, datetime('now'))
+						ON CONFLICT(uid, key) DO UPDATE SET
+							value_json = excluded.value_json,
+							updated_at = excluded.updated_at
+					`,
+					)
+						.bind(user.uid, id, JSON.stringify(body))
+						.run();
+					return json({ ok: true }, 200, cors);
+				} catch (e) {
+					return err(e.message || 'Database error', 500, cors);
+				}
 			}
 
 			// ── GET /api/pages/:slug ──────────────────────────────────────────────
 			if (resource === 'pages' && id && req.method === 'GET') {
-				const row = await env.DB.prepare('SELECT content_json FROM page_content WHERE page_slug = ?').bind(id).first();
-				if (!row) return json(null, 200, cors);
-				return json(JSON.parse(row.content_json), 200, cors);
+				try {
+					const row = await env.DB.prepare('SELECT content_json FROM page_content WHERE page_slug = ?').bind(id).first();
+					if (!row) return json(null, 200, cors);
+					return json(JSON.parse(row.content_json), 200, cors);
+				} catch {
+					return json(null, 200, cors);
+				}
 			}
 
 			// ── PUT /api/pages/:slug ────────────────────────────────────────────── [admin]
 			if (resource === 'pages' && id && req.method === 'PUT') {
 				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
-				const body = await req.json();
-				await env.DB.prepare(
-					`
-					INSERT INTO page_content (page_slug, content_json, updated_at)
-					VALUES (?, ?, datetime('now'))
-					ON CONFLICT(page_slug) DO UPDATE SET
-						content_json = excluded.content_json,
-						updated_at   = excluded.updated_at
-				`,
-				)
-					.bind(id, JSON.stringify(body))
-					.run();
-				return json({ ok: true }, 200, cors);
+				try {
+					const body = await req.json();
+					await env.DB.prepare(
+						`
+						INSERT INTO page_content (page_slug, content_json, updated_at)
+						VALUES (?, ?, datetime('now'))
+						ON CONFLICT(page_slug) DO UPDATE SET
+							content_json = excluded.content_json,
+							updated_at   = excluded.updated_at
+					`,
+					)
+						.bind(id, JSON.stringify(body))
+						.run();
+					return json({ ok: true }, 200, cors);
+				} catch (e) {
+					return err(e.message || 'Database error', 500, cors);
+				}
 			}
 
 			// ── POST /api/stats/ping ───────────────────────────────────────────── [public activity ping]
 			if (resource === 'stats' && id === 'ping' && req.method === 'POST') {
 				if (isRateLimited(req, 120)) return json({ ok: true }, 200, cors);
-				await env.DB.prepare(
-					`
-					INSERT INTO site_stats (key, value, updated_at)
-					VALUES ('page_views', 1, datetime('now'))
-					ON CONFLICT(key) DO UPDATE SET
-						value = value + 1,
-						updated_at = datetime('now')
-				`,
-				).run();
+				try {
+					await env.DB.prepare(
+						`
+						INSERT INTO site_stats (key, value, updated_at)
+						VALUES ('page_views', 1, datetime('now'))
+						ON CONFLICT(key) DO UPDATE SET
+							value = value + 1,
+							updated_at = datetime('now')
+					`,
+					).run();
+				} catch {}
 				return json({ ok: true }, 200, cors);
 			}
 
 			// ── GET /api/stats/active ──────────────────────────────────────────── [active session estimation]
 			if (resource === 'stats' && id === 'active' && req.method === 'GET') {
-				const row = await env.DB.prepare("SELECT value FROM site_stats WHERE key = 'page_views'").first();
-				const totalViews = row ? row.value : 0;
+				let totalViews = 0;
+				try {
+					const row = await env.DB.prepare("SELECT value FROM site_stats WHERE key = 'page_views'").first();
+					if (row) totalViews = row.value;
+				} catch {}
 				// Synthetic active estimate based on total activity (or fallback baseline)
 				const activeCount = Math.max(1, Math.min(42, Math.floor(totalViews / 50) + 3));
 				return json({ activeLearners: activeCount, totalViews }, 200, cors);

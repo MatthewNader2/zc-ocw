@@ -143,17 +143,17 @@ export default function AdminDashboard() {
         )}
         {/* Info */}
         <ScrollReveal>
-          <div className="bg-ocean-50 border border-ocean-200/60 rounded-2xl p-5 mb-8 flex gap-4">
+          <div className="bg-ocean-50 dark:bg-night-200/80 border border-ocean-200/60 dark:border-white/10 rounded-2xl p-5 mb-8 flex gap-4 shadow-sm">
             <div className="w-10 h-10 rounded-xl bg-ocean-500/15 flex items-center justify-center flex-shrink-0">
-              <Layers className="w-5 h-5 text-ocean-600" />
+              <Layers className="w-5 h-5 text-ocean-600 dark:text-cyan-400" />
             </div>
-            <div className="text-sm text-ink-muted space-y-1">
-              <p className="font-semibold text-ink dark:text-white">Smart Auto-Detection</p>
+            <div className="text-sm text-slate-700 dark:text-slate-300 space-y-1">
+              <p className="font-semibold text-slate-900 dark:text-white">Smart Auto-Detection</p>
               <p className="leading-relaxed">
                 Playlist titles are scanned for course codes (e.g. "PHYS 323").
                 When matched, school, program, and tags are set automatically.
                 Use the Edit button to override anything and add materials. Run{" "}
-                <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">
+                <code className="bg-slate-200 dark:bg-night-100 text-slate-800 dark:text-cyan-300 px-1.5 py-0.5 rounded font-mono text-xs">
                   npm run profile
                 </code>{" "}
                 in terminal to see a full detection table.
