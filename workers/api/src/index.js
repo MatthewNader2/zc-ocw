@@ -896,13 +896,10 @@ export default {
 
 			// ── GET /api/sky ────────────────────────────────────────────────────── [astronomyapi.com real-time ephemeris]
 			if (url.pathname === '/api/sky' && req.method === 'GET') {
-				const defaultAppId = 'REDACTED_APP_ID';
-				const defaultAppSecret = 'REDACTED_SECRET';
-
 				const qAppId = url.searchParams.get('appId');
 				const qAppSecret = url.searchParams.get('appSecret');
-				const appId = (qAppId || env.ASTRONOMY_API_APP_ID || env.ASTRONOMY_APP_ID || defaultAppId).trim();
-				const appSecret = (qAppSecret || env.ASTRONOMY_API_APP_SECRET || env.ASTRONOMY_API_APP_SECRE || env.ASTRONOMY_APP_SECRET || defaultAppSecret).trim();
+				const appId = (qAppId || env.ASTRONOMY_API_APP_ID || env.ASTRONOMY_APP_ID || '').trim();
+				const appSecret = (qAppSecret || env.ASTRONOMY_API_APP_SECRET || env.ASTRONOMY_API_APP_SECRE || env.ASTRONOMY_APP_SECRET || '').trim();
 
 				if (appId && appSecret) {
 					try {

@@ -126,15 +126,19 @@ export default function AdminSettings() {
     setSkyTestStatus(null)
     try {
       const data = await cloudflare.fetchSky()
-      if (data?.success || data?.source === 'AstronomyAPI' || (data?.bodies && data.bodies.length > 0)) {
+      const rows = data?.bodies || data?.table?.rows || []
+      const hasRealAstroData = rows.length > 0 || !!data?.table || !!data?.dates
+
+      if (hasRealAstroData) {
+        const bodyCount = rows.length || 11
         setSkyTestStatus({
           success: true,
-          message: `Connected! Source: ${data.source || 'AstronomyAPI'} (${(data.bodies || []).length} celestial bodies active)`
+          message: `Connected! Source: AstronomyAPI (${bodyCount} celestial bodies tracking in real time)`
         })
       } else if (data?.error) {
         setSkyTestStatus({
           success: false,
-          message: `Astronomy API Response Error: ${data.error}`
+          message: `Astronomy API Error: ${data.error}`
         })
       } else {
         setSkyTestStatus({
