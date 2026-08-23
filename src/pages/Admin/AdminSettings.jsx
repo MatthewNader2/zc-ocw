@@ -44,6 +44,24 @@ export default function AdminSettings() {
   const [teamForm, setTeamForm] = useState({ name: '', role: '', school: '', photoUrl: '' })
   const [teamSaved, setTeamSaved] = useState(false)
   const [uploadingTeamPhoto, setUploadingTeamPhoto] = useState(false)
+  const [teamPhotoError, setTeamPhotoError] = useState('')
+
+  async function handleTeamPhotoFileChange(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploadingTeamPhoto(true)
+    setTeamPhotoError('')
+    try {
+      const res = await uploadAcknowledgmentImage(file)
+      if (res?.publicUrl) {
+        setTeamForm((f) => ({ ...f, photoUrl: res.publicUrl }))
+      }
+    } catch (err) {
+      setTeamPhotoError(err.message || 'Photo upload failed')
+    } finally {
+      setUploadingTeamPhoto(false)
+    }
+  }
 
   // Sponsor form state
   const [sponsorForm, setSponsorForm] = useState({ name: '', contribution: '' })
