@@ -74,6 +74,34 @@ export default function AdminSettings() {
   const [newAdminEmail, setNewAdminEmail] = useState('')
   const [grantingAdmin, setGrantingAdmin] = useState(false)
 
+  // 📝 CMS Page Content Manager state
+  const [cmsPage, setCmsPage] = useState('about')
+  const [cmsSaved, setCmsSaved] = useState(false)
+  const [aboutCms, setAboutCms] = useState({
+    title: 'Bridging Zewail City to the World',
+    subtitle: 'Free, open educational resources created by students, for students.',
+    missionTitle: 'Our Mission',
+    missionText: 'To democratize access to Zewail City’s world-class curriculum by publishing lecture playlists, verified textbooks, and structured course materials.',
+    visionTitle: 'Our Vision',
+    visionText: 'Empowering the next generation of scientists, engineers, and technological leaders across Egypt and the Middle East.',
+  })
+  const [homeCms, setHomeCms] = useState({
+    heroTitle: 'Open Courseware for Zewail City',
+    heroSubtitle: 'Access world-class lectures, course notes, and textbooks from Science, Engineering, CSAI, and Business.',
+  })
+
+  async function handleSaveCms(e) {
+    e.preventDefault()
+    try {
+      const dataToSave = cmsPage === 'about' ? aboutCms : homeCms
+      await cloudflare.upsertPageContent(cmsPage, dataToSave)
+      setCmsSaved(true)
+      setTimeout(() => setCmsSaved(false), 3000)
+    } catch (err) {
+      alert('Failed to save page content: ' + err.message)
+    }
+  }
+
   useEffect(() => {
     let active = true
     cloudflare.fetchAdmins()

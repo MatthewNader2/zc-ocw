@@ -187,14 +187,16 @@ export async function fetchUserData(key, token) {
 
 export async function putUserData(key, value, token) {
   if (!isConfigured || !token) return;
-  await fetch(`${BASE}/api/user-data/${encodeURIComponent(key)}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(value),
-  });
+  try {
+    await fetch(`${BASE}/api/user-data/${encodeURIComponent(key)}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(value),
+    });
+  } catch {}
 }
 
 // ── Generic page content CMS ──────────────────────────────────────────────

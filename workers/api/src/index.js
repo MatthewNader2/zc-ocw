@@ -921,8 +921,11 @@ export default {
 
 			// ── GET /sitemap.xml ───────────────────────────────────────────────── [Dynamic XML Sitemap]
 			if (url.pathname === '/sitemap.xml' && req.method === 'GET') {
-				const profiles = await env.DB.prepare('SELECT id FROM course_profiles').all();
-				const courseIds = (profiles.results || []).map(p => p.id);
+				let courseIds = [];
+				try {
+					const profiles = await env.DB.prepare('SELECT playlist_id FROM playlist_profiles').all();
+					courseIds = (profiles.results || []).map(p => p.playlist_id);
+				} catch {}
 				const baseUrl = 'https://zc-ocw.vercel.app';
 				const now = new Date().toISOString().split('T')[0];
 
