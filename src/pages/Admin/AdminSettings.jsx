@@ -101,6 +101,36 @@ export default function AdminSettings() {
     }
   }
 
+  // 🌌 Astronomy API Test State & Handler
+  const [testingSky, setTestingSky] = useState(false)
+  const [skyTestStatus, setSkyTestStatus] = useState(null)
+
+  async function handleTestSkyApi() {
+    setTestingSky(true)
+    setSkyTestStatus(null)
+    try {
+      const data = await cloudflare.fetchSky()
+      if (data && (data.bodies || data.source)) {
+        setSkyTestStatus({
+          success: true,
+          message: `Connected! Source: ${data.source || 'AstronomyAPI'} (${(data.bodies || []).length} celestial bodies active)`
+        })
+      } else {
+        setSkyTestStatus({
+          success: false,
+          message: 'Returned fallback data. Verify ASTRONOMY_API_APP_ID in Worker secrets.'
+        })
+      }
+    } catch (e) {
+      setSkyTestStatus({
+        success: false,
+        message: 'Sky API fetch failed: ' + e.message
+      })
+    } finally {
+      setTestingSky(false)
+    }
+  }
+
   useEffect(() => {
     let active = true
     cloudflare.fetchAdmins()
