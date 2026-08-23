@@ -77,15 +77,14 @@ export default function AdminSettings() {
   // 📝 CMS Page Content Manager state
   const [cmsPage, setCmsPage] = useState('about')
   const [cmsSaved, setCmsSaved] = useState(false)
-  const [aboutCms, setAboutCms] = useState({
-    title: 'Bridging Zewail City to the World',
-    subtitle: 'Free, open educational resources created by students, for students.',
-    missionTitle: 'Our Mission',
-    missionText: 'To democratize access to Zewail City’s world-class curriculum by publishing lecture playlists, verified textbooks, and structured course materials.',
-    visionTitle: 'Our Vision',
-    visionText: 'Empowering the next generation of scientists, engineers, and technological leaders across Egypt and the Middle East.',
+  const [aboutForm, setAboutForm] = useState({
+    headerSubtitle: "ZC OCW makes Zewail City's academic content freely available — lecture videos, course materials, and more — inspired by MIT OpenCourseWare and the global open education movement.",
+    missionTitle: "Our Mission",
+    missionBody: "Zewail City was founded on the belief that access to world-class education is a right, not a privilege. ZC OCW extends that mission to the digital world — making our courses available to students across Egypt, the Arab world, and beyond.",
+    licenseTitle: "License",
+    licenseBody: "All course materials on ZC OCW are shared under a Creative Commons BY-NC-SA 4.0 license. You are free to use, adapt, and share them for non-commercial purposes with proper attribution.",
   })
-  const [homeCms, setHomeCms] = useState({
+  const [homeForm, setHomeForm] = useState({
     heroTitle: 'Open Courseware for Zewail City',
     heroSubtitle: 'Access world-class lectures, course notes, and textbooks from Science, Engineering, CSAI, and Business.',
   })
@@ -93,7 +92,7 @@ export default function AdminSettings() {
   async function handleSaveCms(e) {
     e.preventDefault()
     try {
-      const dataToSave = cmsPage === 'about' ? aboutCms : homeCms
+      const dataToSave = cmsPage === 'about' ? aboutForm : homeForm
       await cloudflare.upsertPageContent(cmsPage, dataToSave)
       setCmsSaved(true)
       setTimeout(() => setCmsSaved(false), 3000)
@@ -108,6 +107,15 @@ export default function AdminSettings() {
       .then((rows) => { if (active) setAdmins(rows || []) })
       .catch((e) => { if (active) setAdminsError(e.message) })
       .finally(() => { if (active) setAdminsLoading(false) })
+
+    cloudflare.fetchPageContent('about').then((data) => {
+      if (active && data) setAboutForm((prev) => ({ ...prev, ...data }))
+    }).catch(() => {})
+
+    cloudflare.fetchPageContent('home').then((data) => {
+      if (active && data) setHomeForm((prev) => ({ ...prev, ...data }))
+    }).catch(() => {})
+
     return () => { active = false }
   }, [])
 
