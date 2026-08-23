@@ -202,29 +202,29 @@ export default function VideoPlayer() {
 
         {/* ── Sidebar playlist ── */}
         <aside>
-          <div className="sticky top-20 bg-white dark:bg-night-200 rounded-2xl border border-slate-100 dark:border-white/10 shadow-card overflow-hidden">
+          <div className="sticky top-20 bg-white dark:bg-night-200/90 rounded-2xl border border-slate-200/70 dark:border-white/10 shadow-card overflow-hidden backdrop-blur-sm">
             {/* Header */}
-            <div className="bg-gradient-to-br from-ocean-950 to-ocean-900 p-4">
+            <div className="bg-gradient-to-br from-ocean-950 via-ocean-900 to-ocean-950 p-4 border-b border-ocean-800/40">
               <Link to={`/courses/${playlistId}`}
-                    className="text-white/45 text-xs hover:text-white/80 transition-colors flex items-center gap-1 mb-2">
+                    className="text-white/50 text-xs hover:text-white transition-colors flex items-center gap-1 mb-2">
                 <ArrowLeft className="w-3 h-3" />
                 Course overview
               </Link>
               <p className="font-display text-sm font-semibold text-white leading-snug line-clamp-2">
                 {course?.snippet?.title ?? 'Playlist'}
               </p>
-              <div className="flex items-center justify-between mt-2 text-xs text-white/50">
+              <div className="flex items-center justify-between mt-2 text-xs text-white/60">
                 <span>{watchedCount} of {lectures?.length ?? '…'} watched</span>
-                <span className="font-mono font-bold text-ocean-300">{courseProgressPct}%</span>
+                <span className="font-mono font-bold text-cyan-300">{courseProgressPct}%</span>
               </div>
               {/* Progress bar */}
-              <div className="mt-2 progress-track">
-                <div className="progress-fill" style={{ width: `${courseProgressPct}%` }} />
+              <div className="mt-2 progress-track bg-white/10">
+                <div className="progress-fill bg-cyan-400" style={{ width: `${courseProgressPct}%` }} />
               </div>
             </div>
 
             {/* Lecture list */}
-            <div className="overflow-y-auto max-h-[65vh] divide-y divide-slate-50">
+            <div className="overflow-y-auto max-h-[65vh] divide-y divide-slate-100 dark:divide-white/5">
               {ll
                 ? Array.from({ length: 6 }).map((_, i) => (
                     <div key={i} className="flex gap-3 p-3">
@@ -245,18 +245,20 @@ export default function VideoPlayer() {
                             to={`/courses/${playlistId}/watch/${id}`}
                             className={clsx(
                               'flex gap-3 p-3 transition-all group',
-                              active ? 'bg-ocean-50 border-l-2 border-ocean-500' : 'hover:bg-slate-50 dark:hover:bg-night-100 border-l-2 border-transparent'
+                              active
+                                ? 'bg-ocean-50/90 dark:bg-cyan-500/15 border-l-4 border-ocean-500 dark:border-cyan-400'
+                                : 'hover:bg-slate-50/80 dark:hover:bg-white/5 border-l-4 border-transparent'
                             )}>
                         <div className="w-7 pt-1 flex-shrink-0 flex items-start justify-center">
                           {active
-                            ? <Play className="w-3.5 h-3.5 text-ocean-500" fill="currentColor" strokeWidth={0} />
+                            ? <Play className="w-3.5 h-3.5 text-ocean-600 dark:text-cyan-400" fill="currentColor" strokeWidth={0} />
                             : <div className="flex flex-col items-center gap-0.5">
-                                <span className="text-[11px] font-mono text-ink-ghost">{i + 1}</span>
+                                <span className="text-[11px] font-mono text-slate-400 dark:text-white/40">{i + 1}</span>
                                 <WatchedCheckmark videoId={id} />
                               </div>
                           }
                         </div>
-                        <div className="w-24 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-night-100 flex-shrink-0">
+                        <div className="w-24 aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-night-100 flex-shrink-0 border border-slate-200/50 dark:border-white/5">
                           <img src={getThumbnail(item.snippet, 'medium')}
                                alt={item.snippet.title}
                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
@@ -264,8 +266,10 @@ export default function VideoPlayer() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className={clsx(
-                            'text-xs font-semibold leading-snug line-clamp-2 transition-colors',
-                            active ? 'text-ocean-700' : 'text-ink dark:text-white group-hover:text-ocean-600'
+                            'text-xs leading-snug line-clamp-2 transition-colors',
+                            active
+                              ? 'text-ocean-900 dark:text-cyan-200 font-bold'
+                              : 'text-slate-800 dark:text-slate-200 group-hover:text-ocean-600 dark:group-hover:text-cyan-300 font-medium'
                           )}>
                             {item.snippet.title}
                           </p>
