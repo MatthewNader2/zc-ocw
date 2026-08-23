@@ -225,9 +225,12 @@ export async function fetchActiveStats() {
 
 // ── Sky Ephemeris & Weather ────────────────────────────────────────────────
 
-export async function fetchSky() {
+export async function fetchSky(params) {
   if (!isConfigured) return null;
-  return call("sky");
+  const path = (params?.appId && params?.appSecret)
+    ? `sky?appId=${encodeURIComponent(params.appId)}&appSecret=${encodeURIComponent(params.appSecret)}`
+    : "sky";
+  return call(path);
 }
 
 export async function fetchWeather() {
