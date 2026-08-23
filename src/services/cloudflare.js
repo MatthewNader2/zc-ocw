@@ -227,9 +227,9 @@ export async function fetchActiveStats() {
 
 export async function fetchSky(params) {
   if (!isConfigured) return null;
-  const path = (params?.appId && params?.appSecret)
-    ? `sky?appId=${encodeURIComponent(params.appId)}&appSecret=${encodeURIComponent(params.appSecret)}`
-    : "sky";
+  const appId = params?.appId || import.meta.env.VITE_ASTRONOMY_API_APP_ID || "REDACTED_APP_ID";
+  const appSecret = params?.appSecret || import.meta.env.VITE_ASTRONOMY_API_APP_SECRET || "REDACTED_SECRET";
+  const path = `sky?appId=${encodeURIComponent(appId)}&appSecret=${encodeURIComponent(appSecret)}`;
   return call(path);
 }
 
