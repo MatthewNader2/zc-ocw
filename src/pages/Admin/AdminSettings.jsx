@@ -287,7 +287,7 @@ export default function AdminSettings() {
       ...acknowledgmentsConfig,
       team: [...(acknowledgmentsConfig?.team || []), newMember],
     })
-    setTeamForm({ name: '', role: '', school: '' })
+    setTeamForm({ name: '', role: '', school: '', photoUrl: '' })
     setTeamSaved(true)
     setTimeout(() => setTeamSaved(false), 3000)
   }
@@ -506,16 +506,54 @@ export default function AdminSettings() {
                 <input value={teamForm.school} onChange={e => setTeamForm(f => ({ ...f, school: e.target.value }))} placeholder="CSAI" className="input text-xs" />
               </div>
             </div>
-            <button type="submit" className="btn-primary text-xs w-full gap-2"><Plus className="w-3.5 h-3.5" /> Add Member</button>
+
+            {/* Profile Photo Uploader */}
+            <div className="pt-2 border-t border-slate-200/60 dark:border-white/10 space-y-2">
+              <label className="block text-xs font-semibold text-ink dark:text-slate-300">Profile Photo</label>
+              <div className="flex items-center gap-3">
+                {teamForm.photoUrl ? (
+                  <img src={teamForm.photoUrl} alt="Preview" className="w-10 h-10 rounded-full object-cover border border-cyan-400" />
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-ink-ghost">
+                    No Photo
+                  </div>
+                )}
+                <div className="flex-1 flex gap-2">
+                  <input
+                    value={teamForm.photoUrl}
+                    onChange={e => setTeamForm(f => ({ ...f, photoUrl: e.target.value }))}
+                    placeholder="https://... or upload photo"
+                    className="input text-xs flex-1"
+                  />
+                  <label className="btn-outline text-xs px-3 py-1.5 flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    {uploadingTeamPhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5 text-cyan-500" />}
+                    <span>{uploadingTeamPhoto ? 'Uploading...' : 'Upload Photo'}</span>
+                    <input type="file" accept="image/*" onChange={handleTeamPhotoFileChange} disabled={uploadingTeamPhoto} className="hidden" />
+                  </label>
+                </div>
+              </div>
+              {teamPhotoError && <p className="text-[11px] text-red-500">{teamPhotoError}</p>}
+            </div>
+
+            <button type="submit" className="btn-primary text-xs w-full gap-2"><Plus className="w-3.5 h-3.5" /> Add Team Member</button>
           </form>
 
           {acknowledgmentsConfig?.team?.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {acknowledgmentsConfig.team.map((m) => (
                 <div key={m.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
-                  <div className="min-w-0">
-                    <p className="font-bold text-xs text-ink dark:text-white truncate">{m.name}</p>
-                    <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{m.role}{m.school ? ` · ${m.school}` : ''}</p>
+                  <div className="flex items-center gap-3 min-w-0">
+                    {m.photoUrl ? (
+                      <img src={m.photoUrl} alt={m.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-cyan-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                        {m.name.slice(0, 2).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold text-xs text-ink dark:text-white truncate">{m.name}</p>
+                      <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{m.role}{m.school ? ` · ${m.school}` : ''}</p>
+                    </div>
                   </div>
                   <button type="button" onClick={() => handleDeleteTeamMember(m.id)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0" title="Remove">
                     <Trash2 className="w-3.5 h-3.5" />
@@ -839,17 +877,131 @@ export default function AdminSettings() {
           )}
         </div>
 
-        {/* YouTube config */}
+        {/* 📝 Page Content CMS Editor */}
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center">
+                <BookOpen className="w-4.5 h-4.5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-ink dark:text-white">Page Content Manager (CMS)</h2>
+                <p className="text-xs text-ink-ghost dark:text-slate-400">Edit titles, mission text, and descriptions live without code changes.</p>
+              </div>
+            </div>
+            {cmsSaved && (
+              <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1">
+                <CheckCircle2 className="w-4 h-4" /> Page Saved!
+              </span>
+            )}
+          </div>
+
+          <div className="flex gap-2 mb-6">
+            <button
+              type="button"
+              onClick={() => setCmsPage('about')}
+              className={`btn text-xs px-4 py-2 ${cmsPage === 'about' ? 'btn-primary' : 'btn-outline'}`}
+            >
+              About Page
+            </button>
+            <button
+              type="button"
+              onClick={() => setCmsPage('home')}
+              className={`btn text-xs px-4 py-2 ${cmsPage === 'home' ? 'btn-primary' : 'btn-outline'}`}
+            >
+              Home Page
+            </button>
+          </div>
+
+          <form onSubmit={handleSaveCms} className="space-y-4">
+            {cmsPage === 'about' && (
+              <>
+                <div>
+                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Header Subtitle</label>
+                  <textarea
+                    rows={2}
+                    value={aboutForm.headerSubtitle}
+                    onChange={(e) => setAboutForm((f) => ({ ...f, headerSubtitle: e.target.value }))}
+                    className="input text-xs"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Mission Section Title</label>
+                    <input
+                      value={aboutForm.missionTitle}
+                      onChange={(e) => setAboutForm((f) => ({ ...f, missionTitle: e.target.value }))}
+                      className="input text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">License Section Title</label>
+                    <input
+                      value={aboutForm.licenseTitle}
+                      onChange={(e) => setAboutForm((f) => ({ ...f, licenseTitle: e.target.value }))}
+                      className="input text-xs"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Mission Statement Body</label>
+                  <textarea
+                    rows={3}
+                    value={aboutForm.missionBody}
+                    onChange={(e) => setAboutForm((f) => ({ ...f, missionBody: e.target.value }))}
+                    className="input text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">License Statement Body</label>
+                  <textarea
+                    rows={3}
+                    value={aboutForm.licenseBody}
+                    onChange={(e) => setAboutForm((f) => ({ ...f, licenseBody: e.target.value }))}
+                    className="input text-xs"
+                  />
+                </div>
+              </>
+            )}
+
+            {cmsPage === 'home' && (
+              <>
+                <div>
+                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Hero Title</label>
+                  <input
+                    value={homeForm.heroTitle}
+                    onChange={(e) => setHomeForm((f) => ({ ...f, heroTitle: e.target.value }))}
+                    className="input text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Hero Subtitle</label>
+                  <textarea
+                    rows={2}
+                    value={homeForm.heroSubtitle}
+                    onChange={(e) => setHomeForm((f) => ({ ...f, heroSubtitle: e.target.value }))}
+                    className="input text-xs"
+                  />
+                </div>
+              </>
+            )}
+
+            <button type="submit" className="btn-primary text-xs w-full gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Save {cmsPage === 'about' ? 'About' : 'Home'} Page Content
+            </button>
+          </form>
+        </div>
+
+        {/* YouTube & Astronomy API Config */}
         <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
           <div className="flex items-center gap-2.5 mb-5 pb-4 border-b border-slate-100 dark:border-white/10">
             <div className="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center">
               <Youtube className="w-4.5 h-4.5 text-red-600" />
             </div>
-            <h2 className="font-display text-lg font-bold text-ink dark:text-white">YouTube Configuration</h2>
+            <h2 className="font-display text-lg font-bold text-ink dark:text-white">API Integrations (YouTube & Astronomy API)</h2>
           </div>
           <p className="text-sm text-ink-muted mb-4 leading-relaxed">
-            YouTube API calls are safely proxied through the Cloudflare Worker using the <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">YOUTUBE_API_KEY</code> secret.
-            The frontend only requires <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">VITE_YOUTUBE_CHANNEL_ID</code>.
+            API keys are kept secure as Cloudflare Worker secrets (<code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">YOUTUBE_API_KEY</code>, <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">ASTRONOMY_API_APP_ID</code>, <code className="bg-slate-100 dark:bg-night-100 dark:text-slate-300 px-1.5 py-0.5 rounded font-mono text-xs">ASTRONOMY_API_APP_SECRET</code>).
           </p>
           <div className="space-y-3 mb-6">
             <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
@@ -864,16 +1016,28 @@ export default function AdminSettings() {
                 {import.meta.env.VITE_YOUTUBE_CHANNEL_ID ? '✓ Set' : '✗ Missing'}
               </span>
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
-              <Key className="w-4 h-4 text-ink-ghost flex-shrink-0" />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-ink-muted">API Key Secret (Worker)</p>
-                <p className="font-mono text-xs text-ink-ghost truncate">YOUTUBE_API_KEY (Cloudflare Worker Secret)</p>
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+              <div className="flex items-center gap-3">
+                <Key className="w-4 h-4 text-ink-ghost flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-ink-muted">Astronomy API Ephemeris Service</p>
+                  <p className="font-mono text-xs text-ink-ghost truncate">Worker route: /api/sky</p>
+                </div>
               </div>
-              <span className="badge text-[10px] bg-cyan-100 text-cyan-700 dark:bg-cyan-950/40 dark:text-cyan-300">
-                🔒 Backend Secret
-              </span>
+              <button
+                type="button"
+                onClick={handleTestSkyApi}
+                disabled={testingSky}
+                className="btn-outline text-xs py-1 px-3"
+              >
+                {testingSky ? 'Testing...' : 'Test Sky API Connection'}
+              </button>
             </div>
+            {skyTestStatus && (
+              <div className={`p-3 rounded-xl text-xs font-semibold ${skyTestStatus.success ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}`}>
+                {skyTestStatus.message}
+              </div>
+            )}
           </div>
         </div>
 

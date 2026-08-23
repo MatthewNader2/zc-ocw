@@ -76,39 +76,61 @@ export default function Navbar() {
         ? 'bg-ocean-950/95 backdrop-blur-xl shadow-[0_1px_0_rgba(72,202,228,0.12),0_4px_24px_rgba(3,4,94,0.35)]'
         : 'bg-ocean-950'
     )}>
-      <div className="section flex items-center h-16 gap-4">
+      <div className="section w-full flex items-center justify-between h-16 gap-2 sm:gap-4">
 
         {/* Logo */}
         <Link to="/" onClick={() => setOpen(false)}
-              className="flex items-center gap-3 flex-shrink-0 group">
-          <img src="/logo.svg" alt="ZC" className="h-9 w-auto" />
+              className="flex items-center gap-2.5 flex-shrink-0 group">
+          <img src="/logo.svg" alt="ZC" className="h-9 w-auto flex-shrink-0" />
           <div className="hidden sm:flex flex-col leading-none">
-            <span className="font-display text-base font-bold text-white">ZC <span className="text-ocean-400">OCW</span></span>
-            <span className="text-[10px] text-white/35 font-body tracking-wide">Open CourseWare</span>
+            <span className="font-display text-base font-bold text-white whitespace-nowrap">ZC <span className="text-ocean-400">OCW</span></span>
+            <span className="text-[10px] text-white/40 font-body tracking-wide whitespace-nowrap">Open CourseWare</span>
           </div>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-0.5 ml-2">
-          {NAV.map(({ to, label }) => (
-            <NavLink key={to} to={to} className={({ isActive }) => clsx(
-              'px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200',
-              isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/65 hover:text-white hover:bg-white/8'
-            )}>
-              {label}
-            </NavLink>
-          ))}
+        <nav className="hidden md:flex items-center gap-1 flex-shrink-0">
+          <NavLink to="/courses" className={({ isActive }) => clsx(
+            'px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
+            isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
+          )}>
+            Courses
+          </NavLink>
+          <NavLink to="/departments" className={({ isActive }) => clsx(
+            'px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
+            isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
+          )}>
+            Departments
+          </NavLink>
+          <NavLink to="/about" className={({ isActive }) => clsx(
+            'px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
+            isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
+          )}>
+            About
+          </NavLink>
+          <NavLink to="/interviews" className={({ isActive }) => clsx(
+            'hidden lg:inline-flex px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
+            isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
+          )}>
+            Interviews
+          </NavLink>
+          <NavLink to="/acknowledgments" className={({ isActive }) => clsx(
+            'hidden xl:inline-flex px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
+            isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
+          )}>
+            Acknowledgements
+          </NavLink>
         </nav>
 
         {/* Search */}
-        <form onSubmit={submit} className="hidden md:flex flex-1 max-w-xs ml-auto">
+        <form onSubmit={submit} className="hidden md:flex flex-1 min-w-[160px] max-w-md mx-2">
           <div className="relative w-full flex items-center">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/35 pointer-events-none" />
             <input
               ref={searchInputRef}
               type="search" value={query} onChange={e => setQuery(e.target.value)}
-              placeholder="Search courses…"
-              className="input-dark w-full pl-9 pr-8 py-1.5 text-sm"
+              placeholder="Search courses, topics, codes…"
+              className="input-dark w-full min-w-0 pl-9 pr-8 py-1.5 text-xs"
               aria-label="Search courses"
             />
             <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 hidden lg:inline-block px-1.5 py-0.5 text-[10px] font-mono text-white/40 bg-white/10 rounded border border-white/10 pointer-events-none">
@@ -118,53 +140,55 @@ export default function Navbar() {
         </form>
 
         {/* Right icons — desktop */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
           <button
             onClick={toggleTheme}
             title="Toggle theme (Light / Dark)"
-            className="p-2.5 rounded-xl text-white/65 hover:text-white hover:bg-white/8 transition-all"
+            className="p-2 rounded-xl text-white/65 hover:text-white hover:bg-white/8 transition-all"
             aria-label="Toggle Theme"
           >
             {settings.theme === 'dark' ? (
-              <Moon className="w-4.5 h-4.5 text-ocean-300" />
+              <Moon className="w-4 h-4 text-ocean-300" />
             ) : (
-              <Sun className="w-4.5 h-4.5 text-amber-300" />
+              <Sun className="w-4 h-4 text-amber-300" />
             )}
           </button>
           <Link to="/bookmarks"
-                className="relative p-2.5 rounded-xl text-white/55 hover:text-white hover:bg-white/8 transition-all">
-            <Bookmark className="w-4.5 h-4.5" strokeWidth={2} />
+                className="relative p-2 rounded-xl text-white/65 hover:text-white hover:bg-white/8 transition-all"
+                title="Bookmarks">
+            <Bookmark className="w-4 h-4" strokeWidth={2} />
             {bmCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-ocean-500 text-white text-[9px] font-bold flex items-center justify-center">
+              <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-cyan-400 text-ocean-950 text-[9px] font-bold flex items-center justify-center">
                 {bmCount > 9 ? '9+' : bmCount}
               </span>
             )}
           </Link>
           <Link to="/settings"
-                className="p-2.5 rounded-xl text-white/55 hover:text-white hover:bg-white/8 transition-all">
-            <Settings className="w-4.5 h-4.5" strokeWidth={2} />
+                className="p-2 rounded-xl text-white/65 hover:text-white hover:bg-white/8 transition-all"
+                title="Settings">
+            <Settings className="w-4 h-4" strokeWidth={2} />
           </Link>
           {isAdmin && (
             <Link to="/admin"
-                  className="ml-1 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold
-                             text-ocean-300 bg-ocean-500/15 border border-ocean-400/20
-                             hover:bg-ocean-500/25 transition-all">
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-semibold
+                             text-ocean-300 bg-ocean-500/20 border border-ocean-400/30
+                             hover:bg-ocean-500/30 transition-all whitespace-nowrap">
               <LayoutDashboard className="w-3.5 h-3.5" />
               Admin
             </Link>
           )}
 
           {user ? (
-            <div className="relative ml-1" ref={userMenuRef}>
+            <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setUserMenuOpen(o => !o)}
-                className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-xl hover:bg-white/8 transition-all"
+                className="flex items-center gap-1.5 px-2 py-1 rounded-xl hover:bg-white/8 transition-all whitespace-nowrap"
               >
                 {user.photoURL ? (
                   <img src={user.photoURL} alt="" className="w-7 h-7 rounded-full" referrerPolicy="no-referrer" />
                 ) : (
-                  <div className="w-7 h-7 rounded-full bg-ocean-500/20 text-ocean-300 flex items-center justify-center">
-                    <User className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-full bg-ocean-500/20 text-ocean-300 flex items-center justify-center font-bold text-xs">
+                    {user.email ? user.email[0].toUpperCase() : 'U'}
                   </div>
                 )}
                 <ChevronDown className="w-3.5 h-3.5 text-white/50" />
@@ -187,17 +211,17 @@ export default function Navbar() {
             </div>
           ) : (
             <Link to="/admin/login"
-                  className="ml-1 flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold
-                             text-white bg-ocean-500/20 border border-ocean-400/25
-                             hover:bg-ocean-500/30 transition-all">
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-white whitespace-nowrap flex-shrink-0
+                             bg-gradient-to-r from-ocean-600 via-ocean-500 to-cyan-500
+                             hover:brightness-110 shadow-sm transition-all flex items-center gap-1.5">
               <User className="w-3.5 h-3.5" />
-              Sign In
+              <span>Sign In / Register</span>
             </Link>
           )}
         </div>
 
         {/* Mobile burger */}
-        <button onClick={() => setOpen(!open)} className="md:hidden text-white/80 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all">
+        <button onClick={() => setOpen(!open)} className="md:hidden text-white/80 hover:text-white p-2 rounded-xl hover:bg-white/8 transition-all flex-shrink-0">
           {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>

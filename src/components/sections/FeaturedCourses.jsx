@@ -5,6 +5,7 @@ import CourseCard from "@/components/ui/CourseCard";
 import { CourseCardSkeleton } from "@/components/ui/LoadingSpinner";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { getPlaylistCategory } from "@/data/profileHelpers";
+import ParticleBackground from "@/components/ui/ParticleBackground";
 
 export default function FeaturedCourses() {
   const { data, isLoading, isError } = usePlaylists();
@@ -13,8 +14,9 @@ export default function FeaturedCourses() {
       ?.filter((c) => getPlaylistCategory(c.id) === "course")
       .slice(0, 6) ?? [];
   return (
-    <section className="py-20">
-      <div className="section">
+    <section className="py-20 relative overflow-hidden">
+      <ParticleBackground mode="classic" />
+      <div className="section relative z-10">
         <ScrollReveal className="flex items-end justify-between mb-12">
           <div>
             <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">

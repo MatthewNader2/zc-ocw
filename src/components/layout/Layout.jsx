@@ -12,9 +12,6 @@ export default function Layout() {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-surface dark:bg-night text-ink dark:text-slate-100 transition-colors duration-300 overflow-x-hidden">
-      {/* Dynamic Cursor-Active Particle Background */}
-      <ParticleBackground isFixed={true} />
-
       {/* Ambient background glows */}
       <div className="fixed top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full opacity-20 dark:opacity-25 blur-[120px] pointer-events-none bg-gradient-to-tr from-ocean-500 via-cyan-400 to-purple-600 animate-float" />
       <div className="fixed bottom-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full opacity-15 dark:opacity-20 blur-[100px] pointer-events-none bg-gradient-to-br from-indigo-500 via-ocean-600 to-teal-400" />

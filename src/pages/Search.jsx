@@ -63,14 +63,14 @@ export default function Search() {
       <div className="bg-gradient-to-br from-ocean-950 via-ocean-900 to-ocean-700 py-12">
         <div className="section max-w-3xl">
           <h1 className="font-display text-3xl md:text-4xl text-white font-bold mb-6">Search Courses</h1>
-          <div className="relative flex items-center glass p-2">
+          <div className="relative flex items-center glass p-2 w-full min-w-0">
             <SearchIcon className="absolute left-5 w-5 h-5 text-white/40 pointer-events-none" />
             <input
               type="search"
               value={input}
               onChange={e => setInput(e.target.value)}
               placeholder="Search by course code, topic, or keyword…"
-              className="flex-1 bg-transparent pl-12 pr-4 py-3 text-white placeholder-white/35 text-sm font-body focus:outline-none"
+              className="w-full flex-1 min-w-0 bg-transparent pl-12 pr-4 py-3 text-white placeholder-white/35 text-sm font-body focus:outline-none"
               autoFocus
             />
             {input && (
