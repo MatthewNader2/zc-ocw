@@ -120,18 +120,16 @@ export default function AdminSettings() {
   // 🌌 Astronomy API Test State & Handler
   const [testingSky, setTestingSky] = useState(false)
   const [skyTestStatus, setSkyTestStatus] = useState(null)
-  const [customSkyAppId, setCustomSkyAppId] = useState('')
-  const [customSkyAppSecret, setCustomSkyAppSecret] = useState('')
 
   async function handleTestSkyApi() {
     setTestingSky(true)
     setSkyTestStatus(null)
     try {
-      const data = await cloudflare.fetchSky({ appId: customSkyAppId, appSecret: customSkyAppSecret })
+      const data = await cloudflare.fetchSky()
       if (data?.success || data?.source === 'AstronomyAPI' || (data?.bodies && data.bodies.length > 0)) {
         setSkyTestStatus({
           success: true,
-          message: `Connected! Source: AstronomyAPI (${(data.bodies || []).length} celestial bodies active)`
+          message: `Connected! Source: ${data.source || 'AstronomyAPI'} (${(data.bodies || []).length} celestial bodies active)`
         })
       } else if (data?.error) {
         setSkyTestStatus({
@@ -1124,48 +1122,22 @@ export default function AdminSettings() {
                 {import.meta.env.VITE_YOUTUBE_CHANNEL_ID ? '✓ Set' : '✗ Missing'}
               </span>
             </div>
-            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Key className="w-4 h-4 text-ink-ghost flex-shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-ink-muted">Astronomy API Ephemeris Service</p>
-                    <p className="font-mono text-xs text-ink-ghost truncate">Worker route: /api/sky</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleTestSkyApi}
-                  disabled={testingSky}
-                  className="btn-outline text-xs py-1 px-3"
-                >
-                  {testingSky ? 'Testing...' : 'Test Sky API Connection'}
-                </button>
-              </div>
-
-              {/* Optional Credential Test Inputs */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-slate-200/60 dark:border-white/5">
-                <div>
-                  <label className="block text-[11px] font-medium text-ink-muted mb-0.5">Test App ID (Optional Override)</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 5d8e78a4-..."
-                    value={customSkyAppId}
-                    onChange={(e) => setCustomSkyAppId(e.target.value)}
-                    className="input text-xs py-1 px-2.5"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-medium text-ink-muted mb-0.5">Test App Secret (Optional Override)</label>
-                  <input
-                    type="password"
-                    placeholder="e.g. 4a2b9f..."
-                    value={customSkyAppSecret}
-                    onChange={(e) => setCustomSkyAppSecret(e.target.value)}
-                    className="input text-xs py-1 px-2.5"
-                  />
+            <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+              <div className="flex items-center gap-3">
+                <Key className="w-4 h-4 text-ink-ghost flex-shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-ink-muted">Astronomy API Ephemeris Service</p>
+                  <p className="font-mono text-xs text-ink-ghost truncate">Worker route: /api/sky</p>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={handleTestSkyApi}
+                disabled={testingSky}
+                className="btn-outline text-xs py-1 px-3"
+              >
+                {testingSky ? 'Testing...' : 'Test Sky API Connection'}
+              </button>
             </div>
             {skyTestStatus && (
               <div className={`p-3 rounded-xl text-xs font-semibold ${skyTestStatus.success ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}`}>

@@ -913,7 +913,21 @@ export default {
 						});
 						if (res.ok) {
 							const data = await res.json();
-							return json({ ...(data.data || {}), source: 'AstronomyAPI', success: true }, 200, cors);
+							const rows = data?.data?.table?.rows || [];
+							const bodies = rows.map((r) => {
+								const entry = r.entry || {};
+								const cell = r.cells?.[0] || {};
+								return {
+									id: entry.id,
+									name: entry.name,
+									altitude: parseFloat(cell.position?.horizontal?.altitude?.degrees || 0),
+									azimuth: parseFloat(cell.position?.horizontal?.azimuth?.degrees || 0),
+									constellation: cell.position?.constellation?.name || '',
+									distanceKm: parseFloat(cell.distance?.fromEarth?.km || 0),
+									phase: cell.extraInfo?.phase || null,
+								};
+							});
+							return json({ bodies, table: data?.data?.table, source: 'AstronomyAPI', success: true }, 200, cors);
 						} else {
 							const errText = await res.text().catch(() => '');
 							return json({ bodies: [], moonPhase: null, source: 'AstronomyAPI_Error', error: `AstronomyAPI HTTP ${res.status}: ${errText}` }, 200, cors);
