@@ -439,16 +439,21 @@ export default {
 				const ext = (file.name || 'image.png').split('.').pop();
 				const fileKey = `${id}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
 
-				const r2Base = (env.R2_PUBLIC_URL || env.R2_PUBLIC_ID || '').replace(/\/$/, '');
+				const defaultR2Host = 'https://pub-c9973170d9e940ff93b0152afec2c45d.r2.dev';
+				const r2Base = (env.R2_PUBLIC_URL || env.R2_PUBLIC_ID || defaultR2Host).replace(/\/$/, '');
 
 				// Upload to R2 if configured
 				if (env.STORAGE) {
-					await env.STORAGE.put(fileKey, file.stream(), {
-						httpMetadata: { contentType: file.type },
-					});
+					try {
+						await env.STORAGE.put(fileKey, file.stream(), {
+							httpMetadata: { contentType: file.type },
+						});
+					} catch (e) {
+						console.warn('R2 storage put warning:', e.message);
+					}
 				}
 
-				const publicUrl = r2Base ? `${r2Base}/${fileKey}` : fileKey;
+				const publicUrl = `${r2Base}/${fileKey}`;
 				const newId = crypto.randomUUID();
 
 				// If this is a course playlist material upload, save metadata to D1
@@ -891,9 +896,12 @@ export default {
 
 			// ── GET /api/sky ────────────────────────────────────────────────────── [astronomyapi.com real-time ephemeris]
 			if (url.pathname === '/api/sky' && req.method === 'GET') {
-				if (env.ASTRONOMY_API_APP_ID && env.ASTRONOMY_API_APP_SECRET) {
+				const appId = (env.ASTRONOMY_API_APP_ID || '').trim();
+				const appSecret = (env.ASTRONOMY_API_APP_SECRET || '').trim();
+
+				if (appId && appSecret) {
 					try {
-						const auth = btoa(`${env.ASTRONOMY_API_APP_ID}:${env.ASTRONOMY_API_APP_SECRET}`);
+						const auth = btoa(`${appId}:${appSecret}`);
 						const now = new Date();
 						const dateStr = now.toISOString().split('T')[0];
 						const timeStr = now.toTimeString().split(' ')[0];
@@ -903,14 +911,17 @@ export default {
 						});
 						if (res.ok) {
 							const data = await res.json();
-							return json(data.data, 200, cors);
+							return json({ ...(data.data || {}), source: 'AstronomyAPI', success: true }, 200, cors);
+						} else {
+							const errText = await res.text().catch(() => '');
+							return json({ bodies: [], moonPhase: null, source: 'AstronomyAPI_Error', error: `AstronomyAPI HTTP ${res.status}: ${errText}` }, 200, cors);
 						}
 					} catch (e) {
-						console.warn('Astronomy API error:', e);
+						return json({ bodies: [], moonPhase: null, source: 'AstronomyAPI_Exception', error: e.message }, 200, cors);
 					}
 				}
 				// Graceful fallback when credentials missing or API unavailable
-				return json({ bodies: [], moonPhase: null, source: 'fallback' }, 200, cors);
+				return json({ bodies: [], moonPhase: null, source: 'fallback', message: 'No Astronomy API credentials bound to Worker env' }, 200, cors);
 			}
 
 			// ── GET /api/weather ────────────────────────────────────────────────── [Open-Meteo sunrise / sunset]

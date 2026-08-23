@@ -65,9 +65,9 @@ export default function AdminSettings() {
     setTeamPhotoError('')
     try {
       const file = new File([croppedBlob], `avatar_${Date.now()}.png`, { type: 'image/png' })
-      const res = await uploadAcknowledgmentImage(file)
-      if (res?.publicUrl) {
-        setTeamForm((f) => ({ ...f, photoUrl: res.publicUrl }))
+      const publicUrl = await uploadAcknowledgmentImage(file)
+      if (publicUrl) {
+        setTeamForm((f) => ({ ...f, photoUrl: publicUrl }))
         setCropImageSrc(null)
       } else {
         throw new Error('Upload did not return a valid public URL')
@@ -126,21 +126,26 @@ export default function AdminSettings() {
     setSkyTestStatus(null)
     try {
       const data = await cloudflare.fetchSky()
-      if (data && (data.bodies || data.source)) {
+      if (data?.success || data?.source === 'AstronomyAPI' || (data?.bodies && data.bodies.length > 0)) {
         setSkyTestStatus({
           success: true,
-          message: `Connected! Source: ${data.source || 'AstronomyAPI'} (${(data.bodies || []).length} celestial bodies active)`
+          message: `Connected! Source: AstronomyAPI (${(data.bodies || []).length} celestial bodies active)`
+        })
+      } else if (data?.error) {
+        setSkyTestStatus({
+          success: false,
+          message: `Astronomy API Response Error: ${data.error}`
         })
       } else {
         setSkyTestStatus({
           success: false,
-          message: 'Returned fallback data. Verify ASTRONOMY_API_APP_ID in Worker secrets.'
+          message: data?.message || 'Returned fallback data. Ensure ASTRONOMY_API_APP_ID & ASTRONOMY_API_APP_SECRET secrets are bound to the Worker.'
         })
       }
     } catch (e) {
       setSkyTestStatus({
         success: false,
-        message: 'Sky API fetch failed: ' + e.message
+        message: 'Sky API fetch error: ' + e.message
       })
     } finally {
       setTestingSky(false)
