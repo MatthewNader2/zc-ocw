@@ -1,0 +1,37 @@
+{
+	"$schema": "workers/api/node_modules/wrangler/config-schema.json",
+	"name": "zc-ocw-api",
+	"main": "workers/api/src/index.js",
+	"compatibility_date": "2024-01-01",
+	"compatibility_flags": ["nodejs_compat"],
+
+	"vars": {
+		"ALLOWED_ORIGIN": "https://zc-ocw.vercel.app",
+		"R2_PUBLIC_ID": "https://pub-c9973170d9e940ff93b0152afec2c45d.r2.dev"
+	},
+
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "zc-ocw-db",
+			"database_id": "63ed7723-d655-4b9c-8859-22b31303b320"
+		}
+	],
+
+	"r2_buckets": [
+		{
+			"binding": "STORAGE",
+			"bucket_name": "zc-ocw-materials"
+		}
+	],
+
+	"observability": {
+		"logs": {
+			"enabled": true,
+			"invocation_logs": true
+		},
+		"traces": {
+			"enabled": true
+		}
+	}
+}
