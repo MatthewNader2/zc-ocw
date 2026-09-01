@@ -4,21 +4,51 @@
  */
 
 // Point to your Cloudflare Worker instead of direct Google APIs
-const BASE = `${import.meta.env.VITE_WORKER_URL}/api/youtube`;
-const CHANNEL_ID = import.meta.env.VITE_YOUTUBE_CHANNEL_ID;
+const BASE = import.meta.env.VITE_WORKER_URL ? `${import.meta.env.VITE_WORKER_URL}/api/youtube` : '';
+const DIRECT_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
+const CHANNEL_ID = import.meta.env.VITE_YOUTUBE_CHANNEL_ID || 'UCGNOEBp7AZaY4XPNoagpv8w';
 
 async function ytGet(endpoint, params = {}) {
-  const url = new URL(`${BASE}${endpoint}`);
-  Object.entries(params).forEach(([key, val]) => {
-    if (val !== undefined && val !== null && val !== "") {
-      url.searchParams.append(key, val);
+  // 1. Try Cloudflare Worker proxy first if configured
+  if (BASE) {
+    try {
+      const url = new URL(`${BASE}${endpoint}`);
+      Object.entries(params).forEach(([key, val]) => {
+        if (val !== undefined && val !== null && val !== "") {
+          url.searchParams.append(key, val);
+        }
+      });
+      const res = await fetch(url.toString());
+      if (res.ok) {
+        const data = await res.json();
+        if (!data.error) return data;
+      }
+    } catch (e) {
+      console.warn("Worker YouTube proxy failed, falling back to direct API:", e);
     }
-  });
-  const res = await fetch(url.toString());
-  if (!res.ok) {
-    throw new Error(`YouTube API error: ${res.status}`);
   }
-  return res.json();
+
+  // 2. Direct fallback to Google API if key is available
+  if (DIRECT_KEY) {
+    const directUrl = new URL(`https://www.googleapis.com/youtube/v3${endpoint}`);
+    Object.entries(params).forEach(([key, val]) => {
+      if (val !== undefined && val !== null && val !== "") {
+        directUrl.searchParams.append(key, val);
+      }
+    });
+    directUrl.searchParams.set("key", DIRECT_KEY);
+    if (!directUrl.searchParams.has("part")) {
+      directUrl.searchParams.set("part", "snippet,contentDetails");
+    }
+    const res = await fetch(directUrl.toString());
+    if (res.ok) {
+      return res.json();
+    }
+    const errData = await res.json().catch(() => ({}));
+    throw new Error(errData.error?.message || `YouTube API error: ${res.status}`);
+  }
+
+  throw new Error("Could not fetch YouTube data. Ensure YOUTUBE_API_KEY is configured in Cloudflare worker secrets or frontend .env.");
 }
 
 // ── Playlists (= courses) ──────────────────────────────────────────────────

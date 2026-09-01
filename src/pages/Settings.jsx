@@ -1,9 +1,11 @@
+import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import {
   Settings as SettingsIcon,
-  Play, BookOpen, Gauge, RotateCcw, Sun, Moon, Monitor
+  Play, BookOpen, Gauge, RotateCcw, Sun, Moon, Monitor, Shield, LayoutDashboard, Lock, Sparkles
 } from 'lucide-react'
 import { useSettings } from '@/context/SettingsContext'
+import { useAuth } from '@/context/AuthContext'
 import ScrollReveal   from '@/components/ui/ScrollReveal'
 
 /* ── Toggle switch ──────────────────────────────────────────────────────────── */
@@ -198,6 +200,34 @@ export default function SettingsPage() {
               <RotateCcw className="w-4 h-4" />
               Reset all settings to defaults
             </button>
+          </Section>
+        </ScrollReveal>
+
+        {/* Admin Portal & Management */}
+        <ScrollReveal delay="0.25s">
+          <Section icon={Shield} iconColor="bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300" title="Administrator Portal">
+            <p className="text-sm text-ink-muted dark:text-slate-300 leading-relaxed mb-5">
+              Access the administrative studio to manage course metadata, upload syllabus/materials, edit the team directory, or customize site branding.
+            </p>
+            {isAdmin ? (
+              <div className="flex flex-wrap gap-3">
+                <Link to="/admin/settings" className="btn-primary gap-2 text-xs">
+                  <SettingsIcon className="w-4 h-4" /> Open Admin Settings &amp; CMS
+                </Link>
+                <Link to="/admin" className="btn-outline gap-2 text-xs">
+                  <LayoutDashboard className="w-4 h-4" /> Admin Dashboard
+                </Link>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-3">
+                <Link to="/admin/login" className="btn-primary gap-2 text-xs">
+                  <Lock className="w-4 h-4" /> Sign In to Admin Portal
+                </Link>
+                <span className="text-xs text-ink-ghost dark:text-slate-400">
+                  Authorized ZC-OCW team accounts only
+                </span>
+              </div>
+            )}
           </Section>
         </ScrollReveal>
       </div>

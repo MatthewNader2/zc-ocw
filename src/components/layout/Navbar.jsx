@@ -202,6 +202,23 @@ export default function Navbar() {
                     <p className="text-xs font-semibold text-ink dark:text-white truncate">{user.displayName || 'Signed in'}</p>
                     <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{user.email}</p>
                   </div>
+                  <Link
+                    to="/admin"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-ink dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                  >
+                    <LayoutDashboard className="w-3.5 h-3.5 text-ocean-500" />
+                    Admin Dashboard
+                  </Link>
+                  <Link
+                    to="/admin/settings"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-ink dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-cyan-500" />
+                    Admin Settings (CMS)
+                  </Link>
+                  <div className="border-t border-slate-100 dark:border-white/10 my-1" />
                   <button
                     onClick={() => { setUserMenuOpen(false); logout() }}
                     className="w-full flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
@@ -260,11 +277,18 @@ export default function Navbar() {
             Settings
           </Link>
           {isAdmin && (
-            <Link to="/admin" onClick={() => setOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-ocean-300 hover:bg-ocean-500/15 transition-all">
-              <LayoutDashboard className="w-4 h-4" />
-              Admin Dashboard
-            </Link>
+            <>
+              <Link to="/admin" onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-ocean-300 hover:bg-ocean-500/15 transition-all">
+                <LayoutDashboard className="w-4 h-4" />
+                Admin Dashboard
+              </Link>
+              <Link to="/admin/settings" onClick={() => setOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-cyan-300 hover:bg-ocean-500/15 transition-all">
+                <Settings className="w-4 h-4" />
+                Admin Settings (CMS)
+              </Link>
+            </>
           )}
           {user ? (
             <button
