@@ -9,7 +9,17 @@ import {
   Award,
 } from "lucide-react";
 import { useChannelStats } from "@/hooks/useYouTube";
+import { useEditablePage } from "@/hooks/useEditablePage";
 import ParticleBackground from "@/components/ui/ParticleBackground";
+
+export const DEFAULT_HOME = {
+  heroTitle: "Knowledge Unlocked",
+  heroSubtitle: "Free lecture videos and course materials from Zewail City of Science and Technology — open to every learner.",
+  featuredVideoUrl: "https://youtu.be/Kr1P4Awv2lE",
+  featuredVideoBadge: "Featured Spotlight",
+  featuredVideoTitle: "What is ZC OCW?",
+  featuredVideoDescription: "Learn how Zewail City students and faculty came together to build an open educational platform carrying the knowledge of remarkable professors and researchers far beyond the classroom.",
+};
 
 function AnimatedNumber({ target, suffix = "" }) {
   const [val, setVal] = useState(0);
@@ -35,9 +45,13 @@ function AnimatedNumber({ target, suffix = "" }) {
 
 export default function HeroSection() {
   const { data: channel } = useChannelStats();
+  const { content } = useEditablePage("home", DEFAULT_HOME);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
+
+  const heroTitle = content?.heroTitle || DEFAULT_HOME.heroTitle;
+  const heroSubtitle = content?.heroSubtitle || DEFAULT_HOME.heroSubtitle;
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 80);
@@ -51,7 +65,7 @@ export default function HeroSection() {
 
   const videoCount = channel?.statistics?.videoCount
     ? Number(channel.statistics.videoCount)
-    : 500;
+    : 551;
 
   const stats = [
     { icon: PlayCircle, label: "Lectures", value: videoCount, suffix: "+" },
@@ -120,44 +134,48 @@ export default function HeroSection() {
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
             )}
           >
-            Knowledge{" "}
-            <span className="relative inline-block">
+            {heroTitle.includes(" ") ? (
+              <>
+                {heroTitle.split(" ").slice(0, -1).join(" ")}{" "}
+                <span className="relative inline-block">
+                  <span className="bg-gradient-to-r from-ocean-400 to-ocean-300 bg-clip-text text-transparent">
+                    {heroTitle.split(" ").slice(-1)[0]}
+                  </span>
+                  <svg
+                    className="absolute -bottom-2 left-0 w-full"
+                    viewBox="0 0 300 8"
+                    fill="none"
+                  >
+                    <path
+                      d="M2 6 Q75 1 150 5 Q225 9 298 3"
+                      stroke="url(#ul)"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      fill="none"
+                    />
+                    <defs>
+                      <linearGradient id="ul" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#48cae4" />
+                        <stop offset="100%" stopColor="#90e0ef" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </span>
+              </>
+            ) : (
               <span className="bg-gradient-to-r from-ocean-400 to-ocean-300 bg-clip-text text-transparent">
-                Unlocked
+                {heroTitle}
               </span>
-              <svg
-                className="absolute -bottom-2 left-0 w-full"
-                viewBox="0 0 300 8"
-                fill="none"
-              >
-                <path
-                  d="M2 6 Q75 1 150 5 Q225 9 298 3"
-                  stroke="url(#ul)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-                <defs>
-                  <linearGradient id="ul" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#48cae4" />
-                    <stop offset="100%" stopColor="#90e0ef" />
-                  </linearGradient>
-                </defs>
-              </svg>
-            </span>
+            )}
           </h1>
 
           <p
             className={clsx_light(
-              "text-white/55 text-lg md:text-xl font-body mb-10 leading-relaxed max-w-2xl mx-auto transition-all duration-700 delay-200",
+              "text-white/65 text-lg md:text-xl font-body mb-10 leading-relaxed max-w-2xl mx-auto transition-all duration-700 delay-200",
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
             )}
           >
-            Free lecture videos and course materials from{" "}
-            <span className="text-white font-semibold">
-              Zewail City of Science and Technology
-            </span>{" "}
-            — open to every learner.
+            {heroSubtitle}
           </p>
 
           {/* Search */}

@@ -89,6 +89,10 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/admin/courses"
+          element={<Navigate to="/admin" replace />}
+        />
+        <Route
           path="/admin/courses/:playlistId"
           element={
             <ProtectedAdmin>

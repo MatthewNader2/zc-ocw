@@ -51,7 +51,7 @@ export default function ImageCropperModal({ imageSrc, onClose, onCropComplete })
     ctx.restore()
   }, [imageObj, zoom, rotation, pan])
 
-  // Drag handlers
+  // Drag handlers (Mouse & Touch)
   const handleMouseDown = (e) => {
     setIsDragging(true)
     setDragStart({ x: e.clientX - pan.x, y: e.clientY - pan.y })
@@ -66,6 +66,25 @@ export default function ImageCropperModal({ imageSrc, onClose, onCropComplete })
   }
 
   const handleMouseUp = () => setIsDragging(false)
+
+  const handleTouchStart = (e) => {
+    if (!e.touches?.[0]) return
+    setIsDragging(true)
+    setDragStart({
+      x: e.touches[0].clientX - pan.x,
+      y: e.touches[0].clientY - pan.y,
+    })
+  }
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || !e.touches?.[0]) return
+    setPan({
+      x: e.touches[0].clientX - dragStart.x,
+      y: e.touches[0].clientY - dragStart.y,
+    })
+  }
+
+  const handleTouchEnd = () => setIsDragging(false)
 
   // Crop & Export Blob
   const handleCrop = () => {
@@ -120,11 +139,15 @@ export default function ImageCropperModal({ imageSrc, onClose, onCropComplete })
 
         {/* Interactive Crop Viewport */}
         <div
-          className="relative w-[320px] h-[320px] mx-auto rounded-2xl overflow-hidden bg-black/60 border border-cyan-500/30 cursor-grab active:cursor-grabbing shadow-inner flex items-center justify-center select-none"
+          className="relative w-[320px] h-[320px] mx-auto rounded-2xl overflow-hidden bg-black/60 border border-cyan-500/30 cursor-grab active:cursor-grabbing shadow-inner flex items-center justify-center select-none touch-none"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
         >
           <canvas ref={canvasRef} className="pointer-events-none" />
 

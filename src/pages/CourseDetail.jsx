@@ -88,9 +88,9 @@ export default function CourseDetail() {
     "name": snippet.title,
     "description": description?.slice(0, 250),
     "provider": {
-      "@type": "CollegeOrUniversity",
-      "name": "Zewail City of Science and Technology",
-      "sameAs": "https://www.zewailcity.edu.eg"
+      "@type": "EducationalOrganization",
+      "name": "Zewail City OpenCourseWare",
+      "sameAs": "https://www.youtube.com/@ZCOCW"
     },
     "hasCourseInstance": {
       "@type": "CourseInstance",

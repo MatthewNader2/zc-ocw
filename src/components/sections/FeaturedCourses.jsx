@@ -5,10 +5,17 @@ import CourseCard from "@/components/ui/CourseCard";
 import { CourseCardSkeleton } from "@/components/ui/LoadingSpinner";
 import ScrollReveal from "@/components/ui/ScrollReveal";
 import { getPlaylistCategory } from "@/data/profileHelpers";
+import { useEditablePage } from "@/hooks/useEditablePage";
+import { DEFAULT_SITE_SETTINGS } from "@/data/siteSettings";
 import ParticleBackground from "@/components/ui/ParticleBackground";
 
 export default function FeaturedCourses() {
   const { data, isLoading, isError } = usePlaylists();
+  const { content: siteContent } = useEditablePage("site_settings", DEFAULT_SITE_SETTINGS);
+
+  const title = siteContent?.featuredCoursesTitle || DEFAULT_SITE_SETTINGS.featuredCoursesTitle;
+  const category = siteContent?.featuredCoursesCategory || DEFAULT_SITE_SETTINGS.featuredCoursesCategory;
+
   const courses =
     data?.pages?.[0]?.items
       ?.filter((c) => getPlaylistCategory(c.id) === "course")
@@ -20,10 +27,10 @@ export default function FeaturedCourses() {
         <ScrollReveal className="flex items-end justify-between mb-12">
           <div>
             <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">
-              Open CourseWare
+              {category}
             </p>
             <h2 className="font-display text-4xl md:text-5xl text-ink dark:text-white font-bold">
-              Latest Courses
+              {title}
             </h2>
           </div>
           <Link

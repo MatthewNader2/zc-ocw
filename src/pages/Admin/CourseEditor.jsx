@@ -33,6 +33,7 @@ export default function AdminCourseEditor() {
   const { getCourseData, saveCourseData, allSchools, allPrograms } = useAdminData();
   const [saved, setSaved] = useState(false);
   const [form, setForm] = useState({
+    category: "course",
     schoolId: "",
     programId: "",
     courseCode: "",
@@ -44,9 +45,8 @@ export default function AdminCourseEditor() {
   });
 
   const auto = course ? detectFromTitle(course.snippet.title) : null;
-  const profilerData =
-    autoProfiles.results?.find((r) => r.playlistId === playlistId)?.suggested ||
-    {};
+  const profilerRecord = autoProfiles.results?.find((r) => r.playlistId === playlistId);
+  const profilerData = profilerRecord?.suggested || {};
   const programs = allPrograms[form.schoolId] || [];
 
   // Combine runtime detection with our saved static profiler data
@@ -64,6 +64,7 @@ export default function AdminCourseEditor() {
     if (!course) return;
     const s = getCourseData(playlistId);
     setForm({
+      category: s.category || profilerRecord?.category || "course",
       // Notice how we use || instead of ?? to ignore empty strings from saved data
       schoolId: s.schoolId || detected.schoolId || "",
       programId: s.programId || detected.programId || "",
@@ -72,7 +73,7 @@ export default function AdminCourseEditor() {
       semester: s.semester || "",
       level: s.level || "",
       description: s.description || course.snippet.description || "",
-      tags: (s.tags?.length ? s.tags : detected.tags).join(", "),
+      tags: (s.tags?.length ? s.tags : (detected.tags || [])).join(", "),
     });
   }, [course?.id]); // eslint-disable-line
 
@@ -101,7 +102,7 @@ export default function AdminCourseEditor() {
       programId: detected.programId || f.programId,
       courseCode: detected.code || f.courseCode,
       instructor: detected.instructor || f.instructor,
-      tags: detected.tags.join(", ") || f.tags,
+      tags: detected.tags?.length ? detected.tags.join(", ") : f.tags,
     }));
     setSaved(false);
   }
@@ -117,7 +118,7 @@ export default function AdminCourseEditor() {
   return (
     <>
       <Helmet>
-        <title>Edit: {course.snippet.title} — Admin</title>
+        <title>Edit: {course.snippet.title} — Admin ZC OCW</title>
       </Helmet>
 
       <div className="page-header">
@@ -126,7 +127,7 @@ export default function AdminCourseEditor() {
             to="/admin"
             className="inline-flex items-center gap-1.5 text-white/40 hover:text-white text-sm mb-4 transition-colors"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
+            <ArrowLeft className="w-3.5 h-3.5" /> Back to Dashboard
           </Link>
           <h1 className="font-display text-2xl md:text-3xl font-bold leading-snug line-clamp-2">
             {course.snippet.title}
@@ -163,16 +164,46 @@ export default function AdminCourseEditor() {
               )}
             </div>
 
+            {/* Section / Category Selector */}
+            <div>
+              <FieldLabel hint="Choose whether this playlist appears under Courses or Interviews/Special Content">
+                Section / Category
+              </FieldLabel>
+              <select
+                value={form.category}
+                onChange={(e) => set("category", e.target.value)}
+                className="input font-semibold text-ocean-700 dark:text-ocean-300"
+              >
+                <option value="course">🎓 Academic Course (Listed in Courses & Departments)</option>
+                <option value="interviews">🎙️ Interviews & Conversations (Listed in Interviews)</option>
+                <option value="public-lectures">🏛️ Public Lectures & Seminars (Listed in Interviews)</option>
+                <option value="special">✨ Special Series & Workshops (Listed in Interviews)</option>
+                <option value="club">👥 Student Activity & Clubs (Listed in Interviews)</option>
+              </select>
+            </div>
+
             {/* School + Program */}
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <FieldLabel>School</FieldLabel>
                 <select
                   value={form.schoolId}
-                  onChange={(e) => set("schoolId", e.target.value)}
+                  onChange={(e) => {
+                    const newSchool = e.target.value;
+                    setForm((f) => ({
+                      ...f,
+                      schoolId: newSchool,
+                      programId: (allPrograms[newSchool] || []).some(
+                        (p) => p.id === f.programId,
+                      )
+                        ? f.programId
+                        : "",
+                    }));
+                    setSaved(false);
+                  }}
                   className="input"
                 >
-                  <option value="">— Select —</option>
+                  <option value="">— Select School —</option>
                   {allSchools.map((s) => (
                     <option key={s.id} value={s.id}>
                       {s.icon} {s.label}
@@ -188,7 +219,7 @@ export default function AdminCourseEditor() {
                   className="input"
                   disabled={!form.schoolId}
                 >
-                  <option value="">— Select —</option>
+                  <option value="">— Select Program —</option>
                   {programs.map((p) => (
                     <option key={p.id} value={p.id}>
                       {p.label}

@@ -1,18 +1,24 @@
 import { Link } from "react-router-dom";
 import {
-  GraduationCap,
   Youtube,
   Facebook,
-  Globe,
+  Linkedin,
   Mail,
   Bug,
   Heart,
-  Users,
 } from "lucide-react";
+import { useEditablePage } from "@/hooks/useEditablePage";
+import { DEFAULT_SITE_SETTINGS } from "@/data/siteSettings";
 
 export default function Footer() {
   const year = new Date().getFullYear();
-  const ytUrl = `https://www.youtube.com/channel/${import.meta.env.VITE_YOUTUBE_CHANNEL_ID}`;
+  const { content: siteContent } = useEditablePage("site_settings", DEFAULT_SITE_SETTINGS);
+
+  const fbUrl = siteContent?.facebookUrl || DEFAULT_SITE_SETTINGS.facebookUrl;
+  const linkedinUrl = siteContent?.linkedinUrl || DEFAULT_SITE_SETTINGS.linkedinUrl;
+  const ytUrl = siteContent?.youtubeUrl || DEFAULT_SITE_SETTINGS.youtubeUrl;
+  const email = siteContent?.contactEmail || DEFAULT_SITE_SETTINGS.contactEmail;
+  const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}`;
 
   return (
     <footer className="bg-ocean-950 text-white/60 border-t border-white/6">
@@ -26,12 +32,12 @@ export default function Footer() {
                 ZC <span className="text-ocean-400">Open CourseWare</span>
               </p>
               <p className="text-xs text-white/35 mt-0.5">
-                University of Science and Technology
+                Independent Student-Led Initiative
               </p>
             </div>
           </Link>
           <p className="text-sm leading-relaxed max-w-xs mb-5">
-            Free access to lecture videos and course materials from Zewail City,
+            Free access to university lecture videos and course materials,
             advancing open education across Egypt and the Arab world.
           </p>
           <div className="flex items-center gap-3">
@@ -39,28 +45,31 @@ export default function Footer() {
               href={ytUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="YouTube Channel"
               className="w-9 h-9 rounded-xl bg-white/8 flex items-center justify-center
                           hover:bg-red-500/20 hover:text-red-400 transition-all"
             >
               <Youtube className="w-4 h-4" />
             </a>
             <a
-              href="https://www.facebook.com/zc.opencourseware.9"
+              href={fbUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="Facebook Page"
               className="w-9 h-9 rounded-xl bg-white/8 flex items-center justify-center
                           hover:bg-blue-500/20 hover:text-blue-400 transition-all"
             >
               <Facebook className="w-4 h-4" />
             </a>
             <a
-              href="https://www.zewailcity.edu.eg"
+              href={linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label="LinkedIn Page"
               className="w-9 h-9 rounded-xl bg-white/8 flex items-center justify-center
-                          hover:bg-ocean-400/20 hover:text-ocean-400 transition-all"
+                          hover:bg-sky-500/20 hover:text-sky-400 transition-all"
             >
-              <Globe className="w-4 h-4" />
+              <Linkedin className="w-4 h-4" />
             </a>
           </div>
         </div>
@@ -91,30 +100,37 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* University + Support */}
+        {/* Community + Support */}
         <div>
           <h4 className="font-display text-white font-semibold text-sm mb-4">
-            University
+            Community
           </h4>
           <ul className="space-y-2.5 text-sm mb-6">
-            {[
-              ["https://www.zewailcity.edu.eg", "ZC Website"],
-              [ytUrl, "YouTube Channel"],
-              ["/about", "About OCW"],
-              ["/acknowledgments", "Acknowledgments"],
-              ["/settings", "Settings"],
-            ].map(([href, label]) => (
-              <li key={href}>
-                <a
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel="noopener noreferrer"
-                  className="hover:text-ocean-300 transition-colors"
-                >
-                  {label}
-                </a>
-              </li>
-            ))}
+            <li>
+              <Link to="/about" className="hover:text-ocean-300 transition-colors">
+                About ZC-OCW
+              </Link>
+            </li>
+            <li>
+              <Link to="/acknowledgments" className="hover:text-ocean-300 transition-colors">
+                Acknowledgments
+              </Link>
+            </li>
+            <li>
+              <a href={linkedinUrl} target="_blank" rel="noopener noreferrer" className="hover:text-ocean-300 transition-colors">
+                LinkedIn
+              </a>
+            </li>
+            <li>
+              <a href={fbUrl} target="_blank" rel="noopener noreferrer" className="hover:text-ocean-300 transition-colors">
+                Facebook Page
+              </a>
+            </li>
+            <li>
+              <Link to="/settings" className="hover:text-ocean-300 transition-colors">
+                Settings
+              </Link>
+            </li>
           </ul>
 
           <h4 className="font-display text-white font-semibold text-sm mb-4">
@@ -139,10 +155,13 @@ export default function Footer() {
             </li>
             <li>
               <a
-                href="mailto:zcocw@zewailcity.edu.eg"
+                href={gmailComposeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Compose in Gmail"
                 className="hover:text-ocean-300 transition-colors flex items-center gap-1.5"
               >
-                <Mail className="w-3.5 h-3.5" /> zcocw@zewailcity.edu.eg
+                <Mail className="w-3.5 h-3.5" /> {email}
               </a>
             </li>
           </ul>

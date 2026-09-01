@@ -250,3 +250,46 @@ export function getAcknowledgmentsConfig() {
 export function saveAcknowledgmentsConfig(config) {
   set('acknowledgments_config', config)
 }
+
+// ── Backup & Data Management ──────────────────────────────────────────────────
+
+export function downloadBackup() {
+  const allData = {}
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key && key.startsWith(NS)) {
+      allData[key.replace(NS, '')] = parse(localStorage.getItem(key))
+    }
+  }
+  const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `zcocw_backup_${new Date().toISOString().split('T')[0]}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+export function restoreBackup(jsonString) {
+  try {
+    const data = JSON.parse(jsonString)
+    if (!data || typeof data !== 'object') return false
+    for (const [key, value] of Object.entries(data)) {
+      set(key, value)
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function clear() {
+  const keysToRemove = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key && key.startsWith(NS)) {
+      keysToRemove.push(key)
+    }
+  }
+  keysToRemove.forEach((key) => localStorage.removeItem(key))
+}

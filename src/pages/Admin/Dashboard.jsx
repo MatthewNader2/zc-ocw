@@ -205,9 +205,13 @@ export default function AdminDashboard() {
               </p>
             </Link>
 
-            <Link
-              to="/admin/courses"
-              className="card p-6 hover:shadow-lg transition-all group border border-slate-100 dark:border-white/10"
+            <a
+              href="#all-courses"
+              onClick={(e) => {
+                e.preventDefault()
+                document.getElementById('all-courses')?.scrollIntoView({ behavior: 'smooth' })
+              }}
+              className="card p-6 hover:shadow-lg transition-all group border border-slate-100 dark:border-white/10 cursor-pointer"
             >
               <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center mb-4 group-hover:bg-emerald-500/20 transition-colors">
                 <Edit2 className="w-6 h-6 text-emerald-600" />
@@ -218,7 +222,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-ink-ghost">
                 Edit metadata, add materials & books
               </p>
-            </Link>
+            </a>
 
             <Link
               to="/admin/settings"
@@ -237,7 +241,7 @@ export default function AdminDashboard() {
 
         {/* Course list */}
         <ScrollReveal delay="0.2s">
-          <h2 className="font-display text-2xl text-ink dark:text-white mb-5">All Courses</h2>
+          <h2 id="all-courses" className="font-display text-2xl text-ink dark:text-white mb-5 scroll-mt-20">All Courses</h2>
         </ScrollReveal>
 
         {isLoading ? (

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
+import * as cloudflare from "@/services/cloudflare";
 import {
   Bug,
   Mail,
@@ -22,27 +23,28 @@ export default function FeedbackViewer() {
 
   useEffect(() => {
     if (!isAdmin) return;
+    let active = true;
     setLoading(true);
     setError(null);
 
-    const typeParam = filter === "all" ? "" : `?type=${filter}`;
-    fetch(`${import.meta.env.VITE_WORKER_URL}/api/feedback${typeParam}`, {
-      headers: {
-        Authorization: `Bearer ${import.meta.env.VITE_ADMIN_PASSWORD}`,
-      },
-    })
-      .then(async (r) => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-      })
+    cloudflare
+      .fetchFeedback(filter)
       .then((data) => {
-        setItems(Array.isArray(data) ? data : []);
-        setLoading(false);
+        if (active) {
+          setItems(Array.isArray(data) ? data : []);
+          setLoading(false);
+        }
       })
       .catch((e) => {
-        setError(e.message);
-        setLoading(false);
+        if (active) {
+          setError(e.message);
+          setLoading(false);
+        }
       });
+
+    return () => {
+      active = false;
+    };
   }, [filter, isAdmin]);
 
   if (!isAdmin) {

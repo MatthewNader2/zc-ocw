@@ -252,6 +252,15 @@ export async function revokeAdmin(email) {
   return call(`admins/${encodeURIComponent(email)}`, { method: "DELETE", admin: true });
 }
 
+// ── Admin Feedback / Bug Reports ─────────────────────────────────────────────
+
+export async function fetchFeedback(type) {
+  if (!isConfigured) return [];
+  const query = type && type !== "all" ? `?type=${encodeURIComponent(type)}` : "";
+  return (await call(`feedback${query}`, { admin: true })) ?? [];
+}
+
+
 // ── Playlist Profiles ────────────────────────────────────────────────────────
 
 export async function fetchProfiles() {

@@ -1,12 +1,55 @@
 import { useState, useEffect } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
-import { Settings, ArrowLeft, Download, Upload, Trash2, Key, Youtube, Plus, GraduationCap, BookOpen, CheckCircle2, Image as ImageIcon, Heart, Users, Award, Loader2, UserPlus, ShieldCheck } from 'lucide-react'
+import {
+  Settings,
+  ArrowLeft,
+  Download,
+  Upload,
+  Trash2,
+  Key,
+  Youtube,
+  Plus,
+  GraduationCap,
+  BookOpen,
+  CheckCircle2,
+  Image as ImageIcon,
+  Heart,
+  Users,
+  Award,
+  Loader2,
+  UserPlus,
+  ShieldCheck,
+  GripVertical,
+  ChevronUp,
+  ChevronDown,
+  ChevronsUp,
+  ChevronsDown,
+  Pencil,
+  X,
+  Tv,
+  ListPlus,
+  Sparkles,
+  PlaySquare,
+} from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useAdminData } from '@/context/AdminDataContext'
 import ImageCropperModal from '@/components/ui/ImageCropperModal'
 import * as storage from '@/services/storage'
 import * as cloudflare from '@/services/cloudflare'
+import clsx from 'clsx'
+
+import { DEFAULT_ABOUT } from '@/pages/About'
+import { DEFAULT_SITE_SETTINGS } from '@/data/siteSettings'
+
+export const DEFAULT_HOME = {
+  heroTitle: 'Knowledge Unlocked',
+  heroSubtitle: 'Free lecture videos and course materials from Zewail City of Science and Technology — open to every learner.',
+  featuredVideoUrl: 'https://youtu.be/Kr1P4Awv2lE',
+  featuredVideoBadge: 'Featured Spotlight',
+  featuredVideoTitle: 'What is ZC OCW?',
+  featuredVideoDescription: 'Learn how Zewail City students and faculty came together to build an open educational platform carrying the knowledge of remarkable professors and researchers far beyond the classroom.',
+}
 
 export default function AdminSettings() {
   const { logout } = useAuth()
@@ -22,31 +65,48 @@ export default function AdminSettings() {
     acknowledgmentsConfig,
     updateAcknowledgmentsConfig,
     uploadAcknowledgmentImage,
+    saveCourseData,
+    getCourseData,
   } = useAdminData()
 
   const [exported, setExported] = useState(false)
   const [imported, setImported] = useState(false)
   const [cleared,  setCleared]  = useState(false)
 
-  // Slide form state
+  // 🖼️ Slide form state & editing
   const [slideForm, setSlideForm] = useState({ url: '', title: '', caption: '' })
+  const [editingSlideId, setEditingSlideId] = useState(null)
   const [ackSaved, setAckSaved] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState('')
 
-  // Header form state
-  const [headerForm, setHeaderForm] = useState({
+  // 📝 Header form state
+  const [headerForm, setHeaderForm] = useState(() => ({
     headerTitle: acknowledgmentsConfig?.headerTitle || '',
     headerSubtitle: acknowledgmentsConfig?.headerSubtitle || '',
-  })
+  }))
   const [headerSaved, setHeaderSaved] = useState(false)
 
-  // Team member form state
+  useEffect(() => {
+    if (acknowledgmentsConfig) {
+      setHeaderForm({
+        headerTitle: acknowledgmentsConfig.headerTitle || '',
+        headerSubtitle: acknowledgmentsConfig.headerSubtitle || '',
+      })
+    }
+  }, [acknowledgmentsConfig])
+
+  // 👥 Team member form state & editing
   const [teamForm, setTeamForm] = useState({ name: '', role: '', school: '', photoUrl: '' })
+  const [editingTeamId, setEditingTeamId] = useState(null)
   const [teamSaved, setTeamSaved] = useState(false)
   const [uploadingTeamPhoto, setUploadingTeamPhoto] = useState(false)
   const [teamPhotoError, setTeamPhotoError] = useState('')
   const [cropImageSrc, setCropImageSrc] = useState(null)
+
+  // Drag & drop state for team members
+  const [draggedTeamIdx, setDraggedTeamIdx] = useState(null)
+  const [dragOverTeamIdx, setDragOverTeamIdx] = useState(null)
 
   function handleTeamPhotoFileChange(e) {
     const file = e.target.files?.[0]
@@ -79,11 +139,38 @@ export default function AdminSettings() {
     }
   }
 
-  // Sponsor form state
+  // 🏆 Sponsor form state
   const [sponsorForm, setSponsorForm] = useState({ name: '', contribution: '' })
   const [sponsorSaved, setSponsorSaved] = useState(false)
 
-  // Admin team management
+  // 📺 Quick Category Assignment Tool state
+  const [assignPlaylistInput, setAssignPlaylistInput] = useState('')
+  const [assignCategory, setAssignCategory] = useState('interviews')
+  const [assignSaved, setAssignSaved] = useState(false)
+
+  function handleAssignPlaylistCategory(e) {
+    e.preventDefault()
+    let raw = assignPlaylistInput.trim()
+    if (!raw) return
+    let pid = raw
+    if (raw.includes('list=')) {
+      const match = raw.match(/list=([a-zA-Z0-9_-]+)/)
+      if (match) pid = match[1]
+    } else if (raw.includes('youtu.be/') || raw.includes('watch?v=')) {
+      const match = raw.match(/(?:youtu\.be\/|watch\?v=)([a-zA-Z0-9_-]+)/)
+      if (match) pid = match[1]
+    }
+    const currentData = getCourseData(pid)
+    saveCourseData(pid, {
+      ...currentData,
+      category: assignCategory,
+    })
+    setAssignSaved(true)
+    setAssignPlaylistInput('')
+    setTimeout(() => setAssignSaved(false), 3500)
+  }
+
+  // 🛡️ Admin team management
   const [admins, setAdmins] = useState([])
   const [adminsLoading, setAdminsLoading] = useState(true)
   const [adminsError, setAdminsError] = useState('')
@@ -91,25 +178,22 @@ export default function AdminSettings() {
   const [grantingAdmin, setGrantingAdmin] = useState(false)
 
   // 📝 CMS Page Content Manager state
-  const [cmsPage, setCmsPage] = useState('about')
+  const [cmsPage, setCmsPage] = useState('site_settings')
   const [cmsSaved, setCmsSaved] = useState(false)
-  const [aboutForm, setAboutForm] = useState({
-    headerSubtitle: "ZC OCW makes Zewail City's academic content freely available — lecture videos, course materials, and more — inspired by MIT OpenCourseWare and the global open education movement.",
-    missionTitle: "Our Mission",
-    missionBody: "Zewail City was founded on the belief that access to world-class education is a right, not a privilege. ZC OCW extends that mission to the digital world — making our courses available to students across Egypt, the Arab world, and beyond.",
-    licenseTitle: "License",
-    licenseBody: "All course materials on ZC OCW are shared under a Creative Commons BY-NC-SA 4.0 license. You are free to use, adapt, and share them for non-commercial purposes with proper attribution.",
-  })
-  const [homeForm, setHomeForm] = useState({
-    heroTitle: 'Open Courseware for Zewail City',
-    heroSubtitle: 'Access world-class lectures, course notes, and textbooks from Science, Engineering, CSAI, and Business.',
-  })
+  const [siteSettingsForm, setSiteSettingsForm] = useState(() => storage.get('page_content_site_settings', DEFAULT_SITE_SETTINGS))
+  const [aboutForm, setAboutForm] = useState(() => storage.get('page_content_about', DEFAULT_ABOUT))
+  const [homeForm, setHomeForm] = useState(() => storage.get('page_content_home', DEFAULT_HOME))
 
   async function handleSaveCms(e) {
     e.preventDefault()
     try {
-      const dataToSave = cmsPage === 'about' ? aboutForm : homeForm
-      await cloudflare.upsertPageContent(cmsPage, dataToSave)
+      const dataToSave = cmsPage === 'about' ? aboutForm : cmsPage === 'home' ? homeForm : siteSettingsForm
+      // Persist locally first
+      storage.set(`page_content_${cmsPage}`, dataToSave)
+      // Persist to Cloudflare Worker D1
+      if (cloudflare.isConfigured) {
+        await cloudflare.upsertPageContent(cmsPage, dataToSave)
+      }
       setCmsSaved(true)
       setTimeout(() => setCmsSaved(false), 3000)
     } catch (err) {
@@ -133,109 +217,123 @@ export default function AdminSettings() {
         const bodyCount = rows.length || 11
         setSkyTestStatus({
           success: true,
-          message: `Connected! Source: AstronomyAPI (${bodyCount} celestial bodies tracking in real time)`
-        })
-      } else if (data?.error) {
-        setSkyTestStatus({
-          success: false,
-          message: `Astronomy API Error: ${data.error}`
+          message: `✓ Connected to Astronomy API! Retrieved live ephemeris positions for ${bodyCount} solar system bodies.`,
         })
       } else {
         setSkyTestStatus({
           success: false,
-          message: data?.message || 'Returned fallback data. Ensure ASTRONOMY_API_APP_ID & ASTRONOMY_API_APP_SECRET secrets are bound to the Worker.'
+          message: `Worker responded, but Astronomy API credentials may be unconfigured or expired.`,
         })
       }
-    } catch (e) {
+    } catch (err) {
       setSkyTestStatus({
         success: false,
-        message: 'Sky API fetch error: ' + e.message
+        message: `Connection failed: ${err.message}`,
       })
     } finally {
       setTestingSky(false)
     }
   }
 
+  // Load admins on mount
   useEffect(() => {
-    let active = true
-    cloudflare.fetchAdmins()
-      .then((rows) => { if (active) setAdmins(rows || []) })
-      .catch((e) => { if (active) setAdminsError(e.message) })
-      .finally(() => { if (active) setAdminsLoading(false) })
-
-    cloudflare.fetchPageContent('about').then((data) => {
-      if (active && data) setAboutForm((prev) => ({ ...prev, ...data }))
-    }).catch(() => {})
-
-    cloudflare.fetchPageContent('home').then((data) => {
-      if (active && data) setHomeForm((prev) => ({ ...prev, ...data }))
-    }).catch(() => {})
-
-    return () => { active = false }
+    let unmounted = false
+    async function loadAdmins() {
+      setAdminsLoading(true)
+      setAdminsError('')
+      try {
+        const list = await cloudflare.fetchAdmins()
+        if (!unmounted) setAdmins(list)
+      } catch (e) {
+        if (!unmounted) setAdminsError(e.message || 'Failed to load admin team')
+      } finally {
+        if (!unmounted) setAdminsLoading(false)
+      }
+    }
+    loadAdmins()
+    return () => { unmounted = true }
   }, [])
 
   async function handleGrantAdmin(e) {
     e.preventDefault()
-    const email = newAdminEmail.trim().toLowerCase()
-    if (!email || !email.includes('@')) return
+    if (!newAdminEmail.trim()) return
     setGrantingAdmin(true)
     setAdminsError('')
     try {
-      await cloudflare.grantAdmin(email)
-      setAdmins((prev) => [...prev, { email, added_at: new Date().toISOString() }])
+      const res = await cloudflare.grantAdmin(newAdminEmail.trim())
+      setAdmins(res.admins || [])
       setNewAdminEmail('')
     } catch (e) {
-      setAdminsError(e.message)
+      setAdminsError(e.message || 'Failed to grant admin access')
     } finally {
       setGrantingAdmin(false)
     }
   }
 
   async function handleRevokeAdmin(email) {
-    if (!confirm(`Remove admin access for ${email}?`)) return
+    if (!confirm(`Revoke admin access for ${email}?`)) return
     try {
-      await cloudflare.revokeAdmin(email)
-      setAdmins((prev) => prev.filter((a) => a.email !== email))
+      const res = await cloudflare.revokeAdmin(email)
+      setAdmins(res.admins || [])
     } catch (e) {
-      setAdminsError(e.message)
+      setAdminsError(e.message || 'Failed to revoke admin access')
     }
   }
 
-
-
-  // School form state
+  // Custom School Form State
   const [schoolForm, setSchoolForm] = useState({
     id: '',
     label: '',
     short: '',
-    icon: '🎓',
+    icon: '🏛️',
     description: '',
-    accent: '#0284c7'
+    colorBg: 'bg-blue-600',
+    colorLight: 'bg-blue-50',
+    colorText: 'text-blue-700',
+    colorBorder: 'border-blue-200',
   })
   const [schoolSaved, setSchoolSaved] = useState(false)
 
-  // Program form state
+  // Custom Program Form State
   const [programForm, setProgramForm] = useState({
     schoolId: '',
     id: '',
     label: '',
-    prefixes: ''
+    prefixes: '',
   })
   const [programSaved, setProgramSaved] = useState(false)
 
   function handleAddSchool(e) {
     e.preventDefault()
     if (!schoolForm.id || !schoolForm.label) {
-      alert('Please fill out at least School ID and School Name.')
+      alert('Please fill out School ID and Label.')
       return
     }
-    const cleanId = schoolForm.id.toLowerCase().replace(/[^a-z0-9_]/g, '')
+    const cleanId = schoolForm.id.toLowerCase().replace(/[^a-z0-9_]/g, '_')
     addCustomSchool({
-      ...schoolForm,
       id: cleanId,
-      short: schoolForm.short || cleanId.toUpperCase()
+      label: schoolForm.label,
+      short: schoolForm.short || cleanId.toUpperCase(),
+      icon: schoolForm.icon || '🏛️',
+      description: schoolForm.description,
+      color: {
+        bg: schoolForm.colorBg,
+        light: schoolForm.colorLight,
+        text: schoolForm.colorText,
+        border: schoolForm.colorBorder,
+      },
     })
-    setSchoolForm({ id: '', label: '', short: '', icon: '🎓', description: '', accent: '#0284c7' })
+    setSchoolForm({
+      id: '',
+      label: '',
+      short: '',
+      icon: '🏛️',
+      description: '',
+      colorBg: 'bg-blue-600',
+      colorLight: 'bg-blue-50',
+      colorText: 'text-blue-700',
+      colorBorder: 'border-blue-200',
+    })
     setSchoolSaved(true)
     setTimeout(() => setSchoolSaved(false), 3000)
   }
@@ -243,136 +341,112 @@ export default function AdminSettings() {
   function handleAddProgram(e) {
     e.preventDefault()
     if (!programForm.schoolId || !programForm.id || !programForm.label) {
-      alert('Please select a School and fill out Major ID and Major Name.')
+      alert('Please select a school, and provide program ID and Label.')
       return
     }
-    const cleanId = programForm.id.toLowerCase().replace(/[^a-z0-9_]/g, '')
+    const cleanId = programForm.id.toLowerCase().replace(/[^a-z0-9_]/g, '_')
     const prefixArray = programForm.prefixes
       .split(',')
-      .map(p => p.trim().toUpperCase())
+      .map((p) => p.trim().toUpperCase())
       .filter(Boolean)
 
     addCustomProgram(programForm.schoolId, {
       id: cleanId,
       label: programForm.label,
-      prefixes: prefixArray
+      prefixes: prefixArray,
     })
-    setProgramForm({ schoolId: '', id: '', label: '', prefixes: '' })
+    setProgramForm({
+      schoolId: programForm.schoolId,
+      id: '',
+      label: '',
+      prefixes: '',
+    })
     setProgramSaved(true)
     setTimeout(() => setProgramSaved(false), 3000)
   }
 
-  function handleExport() {
-    const data = {
-      course_overrides:  storage.get('course_overrides', {}),
-      custom_schools:    storage.getCustomSchools(),
-      custom_programs:   storage.getCustomPrograms(),
-      exportedAt:        new Date().toISOString(),
-      version:           '3.1',
-    }
-    const overrideIds = Object.keys(data.course_overrides)
-    const materials = {}
-    const books = {}
-    for (const id of overrideIds) {
-      materials[id] = storage.getMaterials(id)
-      books[id]     = storage.getBooks(id)
-    }
-    data.materials = materials
-    data.books     = books
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url  = URL.createObjectURL(blob)
-    const a    = document.createElement('a')
-    a.href     = url
-    a.download = `zcocw-data-${new Date().toISOString().slice(0,10)}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-    setExported(true)
-    setTimeout(() => setExported(false), 3000)
-  }
-
-  function handleImport(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      try {
-        const data = JSON.parse(ev.target.result)
-        if (data.course_overrides) storage.set('course_overrides', data.course_overrides)
-        if (data.custom_schools) storage.saveCustomSchools(data.custom_schools)
-        if (data.custom_programs) storage.saveCustomPrograms(data.custom_programs)
-        if (data.materials) {
-          for (const [id, mats] of Object.entries(data.materials)) {
-            storage.set(`materials_${id}`, mats)
-          }
-        }
-        if (data.books) {
-          for (const [id, bks] of Object.entries(data.books)) {
-            storage.set(`books_${id}`, bks)
-          }
-        }
-        setImported(true)
-        setTimeout(() => { setImported(false); window.location.reload() }, 2000)
-      } catch {
-        alert('Invalid file format.')
-      }
-    }
-    reader.readAsText(file)
-  }
-
-  function handleClearAll() {
-    if (!confirm('This will delete ALL course overrides, custom schools/majors, materials, and books. Are you sure?')) return
-    storage.remove('course_overrides')
-    storage.remove('custom_schools')
-    storage.remove('custom_programs')
-    setCleared(true)
-    setTimeout(() => { setCleared(false); window.location.reload() }, 2000)
-  }
-
-  function handleAddSlide(e) {
-    e.preventDefault()
-    if (!slideForm.url || !slideForm.title) {
-      alert('Please fill out Image URL and Title.')
-      return
-    }
-    const newSlide = {
-      id: `slide_${Date.now()}`,
-      url: slideForm.url,
-      title: slideForm.title,
-      caption: slideForm.caption,
-    }
-    const nextConfig = {
-      ...acknowledgmentsConfig,
-      slides: [...(acknowledgmentsConfig?.slides || []), newSlide],
-    }
-    updateAcknowledgmentsConfig(nextConfig)
-    setSlideForm({ url: '', title: '', caption: '' })
-    setAckSaved(true)
-    setTimeout(() => setAckSaved(false), 3000)
-  }
-
-  function handleDeleteSlide(slideId) {
-    const nextConfig = {
-      ...acknowledgmentsConfig,
-      slides: (acknowledgmentsConfig?.slides || []).filter((s) => s.id !== slideId),
-    }
-    updateAcknowledgmentsConfig(nextConfig)
-  }
-
+  // Slide Handlers
   async function handleSlideFileChange(e) {
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
     setUploadError('')
     try {
-      const url = await uploadAcknowledgmentImage(file)
-      setSlideForm((f) => ({ ...f, url }))
+      const publicUrl = await uploadAcknowledgmentImage(file)
+      if (publicUrl) {
+        setSlideForm((f) => ({ ...f, url: publicUrl }))
+      } else {
+        throw new Error('Upload did not return a valid public URL')
+      }
     } catch (err) {
-      setUploadError(err.message || 'Upload failed')
+      setUploadError(err.message || 'Image upload failed')
     } finally {
       setUploading(false)
-      e.target.value = '' // allow re-selecting the same file later
+      e.target.value = ''
     }
+  }
+
+  function handleStartEditSlide(s) {
+    setEditingSlideId(s.id)
+    setSlideForm({
+      url: s.url || '',
+      title: s.title || '',
+      caption: s.caption || '',
+    })
+    document.getElementById('slide-form')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function handleCancelEditSlide() {
+    setEditingSlideId(null)
+    setSlideForm({ url: '', title: '', caption: '' })
+  }
+
+  function handleSaveSlide(e) {
+    e.preventDefault()
+    if (!slideForm.url || !slideForm.title) {
+      alert('Please fill out Image URL and Title.')
+      return
+    }
+    const currentSlides = acknowledgmentsConfig?.slides || []
+    let nextSlides = []
+    if (editingSlideId) {
+      nextSlides = currentSlides.map((s) =>
+        s.id === editingSlideId
+          ? { ...s, url: slideForm.url.trim(), title: slideForm.title.trim(), caption: slideForm.caption.trim() || undefined }
+          : s
+      )
+      setEditingSlideId(null)
+    } else {
+      const newSlide = {
+        id: `slide_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        url: slideForm.url.trim(),
+        title: slideForm.title.trim(),
+        caption: slideForm.caption.trim() || undefined,
+      }
+      nextSlides = [...currentSlides, newSlide]
+    }
+    updateAcknowledgmentsConfig({
+      ...acknowledgmentsConfig,
+      slides: nextSlides,
+    })
+    setSlideForm({ url: '', title: '', caption: '' })
+    setAckSaved(true)
+    setTimeout(() => setAckSaved(false), 3000)
+  }
+
+  function handleDeleteSlide(id) {
+    updateAcknowledgmentsConfig({
+      ...acknowledgmentsConfig,
+      slides: (acknowledgmentsConfig?.slides || []).filter((s) => s.id !== id),
+    })
+  }
+
+  function handleMoveSlide(fromIndex, toIndex) {
+    const currentSlides = [...(acknowledgmentsConfig?.slides || [])]
+    if (toIndex < 0 || toIndex >= currentSlides.length || fromIndex === toIndex) return
+    const [moved] = currentSlides.splice(fromIndex, 1)
+    currentSlides.splice(toIndex, 0, moved)
+    updateAcknowledgmentsConfig({ ...acknowledgmentsConfig, slides: currentSlides })
   }
 
   function handleSaveHeader(e) {
@@ -386,16 +460,58 @@ export default function AdminSettings() {
     setTimeout(() => setHeaderSaved(false), 3000)
   }
 
-  function handleAddTeamMember(e) {
+  // 👥 Team Handlers (Reorder & In-place Edit)
+  function handleStartEditTeamMember(m) {
+    setEditingTeamId(m.id)
+    setTeamForm({
+      name: m.name || '',
+      role: m.role || '',
+      school: m.school || '',
+      photoUrl: m.photoUrl || '',
+    })
+    document.getElementById('team-member-form')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  function handleCancelEditTeamMember() {
+    setEditingTeamId(null)
+    setTeamForm({ name: '', role: '', school: '', photoUrl: '' })
+  }
+
+  function handleSaveTeamMember(e) {
     e.preventDefault()
     if (!teamForm.name || !teamForm.role) {
       alert('Please fill out at least Name and Role.')
       return
     }
-    const newMember = { id: `team_${Date.now()}`, ...teamForm }
+    const currentTeam = acknowledgmentsConfig?.team || []
+    let nextTeam = []
+    if (editingTeamId) {
+      // Edit in-place — preserving position and ID
+      nextTeam = currentTeam.map((m) =>
+        m.id === editingTeamId
+          ? {
+              ...m,
+              name: teamForm.name.trim(),
+              role: teamForm.role.trim(),
+              school: teamForm.school.trim() || undefined,
+              photoUrl: teamForm.photoUrl.trim() || undefined,
+            }
+          : m
+      )
+      setEditingTeamId(null)
+    } else {
+      const newMember = {
+        id: `team_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        name: teamForm.name.trim(),
+        role: teamForm.role.trim(),
+        school: teamForm.school.trim() || undefined,
+        photoUrl: teamForm.photoUrl.trim() || undefined,
+      }
+      nextTeam = [...currentTeam, newMember]
+    }
     updateAcknowledgmentsConfig({
       ...acknowledgmentsConfig,
-      team: [...(acknowledgmentsConfig?.team || []), newMember],
+      team: nextTeam,
     })
     setTeamForm({ name: '', role: '', school: '', photoUrl: '' })
     setTeamSaved(true)
@@ -403,19 +519,61 @@ export default function AdminSettings() {
   }
 
   function handleDeleteTeamMember(id) {
+    if (editingTeamId === id) {
+      setEditingTeamId(null)
+      setTeamForm({ name: '', role: '', school: '', photoUrl: '' })
+    }
     updateAcknowledgmentsConfig({
       ...acknowledgmentsConfig,
       team: (acknowledgmentsConfig?.team || []).filter((m) => m.id !== id),
     })
   }
 
+  function handleMoveTeamMember(fromIndex, toIndex) {
+    const currentTeam = [...(acknowledgmentsConfig?.team || [])]
+    if (toIndex < 0 || toIndex >= currentTeam.length || fromIndex === toIndex) return
+    const [moved] = currentTeam.splice(fromIndex, 1)
+    currentTeam.splice(toIndex, 0, moved)
+    updateAcknowledgmentsConfig({ ...acknowledgmentsConfig, team: currentTeam })
+  }
+
+  function handleTeamDragStart(e, index) {
+    setDraggedTeamIdx(index)
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('text/plain', index.toString())
+  }
+
+  function handleTeamDragOver(e, index) {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    if (dragOverTeamIdx !== index) {
+      setDragOverTeamIdx(index)
+    }
+  }
+
+  function handleTeamDrop(e, targetIndex) {
+    e.preventDefault()
+    if (draggedTeamIdx === null || draggedTeamIdx === targetIndex) {
+      setDraggedTeamIdx(null)
+      setDragOverTeamIdx(null)
+      return
+    }
+    handleMoveTeamMember(draggedTeamIdx, targetIndex)
+    setDraggedTeamIdx(null)
+    setDragOverTeamIdx(null)
+  }
+
+  // Sponsor Handlers
   function handleAddSponsor(e) {
     e.preventDefault()
     if (!sponsorForm.name) {
       alert('Please fill out at least Name.')
       return
     }
-    const newSponsor = { id: `sponsor_${Date.now()}`, ...sponsorForm }
+    const newSponsor = {
+      id: `sponsor_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      ...sponsorForm,
+    }
     updateAcknowledgmentsConfig({
       ...acknowledgmentsConfig,
       sponsors: [...(acknowledgmentsConfig?.sponsors || []), newSponsor],
@@ -431,6 +589,39 @@ export default function AdminSettings() {
       sponsors: (acknowledgmentsConfig?.sponsors || []).filter((s) => s.id !== id),
     })
   }
+
+  function handleExport() {
+    storage.downloadBackup()
+    setExported(true)
+    setTimeout(() => setExported(false), 3000)
+  }
+
+  function handleImport(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const ok = storage.restoreBackup(ev.target.result)
+      if (ok) {
+        setImported(true)
+        setTimeout(() => window.location.reload(), 800)
+      } else {
+        alert('Invalid backup file.')
+      }
+    }
+    reader.readAsText(file)
+  }
+
+  function handleClearAll() {
+    if (confirm('Are you sure? This will delete ALL local overrides, custom schools, materials, and books.')) {
+      storage.clear()
+      setCleared(true)
+      setTimeout(() => window.location.reload(), 800)
+    }
+  }
+
+  const currentTeamList = acknowledgmentsConfig?.team || []
+  const currentSlidesList = acknowledgmentsConfig?.slides || []
 
   return (
     <>
@@ -451,8 +642,72 @@ export default function AdminSettings() {
 
       <div className="section py-10 max-w-4xl space-y-8">
 
+        {/* 🎙️ Quick Playlist Category Manager (Add to Interviews / Special) */}
+        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card bg-gradient-to-br from-slate-50 to-cyan-50/30 dark:from-night-200/90 dark:to-cyan-950/20">
+          <div className="flex items-center justify-between pb-4 mb-5 border-b border-slate-200/80 dark:border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
+                <PlaySquare className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-ink dark:text-white">Playlist Section & Category Manager</h2>
+                <p className="text-xs text-ink-ghost dark:text-slate-400">Quickly assign any YouTube playlist to Interviews, Public Lectures, or Courses.</p>
+              </div>
+            </div>
+          </div>
+
+          <form onSubmit={handleAssignPlaylistCategory} className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+              <div className="md:col-span-7">
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">
+                  Playlist URL or Playlist ID
+                </label>
+                <input
+                  value={assignPlaylistInput}
+                  onChange={(e) => setAssignPlaylistInput(e.target.value)}
+                  placeholder="https://youtube.com/playlist?list=PL... or PL..."
+                  className="input text-xs"
+                  required
+                />
+              </div>
+
+              <div className="md:col-span-5">
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">
+                  Target Category
+                </label>
+                <select
+                  value={assignCategory}
+                  onChange={(e) => setAssignCategory(e.target.value)}
+                  className="input text-xs font-semibold"
+                >
+                  <option value="interviews">🎙️ Interviews & Conversations</option>
+                  <option value="public-lectures">🏛️ Public Lectures & Keynotes</option>
+                  <option value="special">✨ Special Events & Workshops</option>
+                  <option value="club">👥 Student Club Activities</option>
+                  <option value="course">🎓 Standard Academic Course</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              {assignSaved ? (
+                <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4" /> Category assigned! Appears immediately in {assignCategory === 'course' ? 'Courses' : 'Interviews'}.
+                </span>
+              ) : (
+                <p className="text-[11px] text-ink-ghost dark:text-slate-400">
+                  Tip: You can also fine-tune any course's category directly in the Course Editor.
+                </p>
+              )}
+              <button type="submit" className="btn-primary text-xs gap-2 !py-2">
+                <ListPlus className="w-3.5 h-3.5" /> Save Category
+              </button>
+            </div>
+          </form>
+        </div>
+
         {/* 🖼️ Acknowledgments & Image Carousel Manager */}
-        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+        <div id="slides-manager" className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
           <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
@@ -460,7 +715,7 @@ export default function AdminSettings() {
               </div>
               <div>
                 <h2 className="font-display text-lg font-bold text-ink dark:text-white">Acknowledgments & Image Slides Manager</h2>
-                <p className="text-xs text-ink-ghost dark:text-slate-400">Add or edit image slides, headers, and captions for the Acknowledgments page.</p>
+                <p className="text-xs text-ink-ghost dark:text-slate-400">Add, edit, or reorder image slides and captions for the Acknowledgments page.</p>
               </div>
             </div>
           </div>
@@ -492,13 +747,38 @@ export default function AdminSettings() {
             <button type="submit" className="btn-outline text-xs w-full">Save Header Text</button>
           </form>
 
-          {/* Add Slide Form */}
-          <form onSubmit={handleAddSlide} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
+          {/* Add / Edit Slide Form */}
+          <form id="slide-form" onSubmit={handleSaveSlide} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
-                <Plus className="w-4 h-4 text-cyan-500" /> Add New Image Slide
+                {editingSlideId ? (
+                  <>
+                    <Pencil className="w-4 h-4 text-amber-500" />
+                    <span>Editing Slide</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 text-cyan-500" />
+                    <span>Add New Image Slide</span>
+                  </>
+                )}
               </h3>
-              {ackSaved && <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Slide Saved!</span>}
+              <div className="flex items-center gap-2">
+                {editingSlideId && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEditSlide}
+                    className="btn-ghost text-xs !py-1 text-slate-500 flex items-center gap-1"
+                  >
+                    <X className="w-3 h-3" /> Cancel Edit
+                  </button>
+                )}
+                {ackSaved && (
+                  <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Slide Saved!
+                  </span>
+                )}
+              </div>
             </div>
 
             <div>
@@ -547,33 +827,77 @@ export default function AdminSettings() {
             </div>
 
             <button type="submit" className="btn-primary text-xs w-full gap-2">
-              <Plus className="w-3.5 h-3.5" /> Add Slide to Acknowledgments
+              {editingSlideId ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+              {editingSlideId ? 'Update Slide Changes' : 'Add Slide to Acknowledgments'}
             </button>
           </form>
 
-
-          {/* Active Slides List */}
+          {/* Active Slides List with Reordering & In-Place Editing */}
           <div>
-            <h3 className="font-semibold text-sm text-ink dark:text-white mb-3">Active Acknowledgments Image Slides</h3>
-            {acknowledgmentsConfig?.slides?.length > 0 ? (
+            <h3 className="font-semibold text-sm text-ink dark:text-white mb-3">Active Acknowledgments Image Slides ({currentSlidesList.length})</h3>
+            {currentSlidesList.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {acknowledgmentsConfig.slides.map((s, idx) => (
-                  <div key={s.id || idx} className="relative rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden bg-slate-50 dark:bg-night-200/80 group">
-                    <div className="aspect-video w-full overflow-hidden bg-black">
+                {currentSlidesList.map((s, idx) => (
+                  <div
+                    key={s.id || idx}
+                    className={clsx(
+                      "relative rounded-2xl border overflow-hidden bg-slate-50 dark:bg-night-200/80 transition-all",
+                      editingSlideId === s.id
+                        ? "border-amber-400 ring-2 ring-amber-400/30"
+                        : "border-slate-200 dark:border-white/10"
+                    )}
+                  >
+                    <div className="aspect-video w-full overflow-hidden bg-black relative">
                       <img src={s.url} alt={s.title} className="w-full h-full object-cover" />
+                      
+                      {/* Top Action Overlay */}
+                      <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/60 backdrop-blur-md p-1 rounded-xl">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEditSlide(s)}
+                          className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/20 transition-colors"
+                          title="Edit Slide"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSlide(s.id)}
+                          className="p-1 rounded-lg text-red-400 hover:text-red-300 hover:bg-red-500/30 transition-colors"
+                          title="Delete Slide"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Position Reorder Controls */}
+                      <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-black/65 backdrop-blur-md px-2 py-1 rounded-lg text-white text-[11px]">
+                        <span className="font-mono text-white/70">#{idx + 1}</span>
+                        <button
+                          type="button"
+                          disabled={idx === 0}
+                          onClick={() => handleMoveSlide(idx, idx - 1)}
+                          className="p-0.5 hover:text-cyan-400 disabled:opacity-30"
+                          title="Move Up"
+                        >
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          disabled={idx === currentSlidesList.length - 1}
+                          onClick={() => handleMoveSlide(idx, idx + 1)}
+                          className="p-0.5 hover:text-cyan-400 disabled:opacity-30"
+                          title="Move Down"
+                        >
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
+
                     <div className="p-3">
                       <p className="font-bold text-xs text-ink dark:text-white truncate">{s.title}</p>
                       <p className="text-[11px] text-ink-ghost dark:text-slate-400 line-clamp-2 mt-0.5">{s.caption || 'No caption provided'}</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteSlide(s.id)}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500/90 text-white opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                      title="Delete Slide"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
                   </div>
                 ))}
               </div>
@@ -583,37 +907,88 @@ export default function AdminSettings() {
           </div>
         </div>
 
-        {/* Team members manager */}
-        <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
-          <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
-            <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
-              <Users className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
+        {/* 👥 Team members manager with Drag & Drop and Profile Modification */}
+        <div id="team-members-manager" className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
+          <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
+                <Users className="w-4.5 h-4.5 text-cyan-600 dark:text-cyan-400" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-ink dark:text-white">Team & Contributors</h2>
+                <p className="text-xs text-ink-ghost dark:text-slate-400">
+                  Edit profiles, modify roles, or drag cards to reorder them in custom positions.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="font-display text-lg font-bold text-ink dark:text-white">Team & Contributors</h2>
-              <p className="text-xs text-ink-ghost dark:text-slate-400">Shown as cards on the Acknowledgments page.</p>
-            </div>
+            <span className="badge text-xs bg-cyan-50 dark:bg-cyan-950/50 text-cyan-700 dark:text-cyan-300 font-semibold">
+              {currentTeamList.length} Members
+            </span>
           </div>
 
-          <form onSubmit={handleAddTeamMember} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
+          {/* Add / Edit Team Member Form */}
+          <form id="team-member-form" onSubmit={handleSaveTeamMember} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
-                <Plus className="w-4 h-4 text-cyan-500" /> Add Team Member
+                {editingTeamId ? (
+                  <>
+                    <Pencil className="w-4 h-4 text-amber-500" />
+                    <span>Modifying Member Profile</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4 text-cyan-500" />
+                    <span>Add Team Member</span>
+                  </>
+                )}
               </h3>
-              {teamSaved && <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Saved!</span>}
+              <div className="flex items-center gap-2">
+                {editingTeamId && (
+                  <button
+                    type="button"
+                    onClick={handleCancelEditTeamMember}
+                    className="btn-ghost text-xs !py-1 text-slate-500 flex items-center gap-1"
+                  >
+                    <X className="w-3 h-3" /> Cancel Edit
+                  </button>
+                )}
+                {teamSaved && (
+                  <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Saved!
+                  </span>
+                )}
+              </div>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Name</label>
-                <input value={teamForm.name} onChange={e => setTeamForm(f => ({ ...f, name: e.target.value }))} className="input text-xs" required />
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Full Name</label>
+                <input
+                  value={teamForm.name}
+                  onChange={e => setTeamForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="e.g. Ahmed Nader"
+                  className="input text-xs"
+                  required
+                />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Role</label>
-                <input value={teamForm.role} onChange={e => setTeamForm(f => ({ ...f, role: e.target.value }))} placeholder="Project Lead" className="input text-xs" required />
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Role / Contribution</label>
+                <input
+                  value={teamForm.role}
+                  onChange={e => setTeamForm(f => ({ ...f, role: e.target.value }))}
+                  placeholder="e.g. Project Lead & Recording"
+                  className="input text-xs"
+                  required
+                />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">School (optional)</label>
-                <input value={teamForm.school} onChange={e => setTeamForm(f => ({ ...f, school: e.target.value }))} placeholder="CSAI" className="input text-xs" />
+                <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">School / Major (optional)</label>
+                <input
+                  value={teamForm.school}
+                  onChange={e => setTeamForm(f => ({ ...f, school: e.target.value }))}
+                  placeholder="e.g. Communications & Info Eng."
+                  className="input text-xs"
+                />
               </div>
             </div>
 
@@ -622,7 +997,7 @@ export default function AdminSettings() {
               <label className="block text-xs font-semibold text-ink dark:text-slate-300">Profile Photo</label>
               <div className="flex items-center gap-3">
                 {teamForm.photoUrl ? (
-                  <img src={teamForm.photoUrl} alt="Preview" className="w-10 h-10 rounded-full object-cover border border-cyan-400" />
+                  <img src={teamForm.photoUrl} alt="Preview" className="w-10 h-10 rounded-full object-cover border-2 border-cyan-400" />
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-white/10 flex items-center justify-center text-xs font-bold text-ink-ghost">
                     No Photo
@@ -645,31 +1020,121 @@ export default function AdminSettings() {
               {teamPhotoError && <p className="text-[11px] text-red-500">{teamPhotoError}</p>}
             </div>
 
-            <button type="submit" className="btn-primary text-xs w-full gap-2"><Plus className="w-3.5 h-3.5" /> Add Team Member</button>
+            <button type="submit" className="btn-primary text-xs w-full gap-2">
+              {editingTeamId ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+              {editingTeamId ? 'Save Changes to Profile' : 'Add Team Member'}
+            </button>
           </form>
 
-          {acknowledgmentsConfig?.team?.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {acknowledgmentsConfig.team.map((m) => (
-                <div key={m.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
-                  <div className="flex items-center gap-3 min-w-0">
-                    {m.photoUrl ? (
-                      <img src={m.photoUrl} alt={m.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
-                    ) : (
-                      <div className="w-9 h-9 rounded-full bg-cyan-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
-                        {m.name.slice(0, 2).toUpperCase()}
-                      </div>
+          {/* Team Members List with Drag & Drop & Move Controls */}
+          {currentTeamList.length > 0 ? (
+            <div className="space-y-2">
+              <p className="text-[11px] text-ink-ghost dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                <GripVertical className="w-3.5 h-3.5 text-cyan-500" />
+                Drag any member by the handle to reorder, or use the quick move buttons.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {currentTeamList.map((m, idx) => (
+                  <div
+                    key={m.id || idx}
+                    draggable
+                    onDragStart={(e) => handleTeamDragStart(e, idx)}
+                    onDragOver={(e) => handleTeamDragOver(e, idx)}
+                    onDrop={(e) => handleTeamDrop(e, idx)}
+                    className={clsx(
+                      "flex items-center justify-between p-3 rounded-2xl border transition-all duration-200 select-none group",
+                      editingTeamId === m.id
+                        ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-400 ring-2 ring-amber-400/30"
+                        : dragOverTeamIdx === idx
+                        ? "bg-cyan-50 dark:bg-cyan-950/30 border-cyan-400 scale-[1.01]"
+                        : "bg-slate-50 dark:bg-night-200/60 border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20"
                     )}
-                    <div className="min-w-0">
-                      <p className="font-bold text-xs text-ink dark:text-white truncate">{m.name}</p>
-                      <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{m.role}{m.school ? ` · ${m.school}` : ''}</p>
+                  >
+                    {/* Left: Drag Handle + Avatar + Details */}
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <button
+                        type="button"
+                        className="cursor-grab active:cursor-grabbing p-1 text-slate-400 hover:text-cyan-500 touch-none flex-shrink-0"
+                        title="Drag to reorder"
+                      >
+                        <GripVertical className="w-4 h-4" />
+                      </button>
+
+                      {m.photoUrl ? (
+                        <img src={m.photoUrl} alt={m.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-slate-200 dark:border-white/10" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-cyan-600 text-white font-bold text-xs flex items-center justify-center flex-shrink-0">
+                          {m.name.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-xs text-ink dark:text-white truncate">{m.name}</p>
+                        <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">
+                          {m.role}{m.school ? ` · ${m.school}` : ''}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right: Quick Action Controls */}
+                    <div className="flex items-center gap-1 flex-shrink-0 pl-2">
+                      {/* Move to Top */}
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleMoveTeamMember(idx, 0)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-200/60 dark:hover:bg-white/10 disabled:opacity-20"
+                        title="Move to Top"
+                      >
+                        <ChevronsUp className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Move Up */}
+                      <button
+                        type="button"
+                        disabled={idx === 0}
+                        onClick={() => handleMoveTeamMember(idx, idx - 1)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-200/60 dark:hover:bg-white/10 disabled:opacity-20"
+                        title="Move Up"
+                      >
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Move Down */}
+                      <button
+                        type="button"
+                        disabled={idx === currentTeamList.length - 1}
+                        onClick={() => handleMoveTeamMember(idx, idx + 1)}
+                        className="p-1 rounded-lg text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-slate-200/60 dark:hover:bg-white/10 disabled:opacity-20"
+                        title="Move Down"
+                      >
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Edit Profile */}
+                      <button
+                        type="button"
+                        onClick={() => handleStartEditTeamMember(m)}
+                        className="p-1.5 rounded-lg text-ocean-600 dark:text-ocean-400 hover:bg-ocean-50 dark:hover:bg-ocean-950/40"
+                        title="Modify Profile"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+
+                      {/* Remove */}
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTeamMember(m.id)}
+                        className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10"
+                        title="Remove"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
-                  <button type="button" onClick={() => handleDeleteTeamMember(m.id)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0" title="Remove">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           ) : (
             <p className="text-xs text-ink-ghost">No team members yet.</p>
@@ -727,7 +1192,7 @@ export default function AdminSettings() {
           )}
         </div>
 
-        {/* Admin team management */}
+        {/* 🛡️ Admin team management */}
         <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
           <div className="flex items-center gap-2.5 pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
             <div className="w-9 h-9 rounded-xl bg-cyan-100 dark:bg-cyan-950/60 flex items-center justify-center">
@@ -836,16 +1301,16 @@ export default function AdminSettings() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Short Badge</label>
+                  <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Short Code</label>
                   <input
                     value={schoolForm.short}
                     onChange={e => setSchoolForm(f => ({ ...f, short: e.target.value }))}
-                    placeholder="BIOTECH"
+                    placeholder="BIOT"
                     className="input text-xs"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Emoji Icon</label>
+                  <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Icon Emoji</label>
                   <input
                     value={schoolForm.icon}
                     onChange={e => setSchoolForm(f => ({ ...f, icon: e.target.value }))}
@@ -857,17 +1322,16 @@ export default function AdminSettings() {
 
               <div>
                 <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Description</label>
-                <textarea
+                <input
                   value={schoolForm.description}
                   onChange={e => setSchoolForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="Focuses on genomics, molecular biology, and health sciences..."
-                  className="input text-xs resize-none"
-                  rows={2}
+                  placeholder="Molecular biology, genomics, cellular science"
+                  className="input text-xs"
                 />
               </div>
 
               <button type="submit" className="btn-primary text-xs w-full gap-2">
-                <Plus className="w-3.5 h-3.5" /> Register New School
+                <Plus className="w-3.5 h-3.5" /> Save School
               </button>
             </form>
 
@@ -875,7 +1339,7 @@ export default function AdminSettings() {
             <form onSubmit={handleAddProgram} className="space-y-4 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-sm text-ink dark:text-white flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-ocean-500" /> Add New Major / Program
+                  <BookOpen className="w-4 h-4 text-ocean-500" /> Add Major / Program
                 </h3>
                 {programSaved && <span className="text-xs text-green-600 font-semibold flex items-center gap-1"><CheckCircle2 className="w-3.5 h-3.5" /> Added!</span>}
               </div>
@@ -896,7 +1360,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Major ID (slug)</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Program ID (slug)</label>
                 <input
                   value={programForm.id}
                   onChange={e => setProgramForm(f => ({ ...f, id: e.target.value }))}
@@ -907,7 +1371,7 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Major Name</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Program Label</label>
                 <input
                   value={programForm.label}
                   onChange={e => setProgramForm(f => ({ ...f, label: e.target.value }))}
@@ -918,66 +1382,67 @@ export default function AdminSettings() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Course Code Prefixes (comma-separated)</label>
+                <label className="block text-xs font-semibold text-ink dark:text-white mb-1">Course Prefixes (comma-separated)</label>
                 <input
                   value={programForm.prefixes}
                   onChange={e => setProgramForm(f => ({ ...f, prefixes: e.target.value }))}
-                  placeholder="GEN, BIOT"
+                  placeholder="GENM, PMED, BIOT"
                   className="input text-xs"
                 />
               </div>
 
               <button type="submit" className="btn-primary text-xs w-full gap-2">
-                <Plus className="w-3.5 h-3.5" /> Register New Major
+                <Plus className="w-3.5 h-3.5" /> Save Major / Program
               </button>
             </form>
           </div>
 
-          {/* List of Custom Registered Catalog Entries */}
-          {(customSchools.length > 0 || Object.keys(customPrograms).length > 0) && (
+          {/* Active Custom Schools List */}
+          {customSchools.length > 0 && (
             <div className="mt-8 pt-6 border-t border-slate-100 dark:border-white/10">
-              <h3 className="font-semibold text-sm text-ink dark:text-white mb-4">Active Custom Catalog Additions</h3>
-              
-              <div className="space-y-3">
+              <h3 className="font-semibold text-sm text-ink dark:text-white mb-3">Custom Added Schools ({customSchools.length})</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {customSchools.map(s => (
                   <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xl">{s.icon}</span>
-                      <div>
-                        <p className="text-xs font-bold text-ink dark:text-white">{s.label} <span className="font-mono text-[10px] text-ocean-600 bg-ocean-50 px-1.5 py-0.5 rounded">ID: {s.id}</span></p>
-                        <p className="text-[11px] text-ink-ghost">{s.description || 'Custom added school'}</p>
-                      </div>
+                    <div className="min-w-0">
+                      <p className="font-bold text-xs text-ink dark:text-white truncate">{s.icon} {s.label} ({s.short})</p>
+                      <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">{s.description || `ID: ${s.id}`}</p>
                     </div>
                     <button
                       type="button"
                       onClick={() => deleteCustomSchool(s.id)}
-                      className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Delete Custom School"
+                      className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0"
+                      title="Delete School"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
 
-                {Object.entries(customPrograms).map(([sId, progs]) =>
-                  progs.map(p => (
-                    <div key={`${sId}-${p.id}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
-                      <div className="flex items-center gap-3">
-                        <BookOpen className="w-4 h-4 text-ocean-500" />
-                        <div>
-                          <p className="text-xs font-bold text-ink dark:text-white">{p.label} <span className="font-mono text-[10px] text-ocean-600 bg-ocean-50 px-1.5 py-0.5 rounded">Under School: {sId}</span></p>
-                          {p.prefixes?.length > 0 && (
-                            <p className="text-[11px] text-ink-ghost">Prefixes: {p.prefixes.join(', ')}</p>
-                          )}
-                        </div>
+          {/* Active Custom Programs List */}
+          {Object.entries(customPrograms).some(([, list]) => list?.length > 0) && (
+            <div className="mt-6 pt-6 border-t border-slate-100 dark:border-white/10">
+              <h3 className="font-semibold text-sm text-ink dark:text-white mb-3">Custom Added Majors / Programs</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {Object.entries(customPrograms).flatMap(([schoolId, list]) =>
+                  (list || []).map(p => (
+                    <div key={`${schoolId}_${p.id}`} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
+                      <div className="min-w-0">
+                        <p className="font-bold text-xs text-ink dark:text-white truncate">{p.label}</p>
+                        <p className="text-[11px] text-ink-ghost dark:text-slate-400 truncate">
+                          School: <span className="font-mono">{schoolId}</span> · Prefixes: {p.prefixes?.join(', ') || 'None'}
+                        </p>
                       </div>
                       <button
                         type="button"
-                        onClick={() => deleteCustomProgram(sId, p.id)}
-                        className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Delete Custom Major"
+                        onClick={() => deleteCustomProgram(schoolId, p.id)}
+                        className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0"
+                        title="Delete Program"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   ))
@@ -987,99 +1452,300 @@ export default function AdminSettings() {
           )}
         </div>
 
-        {/* 📝 Page Content CMS Editor */}
+        {/* 📝 CMS Page Content Manager (About & Home) */}
         <div className="card-flat border border-slate-100 dark:border-white/10 shadow-card">
           <div className="flex items-center justify-between pb-4 mb-6 border-b border-slate-100 dark:border-white/10">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-950/60 flex items-center justify-center">
-                <BookOpen className="w-4.5 h-4.5 text-purple-600 dark:text-purple-400" />
+              <div className="w-9 h-9 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 flex items-center justify-center">
+                <BookOpen className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div>
                 <h2 className="font-display text-lg font-bold text-ink dark:text-white">Page Content Manager (CMS)</h2>
-                <p className="text-xs text-ink-ghost dark:text-slate-400">Edit titles, mission text, and descriptions live without code changes.</p>
+                <p className="text-xs text-ink-ghost dark:text-slate-400">Edit titles, narratives, and featured media for the About and Home pages.</p>
               </div>
             </div>
-            {cmsSaved && (
-              <span className="text-xs text-green-600 dark:text-green-400 font-semibold flex items-center gap-1">
-                <CheckCircle2 className="w-4 h-4" /> Page Saved!
-              </span>
-            )}
-          </div>
 
-          <div className="flex gap-2 mb-6">
-            <button
-              type="button"
-              onClick={() => setCmsPage('about')}
-              className={`btn text-xs px-4 py-2 ${cmsPage === 'about' ? 'btn-primary' : 'btn-outline'}`}
-            >
-              About Page
-            </button>
-            <button
-              type="button"
-              onClick={() => setCmsPage('home')}
-              className={`btn text-xs px-4 py-2 ${cmsPage === 'home' ? 'btn-primary' : 'btn-outline'}`}
-            >
-              Home Page
-            </button>
+            {/* Page tab switcher */}
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-night-200 border border-slate-200 dark:border-white/10 overflow-x-auto">
+              <button
+                type="button"
+                onClick={() => setCmsPage('site_settings')}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                  cmsPage === 'site_settings'
+                    ? 'bg-white dark:bg-white/10 text-ocean-600 dark:text-white shadow-sm'
+                    : 'text-ink-ghost dark:text-slate-400 hover:text-ink dark:hover:text-white'
+                }`}
+              >
+                Navigation & Social
+              </button>
+              <button
+                type="button"
+                onClick={() => setCmsPage('home')}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                  cmsPage === 'home'
+                    ? 'bg-white dark:bg-white/10 text-ocean-600 dark:text-white shadow-sm'
+                    : 'text-ink-ghost dark:text-slate-400 hover:text-ink dark:hover:text-white'
+                }`}
+              >
+                Home Page
+              </button>
+              <button
+                type="button"
+                onClick={() => setCmsPage('about')}
+                className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                  cmsPage === 'about'
+                    ? 'bg-white dark:bg-white/10 text-ocean-600 dark:text-white shadow-sm'
+                    : 'text-ink-ghost dark:text-slate-400 hover:text-ink dark:hover:text-white'
+                }`}
+              >
+                About Page
+              </button>
+            </div>
           </div>
 
           <form onSubmit={handleSaveCms} className="space-y-4">
+            {cmsSaved && (
+              <div className="p-3 rounded-xl bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-800 text-xs font-semibold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                <span>Page content saved successfully! Changes are live across the website.</span>
+              </div>
+            )}
+
+                        {cmsPage === 'site_settings' && (
+              <div className="space-y-6">
+                {/* Navigation Tab Labels */}
+                <div>
+                  <h3 className="font-semibold text-xs text-ocean-700 dark:text-ocean-300 uppercase tracking-wider mb-3">
+                    Navbar Tab Names
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Courses Tab Label</label>
+                      <input
+                        value={siteSettingsForm.navCourses || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, navCourses: e.target.value }))}
+                        placeholder="Courses"
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Interviews Tab Label</label>
+                      <input
+                        value={siteSettingsForm.navInterviews || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, navInterviews: e.target.value }))}
+                        placeholder="Interviews"
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">About Tab Label</label>
+                      <input
+                        value={siteSettingsForm.navAbout || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, navAbout: e.target.value }))}
+                        placeholder="About"
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Acknowledgements Tab Label</label>
+                      <input
+                        value={siteSettingsForm.navAcknowledgments || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, navAcknowledgments: e.target.value }))}
+                        placeholder="Acknowledgements"
+                        className="input text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Social & Contact Links */}
+                <div className="pt-4 border-t border-slate-200/80 dark:border-white/10">
+                  <h3 className="font-semibold text-xs text-ocean-700 dark:text-ocean-300 uppercase tracking-wider mb-3">
+                    Social Media & Contact Links
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Facebook Page URL</label>
+                      <input
+                        value={siteSettingsForm.facebookUrl || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, facebookUrl: e.target.value }))}
+                        placeholder="https://www.facebook.com/share/..."
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">LinkedIn Page URL</label>
+                      <input
+                        value={siteSettingsForm.linkedinUrl || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, linkedinUrl: e.target.value }))}
+                        placeholder="https://www.linkedin.com/company/..."
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">YouTube Channel URL</label>
+                      <input
+                        value={siteSettingsForm.youtubeUrl || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, youtubeUrl: e.target.value }))}
+                        placeholder="https://www.youtube.com/..."
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Support & Contact Email</label>
+                      <input
+                        value={siteSettingsForm.contactEmail || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, contactEmail: e.target.value }))}
+                        placeholder="zewailcityocw@gmail.com"
+                        className="input text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Section Titles on Home */}
+                <div className="pt-4 border-t border-slate-200/80 dark:border-white/10">
+                  <h3 className="font-semibold text-xs text-ocean-700 dark:text-ocean-300 uppercase tracking-wider mb-3">
+                    Home Page Section Headings
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Featured Courses Heading</label>
+                      <input
+                        value={siteSettingsForm.featuredCoursesTitle || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, featuredCoursesTitle: e.target.value }))}
+                        placeholder="Latest Courses"
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Featured Courses Tagline</label>
+                      <input
+                        value={siteSettingsForm.featuredCoursesCategory || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, featuredCoursesCategory: e.target.value }))}
+                        placeholder="Open CourseWare"
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Departments Section Heading</label>
+                      <input
+                        value={siteSettingsForm.departmentsTitle || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, departmentsTitle: e.target.value }))}
+                        placeholder="Schools & Programs"
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Departments Tagline</label>
+                      <input
+                        value={siteSettingsForm.departmentsCategory || ''}
+                        onChange={(e) => setSiteSettingsForm((f) => ({ ...f, departmentsCategory: e.target.value }))}
+                        placeholder="Explore by field"
+                        className="input text-xs"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {cmsPage === 'about' && (
               <>
+                <div>
+                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Header Title</label>
+                  <input
+                    value={aboutForm.headerTitle || ''}
+                    onChange={(e) => setAboutForm((f) => ({ ...f, headerTitle: e.target.value }))}
+                    className="input text-xs"
+                    placeholder="About ZC OpenCourseWare"
+                  />
+                </div>
                 <div>
                   <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Header Subtitle</label>
                   <textarea
                     rows={2}
-                    value={aboutForm.headerSubtitle}
+                    value={aboutForm.headerSubtitle || ''}
                     onChange={(e) => setAboutForm((f) => ({ ...f, headerSubtitle: e.target.value }))}
                     className="input text-xs"
+                    placeholder="Knowledge becomes more powerful when it is shared..."
                   />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">About / Story Section Title</label>
+                    <input
+                      value={aboutForm.aboutTitle || ''}
+                      onChange={(e) => setAboutForm((f) => ({ ...f, aboutTitle: e.target.value }))}
+                      className="input text-xs"
+                      placeholder="About ZC-OCW"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">About / Story Statement Body</label>
+                    <textarea
+                      rows={5}
+                      value={aboutForm.aboutBody || ''}
+                      onChange={(e) => setAboutForm((f) => ({ ...f, aboutBody: e.target.value }))}
+                      className="input text-xs leading-relaxed"
+                      placeholder="Zewail City OpenCourseWare (ZC-OCW) was born from a simple belief..."
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-3">
                   <div>
                     <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Mission Section Title</label>
                     <input
-                      value={aboutForm.missionTitle}
+                      value={aboutForm.missionTitle || ''}
                       onChange={(e) => setAboutForm((f) => ({ ...f, missionTitle: e.target.value }))}
                       className="input text-xs"
+                      placeholder="Our Mission"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">License Section Title</label>
-                    <input
-                      value={aboutForm.licenseTitle}
-                      onChange={(e) => setAboutForm((f) => ({ ...f, licenseTitle: e.target.value }))}
-                      className="input text-xs"
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Mission Statement Body</label>
+                    <textarea
+                      rows={5}
+                      value={aboutForm.missionBody || ''}
+                      onChange={(e) => setAboutForm((f) => ({ ...f, missionBody: e.target.value }))}
+                      className="input text-xs leading-relaxed"
+                      placeholder="Our mission is bigger than recording lectures..."
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Mission Statement Body</label>
-                  <textarea
-                    rows={3}
-                    value={aboutForm.missionBody}
-                    onChange={(e) => setAboutForm((f) => ({ ...f, missionBody: e.target.value }))}
-                    className="input text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">License Statement Body</label>
-                  <textarea
-                    rows={3}
-                    value={aboutForm.licenseBody}
-                    onChange={(e) => setAboutForm((f) => ({ ...f, licenseBody: e.target.value }))}
-                    className="input text-xs"
-                  />
+
+                <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">License Section Title</label>
+                    <input
+                      value={aboutForm.licenseTitle || ''}
+                      onChange={(e) => setAboutForm((f) => ({ ...f, licenseTitle: e.target.value }))}
+                      className="input text-xs"
+                      placeholder="License"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">License Statement Body</label>
+                    <textarea
+                      rows={2}
+                      value={aboutForm.licenseBody || ''}
+                      onChange={(e) => setAboutForm((f) => ({ ...f, licenseBody: e.target.value }))}
+                      className="input text-xs leading-relaxed"
+                      placeholder="All course materials on ZC OCW are shared under a Creative Commons BY-NC-SA 4.0 license..."
+                    />
+                  </div>
                 </div>
               </>
             )}
 
             {cmsPage === 'home' && (
-              <>
+              <div className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Hero Title</label>
                   <input
-                    value={homeForm.heroTitle}
+                    value={homeForm.heroTitle || ''}
                     onChange={(e) => setHomeForm((f) => ({ ...f, heroTitle: e.target.value }))}
                     className="input text-xs"
                   />
@@ -1088,16 +1754,75 @@ export default function AdminSettings() {
                   <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Hero Subtitle</label>
                   <textarea
                     rows={2}
-                    value={homeForm.heroSubtitle}
+                    value={homeForm.heroSubtitle || ''}
                     onChange={(e) => setHomeForm((f) => ({ ...f, heroSubtitle: e.target.value }))}
                     className="input text-xs"
                   />
                 </div>
-              </>
+
+                <div className="pt-3 border-t border-slate-200/80 dark:border-white/10 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-cyan-500" />
+                    <h3 className="font-semibold text-xs text-ink dark:text-white uppercase tracking-wider">
+                      Featured Spotlight Video (Home Page)
+                    </h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">
+                        Featured Video URL
+                      </label>
+                      <input
+                        value={homeForm.featuredVideoUrl || ''}
+                        onChange={(e) => setHomeForm((f) => ({ ...f, featuredVideoUrl: e.target.value }))}
+                        placeholder="https://youtu.be/Kr1P4Awv2lE"
+                        className="input text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">
+                        Badge Label
+                      </label>
+                      <input
+                        value={homeForm.featuredVideoBadge || ''}
+                        onChange={(e) => setHomeForm((f) => ({ ...f, featuredVideoBadge: e.target.value }))}
+                        placeholder="Featured Spotlight"
+                        className="input text-xs"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">
+                      Featured Video Title
+                    </label>
+                    <input
+                      value={homeForm.featuredVideoTitle || ''}
+                      onChange={(e) => setHomeForm((f) => ({ ...f, featuredVideoTitle: e.target.value }))}
+                      placeholder="What is ZC OCW?"
+                      className="input text-xs"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">
+                      Featured Video Narrative / Description
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={homeForm.featuredVideoDescription || ''}
+                      onChange={(e) => setHomeForm((f) => ({ ...f, featuredVideoDescription: e.target.value }))}
+                      className="input text-xs leading-relaxed"
+                      placeholder="Learn how Zewail City students and faculty came together..."
+                    />
+                  </div>
+                </div>
+              </div>
             )}
 
             <button type="submit" className="btn-primary text-xs w-full gap-2">
-              <CheckCircle2 className="w-3.5 h-3.5" /> Save {cmsPage === 'about' ? 'About' : 'Home'} Page Content
+              <CheckCircle2 className="w-3.5 h-3.5" /> Save {cmsPage === 'site_settings' ? 'Navigation & Social' : cmsPage === 'about' ? 'About' : 'Home'} Content
             </button>
           </form>
         </div>

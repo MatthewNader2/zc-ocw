@@ -23,7 +23,7 @@ async function ytGet(endpoint, params = {}) {
 
 // ── Playlists (= courses) ──────────────────────────────────────────────────
 
-export async function fetchPlaylists({ pageToken = "", maxResults = 20 } = {}) {
+export async function fetchPlaylists({ pageToken = "", maxResults = 50 } = {}) {
   return ytGet("/playlists", {
     channelId: CHANNEL_ID,
     maxResults,

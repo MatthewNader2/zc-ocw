@@ -4,15 +4,9 @@ import { Search, Bookmark, Settings, LayoutDashboard, Menu, X, Sun, Moon, User, 
 import { useProgress } from '@/context/ProgressContext'
 import { useAuth }     from '@/context/AuthContext'
 import { useSettings } from '@/context/SettingsContext'
+import { useEditablePage } from '@/hooks/useEditablePage'
+import { DEFAULT_SITE_SETTINGS } from '@/data/siteSettings'
 import clsx from 'clsx'
-
-const NAV = [
-  { to: '/courses',         label: 'Courses'          },
-  { to: '/departments',     label: 'Departments'      },
-  { to: '/interviews',      label: 'Interviews'       },
-  { to: '/about',           label: 'About'            },
-  { to: '/acknowledgments', label: 'Acknowledgements' },
-]
 
 export default function Navbar() {
   const [open,    setOpen]    = useState(false)
@@ -23,9 +17,24 @@ export default function Navbar() {
   const { getBookmarks } = useProgress()
   const { isAdmin, user, logout } = useAuth()
   const { settings, update } = useSettings()
+  const { content: siteContent } = useEditablePage('site_settings', DEFAULT_SITE_SETTINGS)
   const navigate         = useNavigate()
   const bmCount          = getBookmarks().length
   const searchInputRef   = useRef(null)
+
+  const navLabels = {
+    courses: siteContent?.navCourses || DEFAULT_SITE_SETTINGS.navCourses,
+    interviews: siteContent?.navInterviews || DEFAULT_SITE_SETTINGS.navInterviews,
+    about: siteContent?.navAbout || DEFAULT_SITE_SETTINGS.navAbout,
+    acknowledgments: siteContent?.navAcknowledgments || DEFAULT_SITE_SETTINGS.navAcknowledgments,
+  }
+
+  const navItems = [
+    { to: '/courses',         label: navLabels.courses },
+    { to: '/interviews',      label: navLabels.interviews },
+    { to: '/about',           label: navLabels.about },
+    { to: '/acknowledgments', label: navLabels.acknowledgments },
+  ]
 
   function toggleTheme() {
     const isDark = document.documentElement.classList.contains('dark')
@@ -94,31 +103,25 @@ export default function Navbar() {
             'px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
             isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
           )}>
-            Courses
+            {navLabels.courses}
           </NavLink>
-          <NavLink to="/departments" className={({ isActive }) => clsx(
+          <NavLink to="/interviews" className={({ isActive }) => clsx(
             'px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
             isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
           )}>
-            Departments
+            {navLabels.interviews}
           </NavLink>
           <NavLink to="/about" className={({ isActive }) => clsx(
             'px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
             isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
           )}>
-            About
+            {navLabels.about}
           </NavLink>
-          <NavLink to="/interviews" className={({ isActive }) => clsx(
+          <NavLink to="/acknowledgments" className={({ isActive }) => clsx(
             'hidden lg:inline-flex px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
             isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
           )}>
-            Interviews
-          </NavLink>
-          <NavLink to="/acknowledgments" className={({ isActive }) => clsx(
-            'hidden xl:inline-flex px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200',
-            isActive ? 'bg-ocean-500/20 text-ocean-300' : 'text-white/70 hover:text-white hover:bg-white/8'
-          )}>
-            Acknowledgements
+            {navLabels.acknowledgments}
           </NavLink>
         </nav>
 
@@ -236,7 +239,7 @@ export default function Navbar() {
                      placeholder="Search courses…" className="input-dark w-full pl-10" />
             </div>
           </form>
-          {NAV.map(({ to, label }) => (
+          {navItems.map(({ to, label }) => (
             <NavLink key={to} to={to} onClick={() => setOpen(false)}
               className={({ isActive }) => clsx(
                 'flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition-all',

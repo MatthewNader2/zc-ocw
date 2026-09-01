@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import { ArrowRight, PlayCircle, BookOpen, Download } from 'lucide-react'
 import HeroSection     from '@/components/sections/HeroSection'
+import HomeSpotlight   from '@/components/sections/HomeSpotlight'
 import FeaturedCourses from '@/components/sections/FeaturedCourses'
 import DepartmentGrid  from '@/components/sections/DepartmentGrid'
 import CourseCard from '@/components/ui/CourseCard'
@@ -57,6 +58,7 @@ export default function Home() {
         <meta name="description" content="Free lecture videos and course materials from Zewail City of Science and Technology — open to every learner." />
       </Helmet>
       <HeroSection />
+      <HomeSpotlight />
       <ContinueSection />
       <FeaturedCourses />
       <DepartmentGrid />

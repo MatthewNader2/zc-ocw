@@ -67,59 +67,52 @@ export function AdminDataProvider({ children }) {
   // ── Custom Schools & Programs CRUD ────────────────────────────────────────
 
   const addCustomSchool = useCallback((school) => {
-    let nextSchools = [];
-    setCustomSchools((prev) => {
-      nextSchools = [...prev.filter((s) => s.id !== school.id), school];
-      storage.saveCustomSchools(nextSchools);
-      return nextSchools;
-    });
-    persistSchoolsPrograms(nextSchools, customPrograms);
+    const currentSchools = storage.getCustomSchools();
+    const nextSchools = [...currentSchools.filter((s) => s.id !== school.id), school];
+    const currentPrograms = storage.getCustomPrograms();
+    setCustomSchools(nextSchools);
+    storage.saveCustomSchools(nextSchools);
+    persistSchoolsPrograms(nextSchools, currentPrograms);
     bump();
-  }, [bump, customPrograms, persistSchoolsPrograms]);
+  }, [bump, persistSchoolsPrograms]);
 
   const deleteCustomSchool = useCallback((schoolId) => {
-    let nextSchools = [];
-    let nextPrograms = {};
-    setCustomSchools((prev) => {
-      nextSchools = prev.filter((s) => s.id !== schoolId);
-      storage.saveCustomSchools(nextSchools);
-      return nextSchools;
-    });
-    setCustomPrograms((prev) => {
-      nextPrograms = { ...prev };
-      delete nextPrograms[schoolId];
-      storage.saveCustomPrograms(nextPrograms);
-      return nextPrograms;
-    });
+    const currentSchools = storage.getCustomSchools();
+    const nextSchools = currentSchools.filter((s) => s.id !== schoolId);
+    const currentPrograms = storage.getCustomPrograms();
+    const nextPrograms = { ...currentPrograms };
+    delete nextPrograms[schoolId];
+    setCustomSchools(nextSchools);
+    setCustomPrograms(nextPrograms);
+    storage.saveCustomSchools(nextSchools);
+    storage.saveCustomPrograms(nextPrograms);
     persistSchoolsPrograms(nextSchools, nextPrograms);
     bump();
   }, [bump, persistSchoolsPrograms]);
 
   const addCustomProgram = useCallback((schoolId, program) => {
-    let nextPrograms = {};
-    setCustomPrograms((prev) => {
-      const schoolProgs = prev[schoolId] ?? [];
-      const nextProgs = [...schoolProgs.filter((p) => p.id !== program.id), program];
-      nextPrograms = { ...prev, [schoolId]: nextProgs };
-      storage.saveCustomPrograms(nextPrograms);
-      return nextPrograms;
-    });
-    persistSchoolsPrograms(customSchools, nextPrograms);
+    const currentSchools = storage.getCustomSchools();
+    const currentPrograms = storage.getCustomPrograms();
+    const schoolProgs = currentPrograms[schoolId] ?? [];
+    const nextProgs = [...schoolProgs.filter((p) => p.id !== program.id), program];
+    const nextPrograms = { ...currentPrograms, [schoolId]: nextProgs };
+    setCustomPrograms(nextPrograms);
+    storage.saveCustomPrograms(nextPrograms);
+    persistSchoolsPrograms(currentSchools, nextPrograms);
     bump();
-  }, [bump, customSchools, persistSchoolsPrograms]);
+  }, [bump, persistSchoolsPrograms]);
 
   const deleteCustomProgram = useCallback((schoolId, programId) => {
-    let nextPrograms = {};
-    setCustomPrograms((prev) => {
-      const schoolProgs = prev[schoolId] ?? [];
-      const nextProgs = schoolProgs.filter((p) => p.id !== programId);
-      nextPrograms = { ...prev, [schoolId]: nextProgs };
-      storage.saveCustomPrograms(nextPrograms);
-      return nextPrograms;
-    });
-    persistSchoolsPrograms(customSchools, nextPrograms);
+    const currentSchools = storage.getCustomSchools();
+    const currentPrograms = storage.getCustomPrograms();
+    const schoolProgs = currentPrograms[schoolId] ?? [];
+    const nextProgs = schoolProgs.filter((p) => p.id !== programId);
+    const nextPrograms = { ...currentPrograms, [schoolId]: nextProgs };
+    setCustomPrograms(nextPrograms);
+    storage.saveCustomPrograms(nextPrograms);
+    persistSchoolsPrograms(currentSchools, nextPrograms);
     bump();
-  }, [bump, customSchools, persistSchoolsPrograms]);
+  }, [bump, persistSchoolsPrograms]);
 
   const allSchools = useMemo(
     () => getCombinedSchools(customSchools),
@@ -177,9 +170,10 @@ export function AdminDataProvider({ children }) {
           const all = {};
           for (const row of overridesResult.value) {
             all[row.playlist_id] = {
-              schoolId: row.school_id,
-              programId: row.program_id,
-              courseCode: row.course_code,
+              category: row.category,
+              schoolId: row.schoolId ?? row.school_id,
+              programId: row.programId ?? row.program_id,
+              courseCode: row.courseCode ?? row.course_code,
               instructor: row.instructor,
               semester: row.semester,
               level: row.level,
@@ -226,6 +220,8 @@ export function AdminDataProvider({ children }) {
 
   const getPlaylistCategory = useCallback(
     (playlistId) => {
+      const override = storage.getOverride(playlistId);
+      if (override?.category) return override.category;
       return getPlaylistProfile(playlistId)?.category || "course";
     },
     [getPlaylistProfile],
