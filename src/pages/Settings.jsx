@@ -59,6 +59,7 @@ function Section({ icon: Icon, iconColor, title, children }) {
 /* ── Page ────────────────────────────────────────────────────────────────────── */
 export default function SettingsPage() {
   const { settings, update, reset } = useSettings()
+  const { isAdmin } = useAuth()
 
   return (
     <>
@@ -204,12 +205,12 @@ export default function SettingsPage() {
         </ScrollReveal>
 
         {/* Admin Portal & Management */}
-        <ScrollReveal delay="0.25s">
-          <Section icon={Shield} iconColor="bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300" title="Administrator Portal">
-            <p className="text-sm text-ink-muted dark:text-slate-300 leading-relaxed mb-5">
-              Access the administrative studio to manage course metadata, upload syllabus/materials, edit the team directory, or customize site branding.
-            </p>
-            {isAdmin ? (
+        {isAdmin && (
+          <ScrollReveal delay="0.25s">
+            <Section icon={Shield} iconColor="bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300" title="Administrator Portal">
+              <p className="text-sm text-ink-muted dark:text-slate-300 leading-relaxed mb-5">
+                Access the administrative studio to manage course metadata, upload syllabus/materials, edit the team directory, or customize site branding.
+              </p>
               <div className="flex flex-wrap gap-3">
                 <Link to="/admin/settings" className="btn-primary gap-2 text-xs">
                   <SettingsIcon className="w-4 h-4" /> Open Admin Settings &amp; CMS
@@ -218,18 +219,9 @@ export default function SettingsPage() {
                   <LayoutDashboard className="w-4 h-4" /> Admin Dashboard
                 </Link>
               </div>
-            ) : (
-              <div className="flex flex-wrap items-center gap-3">
-                <Link to="/admin/login" className="btn-primary gap-2 text-xs">
-                  <Lock className="w-4 h-4" /> Sign In to Admin Portal
-                </Link>
-                <span className="text-xs text-ink-ghost dark:text-slate-400">
-                  Authorized ZC-OCW team accounts only
-                </span>
-              </div>
-            )}
-          </Section>
-        </ScrollReveal>
+            </Section>
+          </ScrollReveal>
+        )}
       </div>
     </>
   )
