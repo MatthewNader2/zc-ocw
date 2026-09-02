@@ -80,20 +80,19 @@ export default function HeroSection() {
       <ParticleBackground />
 
       {/* Layered backgrounds */}
-      <div className="absolute inset-0 bg-grid" />
-      <div className="absolute inset-0 bg-hero-mesh" />
+      <div className="absolute inset-0 bg-hero-mesh pointer-events-none" />
 
       {/* Animated blobs */}
       <div
-        className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-[0.07] blur-[80px]"
+        className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] rounded-full opacity-[0.07] blur-[80px] pointer-events-none"
         style={{ background: "radial-gradient(circle, #00b4d8, #0077b6)" }}
       />
       <div
-        className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] rounded-full opacity-[0.06] blur-[60px] animate-float"
+        className="absolute bottom-[-5%] left-[-5%] w-[400px] h-[400px] rounded-full opacity-[0.06] blur-[60px] animate-float pointer-events-none"
         style={{ background: "radial-gradient(circle, #48cae4, #0096c7)" }}
       />
       <div
-        className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full opacity-[0.04] blur-[50px]"
+        className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full opacity-[0.04] blur-[50px] pointer-events-none"
         style={{ background: "radial-gradient(circle, #90e0ef, transparent)" }}
       />
 
