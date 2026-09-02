@@ -19,3 +19,11 @@ build/
 .vercel/
 .vite/
 .vercel
+
+# Archives & Temporary Packages
+*.rar
+*.zip
+*.7z
+*.tar.gz
+*.tar
+
