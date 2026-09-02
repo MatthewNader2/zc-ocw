@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS acknowledgments (
 -- Admin > Team panel, which adds a row here.
 CREATE TABLE IF NOT EXISTS admins (
   email       TEXT PRIMARY KEY,
+  role        TEXT DEFAULT 'moderator', -- 'admin' or 'moderator'
   added_by    TEXT,
   added_at    TEXT DEFAULT (datetime('now'))
 );

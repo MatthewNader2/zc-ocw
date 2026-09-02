@@ -28,10 +28,18 @@ const AdminDashboard = lazy(() => import("@/pages/Admin/Dashboard"));
 const AdminCourseEditor = lazy(() => import("@/pages/Admin/CourseEditor"));
 const AdminSettings = lazy(() => import("@/pages/Admin/AdminSettings"));
 
+function ProtectedStaff({ children }) {
+  const { isStaff, loading } = useAuth();
+  if (loading) return null;
+  return isStaff ? children : <Navigate to="/admin/login" replace />;
+}
+
 function ProtectedAdmin({ children }) {
-  const { isAdmin, loading } = useAuth();
-  if (loading) return null; // brief — avoids flashing a redirect before the role check resolves
-  return isAdmin ? children : <Navigate to="/admin/login" replace />;
+  const { isAdmin, isStaff, loading } = useAuth();
+  if (loading) return null;
+  if (!isStaff) return <Navigate to="/admin/login" replace />;
+  if (!isAdmin) return <Navigate to="/admin" replace />;
+  return children;
 }
 
 function AppRoutes() {
@@ -65,7 +73,7 @@ function AppRoutes() {
         <Route
           path="/admin"
           element={
-            <ProtectedAdmin>
+            <ProtectedStaff>
               <ErrorBoundary title="Admin Dashboard Error">
                 <Suspense
                   fallback={
@@ -77,15 +85,15 @@ function AppRoutes() {
                   <AdminDashboard />
                 </Suspense>
               </ErrorBoundary>
-            </ProtectedAdmin>
+            </ProtectedStaff>
           }
         />
         <Route
           path="/admin/feedback"
           element={
-            <ProtectedAdmin>
+            <ProtectedStaff>
               <FeedbackViewer />
-            </ProtectedAdmin>
+            </ProtectedStaff>
           }
         />
         <Route
@@ -95,7 +103,7 @@ function AppRoutes() {
         <Route
           path="/admin/courses/:playlistId"
           element={
-            <ProtectedAdmin>
+            <ProtectedStaff>
               <Suspense
                 fallback={
                   <div className="p-10 text-center text-ink-muted">
@@ -105,7 +113,7 @@ function AppRoutes() {
               >
                 <AdminCourseEditor />
               </Suspense>
-            </ProtectedAdmin>
+            </ProtectedStaff>
           }
         />
         <Route

@@ -1,236 +1,5393 @@
 {
   "stars": [
-    { "id": "polaris", "name": "Polaris", "ra": 2.53, "dec": 89.26, "mag": 1.97 },
-    { "id": "kochab", "name": "Kochab", "ra": 14.85, "dec": 74.16, "mag": 2.08 },
-    { "id": "pherkad", "name": "Pherkad", "ra": 15.35, "dec": 71.83, "mag": 3.05 },
-
-    { "id": "betelgeuse", "name": "Betelgeuse", "ra": 5.92, "dec": 7.41, "mag": 0.50 },
-    { "id": "rigel", "name": "Rigel", "ra": 5.24, "dec": -8.20, "mag": 0.12 },
-    { "id": "bellatrix", "name": "Bellatrix", "ra": 5.42, "dec": 6.35, "mag": 1.64 },
-    { "id": "saiph", "name": "Saiph", "ra": 5.79, "dec": -9.67, "mag": 2.07 },
-    { "id": "alnitak", "name": "Alnitak", "ra": 5.68, "dec": -1.94, "mag": 1.77 },
-    { "id": "alnilam", "name": "Alnilam", "ra": 5.60, "dec": -1.20, "mag": 1.69 },
-    { "id": "mintaka", "name": "Mintaka", "ra": 5.53, "dec": -0.30, "mag": 2.23 },
-
-    { "id": "dubhe", "name": "Dubhe", "ra": 11.06, "dec": 61.75, "mag": 1.79 },
-    { "id": "merak", "name": "Merak", "ra": 11.03, "dec": 56.38, "mag": 2.37 },
-    { "id": "phecda", "name": "Phecda", "ra": 11.90, "dec": 53.69, "mag": 2.44 },
-    { "id": "megrez", "name": "Megrez", "ra": 12.25, "dec": 57.03, "mag": 3.31 },
-    { "id": "alioth", "name": "Alioth", "ra": 12.90, "dec": 55.96, "mag": 1.77 },
-    { "id": "mizar", "name": "Mizar", "ra": 13.40, "dec": 54.92, "mag": 2.23 },
-    { "id": "alkaid", "name": "Alkaid", "ra": 13.79, "dec": 49.31, "mag": 1.86 },
-
-    { "id": "schedar", "name": "Schedar", "ra": 0.68, "dec": 56.54, "mag": 2.23 },
-    { "id": "caph", "name": "Caph", "ra": 0.15, "dec": 59.15, "mag": 2.27 },
-    { "id": "gamma_cas", "name": "Gamma Cas", "ra": 0.94, "dec": 60.72, "mag": 2.15 },
-    { "id": "ruchbah", "name": "Ruchbah", "ra": 1.43, "dec": 60.24, "mag": 2.68 },
-    { "id": "segin", "name": "Segin", "ra": 1.90, "dec": 63.67, "mag": 3.37 },
-
-    { "id": "deneb", "name": "Deneb", "ra": 20.69, "dec": 45.28, "mag": 1.25 },
-    { "id": "albireo", "name": "Albireo", "ra": 19.51, "dec": 27.96, "mag": 3.05 },
-    { "id": "sadr", "name": "Sadr", "ra": 20.37, "dec": 40.26, "mag": 2.23 },
-    { "id": "gienah_cyg", "name": "Gienah Cyg", "ra": 20.77, "dec": 33.97, "mag": 2.48 },
-    { "id": "delta_cyg", "name": "Delta Cyg", "ra": 19.75, "dec": 45.13, "mag": 2.87 },
-
-    { "id": "vega", "name": "Vega", "ra": 18.62, "dec": 38.78, "mag": 0.03 },
-    { "id": "sheliak", "name": "Sheliak", "ra": 18.83, "dec": 33.36, "mag": 3.52 },
-    { "id": "sulafat", "name": "Sulafat", "ra": 18.98, "dec": 32.69, "mag": 3.24 },
-
-    { "id": "altair", "name": "Altair", "ra": 19.84, "dec": 8.87, "mag": 0.77 },
-    { "id": "tarazed", "name": "Tarazed", "ra": 19.77, "dec": 10.61, "mag": 2.72 },
-    { "id": "alshain", "name": "Alshain", "ra": 19.92, "dec": 6.41, "mag": 3.71 },
-
-    { "id": "antares", "name": "Antares", "ra": 16.49, "dec": -26.43, "mag": 1.06 },
-    { "id": "graffias", "name": "Graffias", "ra": 16.09, "dec": -19.80, "mag": 2.56 },
-    { "id": "dschubba", "name": "Dschubba", "ra": 16.00, "dec": -22.62, "mag": 2.29 },
-    { "id": "sargas", "name": "Sargas", "ra": 17.62, "dec": -42.99, "mag": 1.86 },
-    { "id": "shaula", "name": "Shaula", "ra": 17.56, "dec": -37.10, "mag": 1.62 },
-
-    { "id": "arcturus", "name": "Arcturus", "ra": 14.26, "dec": 19.18, "mag": -0.05 },
-    { "id": "izar", "name": "Izar", "ra": 14.75, "dec": 27.07, "mag": 2.35 },
-    { "id": "muphrid", "name": "Muphrid", "ra": 13.91, "dec": 18.39, "mag": 2.68 },
-
-    { "id": "capella", "name": "Capella", "ra": 5.28, "dec": 45.99, "mag": 0.08 },
-    { "id": "menkalinan", "name": "Menkalinan", "ra": 5.99, "dec": 44.95, "mag": 1.90 },
-
-    { "id": "sirius", "name": "Sirius", "ra": 6.75, "dec": -16.72, "mag": -1.46 },
-    { "id": "adhara", "name": "Adhara", "ra": 6.98, "dec": -28.97, "mag": 1.50 },
-    { "id": "procyon", "name": "Procyon", "ra": 7.65, "dec": 5.22, "mag": 0.34 },
-    { "id": "pollux", "name": "Pollux", "ra": 7.76, "dec": 28.03, "mag": 1.14 },
-    { "id": "castor", "name": "Castor", "ra": 7.58, "dec": 31.89, "mag": 1.58 },
-
-    { "id": "aldebaran", "name": "Aldebaran", "ra": 4.60, "dec": 16.51, "mag": 0.87 },
-    { "id": "alnath", "name": "Elnath", "ra": 5.44, "dec": 28.61, "mag": 1.65 },
-
-    { "id": "regulus", "name": "Regulus", "ra": 10.14, "dec": 11.97, "mag": 1.36 },
-    { "id": "denebola", "name": "Denebola", "ra": 11.82, "dec": 14.57, "mag": 2.14 },
-    { "id": "algieba", "name": "Algieba", "ra": 10.33, "dec": 19.84, "mag": 2.01 },
-    { "id": "zosma", "name": "Zosma", "ra": 11.24, "dec": 20.52, "mag": 2.56 },
-
-    { "id": "markab", "name": "Markab", "ra": 23.08, "dec": 15.21, "mag": 2.49 },
-    { "id": "scheat", "name": "Scheat", "ra": 23.06, "dec": 28.08, "mag": 2.44 },
-    { "id": "algenib", "name": "Algenib", "ra": 0.22, "dec": 15.18, "mag": 2.84 },
-    { "id": "alpheratz", "name": "Alpheratz", "ra": 0.14, "dec": 29.09, "mag": 2.07 },
-    { "id": "enif", "name": "Enif", "ra": 21.74, "dec": 9.87, "mag": 2.38 },
-    { "id": "homam", "name": "Homam", "ra": 22.46, "dec": 10.83, "mag": 3.41 },
-    { "id": "matar", "name": "Matar", "ra": 22.72, "dec": 30.22, "mag": 2.93 },
-    { "id": "baham", "name": "Baham", "ra": 22.17, "dec": 12.15, "mag": 3.53 },
-
-    { "id": "mirach", "name": "Mirach", "ra": 1.16, "dec": 35.62, "mag": 2.07 },
-    { "id": "almach", "name": "Almach", "ra": 2.06, "dec": 42.33, "mag": 2.10 },
-
-    { "id": "mirfak", "name": "Mirfak", "ra": 3.41, "dec": 49.86, "mag": 1.79 },
-    { "id": "algol", "name": "Algol", "ra": 3.14, "dec": 40.96, "mag": 2.12 },
-
-    { "id": "kaus_australis", "name": "Kaus Australis", "ra": 18.40, "dec": -34.38, "mag": 1.79 },
-    { "id": "nunki", "name": "Nunki", "ra": 18.92, "dec": -26.30, "mag": 2.05 },
-
-    { "id": "spica", "name": "Spica", "ra": 13.42, "dec": -11.16, "mag": 0.98 },
-    { "id": "fomalhaut", "name": "Fomalhaut", "ra": 22.96, "dec": -29.62, "mag": 1.17 }
+    {
+      "id": "polaris",
+      "name": "Polaris",
+      "ra": 2.53,
+      "dec": 89.26,
+      "mag": 1.97,
+      "spect": "F7Ib"
+    },
+    {
+      "id": "kochab",
+      "name": "Kochab",
+      "ra": 14.85,
+      "dec": 74.16,
+      "mag": 2.08,
+      "spect": "K4III"
+    },
+    {
+      "id": "pherkad",
+      "name": "Pherkad",
+      "ra": 15.35,
+      "dec": 71.83,
+      "mag": 3.05,
+      "spect": "A3II"
+    },
+    {
+      "id": "yildun",
+      "name": "Yildun",
+      "ra": 17.54,
+      "dec": 86.59,
+      "mag": 4.35,
+      "spect": "A1V"
+    },
+    {
+      "id": "zeta_umi",
+      "name": "Akhfa al Farkadain",
+      "ra": 15.73,
+      "dec": 77.79,
+      "mag": 4.29,
+      "spect": "A3V"
+    },
+    {
+      "id": "eta_umi",
+      "name": "Anwar al Farkadain",
+      "ra": 16.29,
+      "dec": 75.76,
+      "mag": 4.95,
+      "spect": "F5V"
+    },
+    {
+      "id": "epsilon_umi",
+      "name": "Epsilon UMi",
+      "ra": 16.76,
+      "dec": 82.04,
+      "mag": 4.21,
+      "spect": "G5III"
+    },
+    {
+      "id": "dubhe",
+      "name": "Dubhe",
+      "ra": 11.06,
+      "dec": 61.75,
+      "mag": 1.79,
+      "spect": "K0III"
+    },
+    {
+      "id": "merak",
+      "name": "Merak",
+      "ra": 11.03,
+      "dec": 56.38,
+      "mag": 2.37,
+      "spect": "A1V"
+    },
+    {
+      "id": "phecda",
+      "name": "Phecda",
+      "ra": 11.9,
+      "dec": 53.69,
+      "mag": 2.44,
+      "spect": "A0V"
+    },
+    {
+      "id": "megrez",
+      "name": "Megrez",
+      "ra": 12.25,
+      "dec": 57.03,
+      "mag": 3.31,
+      "spect": "A3V"
+    },
+    {
+      "id": "alioth",
+      "name": "Alioth",
+      "ra": 12.9,
+      "dec": 55.96,
+      "mag": 1.77,
+      "spect": "A1III"
+    },
+    {
+      "id": "mizar",
+      "name": "Mizar",
+      "ra": 13.4,
+      "dec": 54.92,
+      "mag": 2.23,
+      "spect": "A2V"
+    },
+    {
+      "id": "alcor",
+      "name": "Alcor",
+      "ra": 13.42,
+      "dec": 54.99,
+      "mag": 3.99,
+      "spect": "A5V"
+    },
+    {
+      "id": "alkaid",
+      "name": "Alkaid",
+      "ra": 13.79,
+      "dec": 49.31,
+      "mag": 1.86,
+      "spect": "B3V"
+    },
+    {
+      "id": "talitha",
+      "name": "Talitha",
+      "ra": 8.99,
+      "dec": 48.04,
+      "mag": 3.12,
+      "spect": "A7IV"
+    },
+    {
+      "id": "tania_borealis",
+      "name": "Tania Borealis",
+      "ra": 10.28,
+      "dec": 42.91,
+      "mag": 3.45,
+      "spect": "A2V"
+    },
+    {
+      "id": "tania_australis",
+      "name": "Tania Australis",
+      "ra": 10.37,
+      "dec": 41.5,
+      "mag": 3.06,
+      "spect": "M0III"
+    },
+    {
+      "id": "alula_borealis",
+      "name": "Alula Borealis",
+      "ra": 11.31,
+      "dec": 33.09,
+      "mag": 3.49,
+      "spect": "K3III"
+    },
+    {
+      "id": "alula_australis",
+      "name": "Alula Australis",
+      "ra": 11.3,
+      "dec": 31.53,
+      "mag": 3.79,
+      "spect": "F8V"
+    },
+    {
+      "id": "muscida",
+      "name": "Muscida",
+      "ra": 8.5,
+      "dec": 60.72,
+      "mag": 3.35,
+      "spect": "G4III"
+    },
+    {
+      "id": "betelgeuse",
+      "name": "Betelgeuse",
+      "ra": 5.92,
+      "dec": 7.41,
+      "mag": 0.5,
+      "spect": "M1Ia"
+    },
+    {
+      "id": "rigel",
+      "name": "Rigel",
+      "ra": 5.24,
+      "dec": -8.2,
+      "mag": 0.12,
+      "spect": "B8Ia"
+    },
+    {
+      "id": "bellatrix",
+      "name": "Bellatrix",
+      "ra": 5.42,
+      "dec": 6.35,
+      "mag": 1.64,
+      "spect": "B2III"
+    },
+    {
+      "id": "saiph",
+      "name": "Saiph",
+      "ra": 5.79,
+      "dec": -9.67,
+      "mag": 2.07,
+      "spect": "B0.5Ia"
+    },
+    {
+      "id": "alnitak",
+      "name": "Alnitak",
+      "ra": 5.68,
+      "dec": -1.94,
+      "mag": 1.77,
+      "spect": "O9.7Ib"
+    },
+    {
+      "id": "alnilam",
+      "name": "Alnilam",
+      "ra": 5.6,
+      "dec": -1.2,
+      "mag": 1.69,
+      "spect": "B0Ia"
+    },
+    {
+      "id": "mintaka",
+      "name": "Mintaka",
+      "ra": 5.53,
+      "dec": -0.3,
+      "mag": 2.23,
+      "spect": "O9.5II"
+    },
+    {
+      "id": "meissa",
+      "name": "Meissa",
+      "ra": 5.58,
+      "dec": 9.93,
+      "mag": 3.39,
+      "spect": "O8III"
+    },
+    {
+      "id": "hatysa",
+      "name": "Hatysa (Iota Ori)",
+      "ra": 5.59,
+      "dec": -5.91,
+      "mag": 2.75,
+      "spect": "O9III"
+    },
+    {
+      "id": "tabit",
+      "name": "Tabit (Pi3 Ori)",
+      "ra": 4.83,
+      "dec": 6.96,
+      "mag": 3.16,
+      "spect": "F6V"
+    },
+    {
+      "id": "schedar",
+      "name": "Schedar",
+      "ra": 0.68,
+      "dec": 56.54,
+      "mag": 2.23,
+      "spect": "K0III"
+    },
+    {
+      "id": "caph",
+      "name": "Caph",
+      "ra": 0.15,
+      "dec": 59.15,
+      "mag": 2.27,
+      "spect": "F2III"
+    },
+    {
+      "id": "gamma_cas",
+      "name": "Navi (Gamma Cas)",
+      "ra": 0.94,
+      "dec": 60.72,
+      "mag": 2.15,
+      "spect": "B0.5IV"
+    },
+    {
+      "id": "ruchbah",
+      "name": "Ruchbah",
+      "ra": 1.43,
+      "dec": 60.24,
+      "mag": 2.68,
+      "spect": "A5V"
+    },
+    {
+      "id": "segin",
+      "name": "Segin",
+      "ra": 1.9,
+      "dec": 63.67,
+      "mag": 3.37,
+      "spect": "B5III"
+    },
+    {
+      "id": "achird",
+      "name": "Achird (Eta Cas)",
+      "ra": 0.82,
+      "dec": 57.81,
+      "mag": 3.44,
+      "spect": "G0V"
+    },
+    {
+      "id": "deneb",
+      "name": "Deneb",
+      "ra": 20.69,
+      "dec": 45.28,
+      "mag": 1.25,
+      "spect": "A2Ia"
+    },
+    {
+      "id": "albireo",
+      "name": "Albireo",
+      "ra": 19.51,
+      "dec": 27.96,
+      "mag": 3.05,
+      "spect": "K3II"
+    },
+    {
+      "id": "sadr",
+      "name": "Sadr",
+      "ra": 20.37,
+      "dec": 40.26,
+      "mag": 2.23,
+      "spect": "F8Ib"
+    },
+    {
+      "id": "gienah_cyg",
+      "name": "Gienah",
+      "ra": 20.77,
+      "dec": 33.97,
+      "mag": 2.48,
+      "spect": "K0III"
+    },
+    {
+      "id": "delta_cyg",
+      "name": "Fawaris (Delta Cyg)",
+      "ra": 19.75,
+      "dec": 45.13,
+      "mag": 2.87,
+      "spect": "B9.5IV"
+    },
+    {
+      "id": "zeta_cyg",
+      "name": "Zeta Cyg",
+      "ra": 21.21,
+      "dec": 30.23,
+      "mag": 3.21,
+      "spect": "G8III"
+    },
+    {
+      "id": "vega",
+      "name": "Vega",
+      "ra": 18.62,
+      "dec": 38.78,
+      "mag": 0.03,
+      "spect": "A0V"
+    },
+    {
+      "id": "sheliak",
+      "name": "Sheliak",
+      "ra": 18.83,
+      "dec": 33.36,
+      "mag": 3.52,
+      "spect": "B7V"
+    },
+    {
+      "id": "sulafat",
+      "name": "Sulafat",
+      "ra": 18.98,
+      "dec": 32.69,
+      "mag": 3.24,
+      "spect": "B9III"
+    },
+    {
+      "id": "delta2_lyr",
+      "name": "Delta2 Lyr",
+      "ra": 18.91,
+      "dec": 36.9,
+      "mag": 4.3,
+      "spect": "M4II"
+    },
+    {
+      "id": "zeta_lyr",
+      "name": "Zeta Lyr",
+      "ra": 18.75,
+      "dec": 37.6,
+      "mag": 4.34,
+      "spect": "Am"
+    },
+    {
+      "id": "altair",
+      "name": "Altair",
+      "ra": 19.84,
+      "dec": 8.87,
+      "mag": 0.77,
+      "spect": "A7V"
+    },
+    {
+      "id": "tarazed",
+      "name": "Tarazed",
+      "ra": 19.77,
+      "dec": 10.61,
+      "mag": 2.72,
+      "spect": "K3II"
+    },
+    {
+      "id": "alshain",
+      "name": "Alshain",
+      "ra": 19.92,
+      "dec": 6.41,
+      "mag": 3.71,
+      "spect": "G8IV"
+    },
+    {
+      "id": "theta_aql",
+      "name": "Tseen Foo",
+      "ra": 20.19,
+      "dec": -0.82,
+      "mag": 3.24,
+      "spect": "B9.5III"
+    },
+    {
+      "id": "delta_aql",
+      "name": "Delta Aql",
+      "ra": 19.42,
+      "dec": 3.11,
+      "mag": 3.36,
+      "spect": "F0IV"
+    },
+    {
+      "id": "zeta_aql",
+      "name": "Okab",
+      "ra": 19.09,
+      "dec": 13.86,
+      "mag": 2.99,
+      "spect": "A0V"
+    },
+    {
+      "id": "antares",
+      "name": "Antares",
+      "ra": 16.49,
+      "dec": -26.43,
+      "mag": 1.06,
+      "spect": "M1.5Iab"
+    },
+    {
+      "id": "graffias",
+      "name": "Graffias",
+      "ra": 16.09,
+      "dec": -19.8,
+      "mag": 2.56,
+      "spect": "B0.5V"
+    },
+    {
+      "id": "dschubba",
+      "name": "Dschubba",
+      "ra": 16,
+      "dec": -22.62,
+      "mag": 2.29,
+      "spect": "B0.2IV"
+    },
+    {
+      "id": "sargas",
+      "name": "Sargas",
+      "ra": 17.62,
+      "dec": -42.99,
+      "mag": 1.86,
+      "spect": "F0II"
+    },
+    {
+      "id": "shaula",
+      "name": "Shaula",
+      "ra": 17.56,
+      "dec": -37.1,
+      "mag": 1.62,
+      "spect": "B2IV"
+    },
+    {
+      "id": "lesath",
+      "name": "Lesath",
+      "ra": 17.51,
+      "dec": -37.3,
+      "mag": 2.7,
+      "spect": "B2IV"
+    },
+    {
+      "id": "wei",
+      "name": "Wei (Epsilon Sco)",
+      "ra": 16.84,
+      "dec": -34.29,
+      "mag": 2.29,
+      "spect": "K2.5III"
+    },
+    {
+      "id": "alniyat",
+      "name": "Alniyat (Sigma Sco)",
+      "ra": 16.35,
+      "dec": -25.59,
+      "mag": 2.89,
+      "spect": "B1III"
+    },
+    {
+      "id": "tau_sco",
+      "name": "Paikauhale",
+      "ra": 16.6,
+      "dec": -28.22,
+      "mag": 2.82,
+      "spect": "B0V"
+    },
+    {
+      "id": "arcturus",
+      "name": "Arcturus",
+      "ra": 14.26,
+      "dec": 19.18,
+      "mag": -0.05,
+      "spect": "K1.5III"
+    },
+    {
+      "id": "izar",
+      "name": "Izar",
+      "ra": 14.75,
+      "dec": 27.07,
+      "mag": 2.35,
+      "spect": "K0II"
+    },
+    {
+      "id": "muphrid",
+      "name": "Muphrid",
+      "ra": 13.91,
+      "dec": 18.39,
+      "mag": 2.68,
+      "spect": "G0IV"
+    },
+    {
+      "id": "seginus",
+      "name": "Seginus",
+      "ra": 14.53,
+      "dec": 38.31,
+      "mag": 3.04,
+      "spect": "A7III"
+    },
+    {
+      "id": "nekkar",
+      "name": "Nekkar",
+      "ra": 15.03,
+      "dec": 40.39,
+      "mag": 3.49,
+      "spect": "G8III"
+    },
+    {
+      "id": "capella",
+      "name": "Capella",
+      "ra": 5.28,
+      "dec": 45.99,
+      "mag": 0.08,
+      "spect": "G3III"
+    },
+    {
+      "id": "menkalinan",
+      "name": "Menkalinan",
+      "ra": 5.99,
+      "dec": 44.95,
+      "mag": 1.9,
+      "spect": "A1IV"
+    },
+    {
+      "id": "mahassim",
+      "name": "Mahassim (Theta Aur)",
+      "ra": 5.99,
+      "dec": 37.21,
+      "mag": 2.65,
+      "spect": "A0p"
+    },
+    {
+      "id": "hassaleh",
+      "name": "Hassaleh (Iota Aur)",
+      "ra": 4.95,
+      "dec": 33.16,
+      "mag": 2.69,
+      "spect": "K3II"
+    },
+    {
+      "id": "almaaz",
+      "name": "Almaaz (Epsilon Aur)",
+      "ra": 5.03,
+      "dec": 43.82,
+      "mag": 3.03,
+      "spect": "F0Ia"
+    },
+    {
+      "id": "sirius",
+      "name": "Sirius",
+      "ra": 6.75,
+      "dec": -16.72,
+      "mag": -1.46,
+      "spect": "A1V"
+    },
+    {
+      "id": "adhara",
+      "name": "Adhara",
+      "ra": 6.98,
+      "dec": -28.97,
+      "mag": 1.5,
+      "spect": "B2II"
+    },
+    {
+      "id": "wezen",
+      "name": "Wezen",
+      "ra": 7.14,
+      "dec": -26.39,
+      "mag": 1.83,
+      "spect": "F8Ia"
+    },
+    {
+      "id": "mirzam",
+      "name": "Mirzam",
+      "ra": 6.38,
+      "dec": -17.95,
+      "mag": 1.98,
+      "spect": "B1II"
+    },
+    {
+      "id": "aludra",
+      "name": "Aludra",
+      "ra": 7.4,
+      "dec": -29.3,
+      "mag": 2.45,
+      "spect": "B5Ia"
+    },
+    {
+      "id": "furud",
+      "name": "Furud",
+      "ra": 6.34,
+      "dec": -30.06,
+      "mag": 3.02,
+      "spect": "B2.5V"
+    },
+    {
+      "id": "procyon",
+      "name": "Procyon",
+      "ra": 7.65,
+      "dec": 5.22,
+      "mag": 0.34,
+      "spect": "F5IV"
+    },
+    {
+      "id": "gomeisa",
+      "name": "Gomeisa",
+      "ra": 7.45,
+      "dec": 8.29,
+      "mag": 2.89,
+      "spect": "B8Ve"
+    },
+    {
+      "id": "pollux",
+      "name": "Pollux",
+      "ra": 7.76,
+      "dec": 28.03,
+      "mag": 1.14,
+      "spect": "K0III"
+    },
+    {
+      "id": "castor",
+      "name": "Castor",
+      "ra": 7.58,
+      "dec": 31.89,
+      "mag": 1.58,
+      "spect": "A1V"
+    },
+    {
+      "id": "alhena",
+      "name": "Alhena",
+      "ra": 6.63,
+      "dec": 16.4,
+      "mag": 1.93,
+      "spect": "A1.5IV"
+    },
+    {
+      "id": "wasat",
+      "name": "Wasat",
+      "ra": 7.34,
+      "dec": 21.98,
+      "mag": 3.53,
+      "spect": "F0IV"
+    },
+    {
+      "id": "mebsuta",
+      "name": "Mebsuta",
+      "ra": 6.73,
+      "dec": 25.13,
+      "mag": 3.06,
+      "spect": "G8Ib"
+    },
+    {
+      "id": "propus",
+      "name": "Propus (Eta Gem)",
+      "ra": 6.25,
+      "dec": 22.51,
+      "mag": 3.31,
+      "spect": "M3III"
+    },
+    {
+      "id": "alzirr",
+      "name": "Alzirr (Xi Gem)",
+      "ra": 6.75,
+      "dec": 12.9,
+      "mag": 3.35,
+      "spect": "F5IV"
+    },
+    {
+      "id": "aldebaran",
+      "name": "Aldebaran",
+      "ra": 4.6,
+      "dec": 16.51,
+      "mag": 0.87,
+      "spect": "K5III"
+    },
+    {
+      "id": "alnath",
+      "name": "Elnath",
+      "ra": 5.44,
+      "dec": 28.61,
+      "mag": 1.65,
+      "spect": "B7III"
+    },
+    {
+      "id": "alcyone",
+      "name": "Alcyone (Pleiades)",
+      "ra": 3.79,
+      "dec": 24.11,
+      "mag": 2.87,
+      "spect": "B7IIIe"
+    },
+    {
+      "id": "tianguan",
+      "name": "Tianguan (Zeta Tau)",
+      "ra": 5.63,
+      "dec": 21.14,
+      "mag": 2.97,
+      "spect": "B2III"
+    },
+    {
+      "id": "hyadum_i",
+      "name": "Hyadum I (Gamma Tau)",
+      "ra": 4.33,
+      "dec": 15.63,
+      "mag": 3.65,
+      "spect": "G8III"
+    },
+    {
+      "id": "ain",
+      "name": "Ain (Epsilon Tau)",
+      "ra": 4.48,
+      "dec": 19.18,
+      "mag": 3.53,
+      "spect": "K0III"
+    },
+    {
+      "id": "regulus",
+      "name": "Regulus",
+      "ra": 10.14,
+      "dec": 11.97,
+      "mag": 1.36,
+      "spect": "B7V"
+    },
+    {
+      "id": "denebola",
+      "name": "Denebola",
+      "ra": 11.82,
+      "dec": 14.57,
+      "mag": 2.14,
+      "spect": "A3V"
+    },
+    {
+      "id": "algieba",
+      "name": "Algieba",
+      "ra": 10.33,
+      "dec": 19.84,
+      "mag": 2.01,
+      "spect": "K0III"
+    },
+    {
+      "id": "zosma",
+      "name": "Zosma",
+      "ra": 11.24,
+      "dec": 20.52,
+      "mag": 2.56,
+      "spect": "A4V"
+    },
+    {
+      "id": "algenubi",
+      "name": "Ras Elased Australis",
+      "ra": 9.76,
+      "dec": 23.77,
+      "mag": 2.98,
+      "spect": "G1II"
+    },
+    {
+      "id": "adhafera",
+      "name": "Adhafera",
+      "ra": 10.28,
+      "dec": 23.42,
+      "mag": 3.44,
+      "spect": "F0III"
+    },
+    {
+      "id": "chertan",
+      "name": "Chertan",
+      "ra": 11.23,
+      "dec": 15.43,
+      "mag": 3.33,
+      "spect": "A2V"
+    },
+    {
+      "id": "markab",
+      "name": "Markab",
+      "ra": 23.08,
+      "dec": 15.21,
+      "mag": 2.49,
+      "spect": "B9III"
+    },
+    {
+      "id": "scheat",
+      "name": "Scheat",
+      "ra": 23.06,
+      "dec": 28.08,
+      "mag": 2.44,
+      "spect": "M2.5II"
+    },
+    {
+      "id": "algenib",
+      "name": "Algenib",
+      "ra": 0.22,
+      "dec": 15.18,
+      "mag": 2.84,
+      "spect": "B2IV"
+    },
+    {
+      "id": "alpheratz",
+      "name": "Alpheratz",
+      "ra": 0.14,
+      "dec": 29.09,
+      "mag": 2.07,
+      "spect": "B8IV"
+    },
+    {
+      "id": "enif",
+      "name": "Enif",
+      "ra": 21.74,
+      "dec": 9.87,
+      "mag": 2.38,
+      "spect": "K2Ib"
+    },
+    {
+      "id": "homam",
+      "name": "Homam",
+      "ra": 22.46,
+      "dec": 10.83,
+      "mag": 3.41,
+      "spect": "B8V"
+    },
+    {
+      "id": "matar",
+      "name": "Matar",
+      "ra": 22.72,
+      "dec": 30.22,
+      "mag": 2.93,
+      "spect": "G2II"
+    },
+    {
+      "id": "baham",
+      "name": "Baham",
+      "ra": 22.17,
+      "dec": 12.15,
+      "mag": 3.53,
+      "spect": "A1V"
+    },
+    {
+      "id": "mirach",
+      "name": "Mirach",
+      "ra": 1.16,
+      "dec": 35.62,
+      "mag": 2.07,
+      "spect": "M0III"
+    },
+    {
+      "id": "almach",
+      "name": "Almach",
+      "ra": 2.06,
+      "dec": 42.33,
+      "mag": 2.1,
+      "spect": "K3II"
+    },
+    {
+      "id": "delta_and",
+      "name": "Delta And",
+      "ra": 0.65,
+      "dec": 30.86,
+      "mag": 3.27,
+      "spect": "K3III"
+    },
+    {
+      "id": "mu_and",
+      "name": "Mu And",
+      "ra": 0.94,
+      "dec": 38.5,
+      "mag": 3.86,
+      "spect": "A5V"
+    },
+    {
+      "id": "mirfak",
+      "name": "Mirfak",
+      "ra": 3.41,
+      "dec": 49.86,
+      "mag": 1.79,
+      "spect": "F5Ib"
+    },
+    {
+      "id": "algol",
+      "name": "Algol (The Demon Star)",
+      "ra": 3.14,
+      "dec": 40.96,
+      "mag": 2.12,
+      "spect": "B8V"
+    },
+    {
+      "id": "atiy",
+      "name": "Atik (Zeta Per)",
+      "ra": 3.9,
+      "dec": 31.88,
+      "mag": 2.84,
+      "spect": "B1Ib"
+    },
+    {
+      "id": "menkib",
+      "name": "Menkib (Xi Per)",
+      "ra": 3.98,
+      "dec": 35.79,
+      "mag": 3.98,
+      "spect": "O7.5III"
+    },
+    {
+      "id": "gorgonea_tertia",
+      "name": "Rho Per",
+      "ra": 3.09,
+      "dec": 38.84,
+      "mag": 3.39,
+      "spect": "M4II"
+    },
+    {
+      "id": "kaus_australis",
+      "name": "Kaus Australis",
+      "ra": 18.4,
+      "dec": -34.38,
+      "mag": 1.79,
+      "spect": "B9.5III"
+    },
+    {
+      "id": "nunki",
+      "name": "Nunki",
+      "ra": 18.92,
+      "dec": -26.3,
+      "mag": 2.05,
+      "spect": "B2.5V"
+    },
+    {
+      "id": "ascella",
+      "name": "Ascella",
+      "ra": 19.04,
+      "dec": -29.88,
+      "mag": 2.59,
+      "spect": "A2V"
+    },
+    {
+      "id": "kaus_media",
+      "name": "Kaus Media",
+      "ra": 18.35,
+      "dec": -29.83,
+      "mag": 2.72,
+      "spect": "K3III"
+    },
+    {
+      "id": "kaus_borealis",
+      "name": "Kaus Borealis",
+      "ra": 18.46,
+      "dec": -25.42,
+      "mag": 2.82,
+      "spect": "K0IV"
+    },
+    {
+      "id": "alnasl",
+      "name": "Alnasl",
+      "ra": 18.09,
+      "dec": -30.42,
+      "mag": 2.98,
+      "spect": "K0III"
+    },
+    {
+      "id": "rukbat",
+      "name": "Rukbat",
+      "ra": 19.39,
+      "dec": -40.61,
+      "mag": 3.96,
+      "spect": "B8V"
+    },
+    {
+      "id": "spica",
+      "name": "Spica",
+      "ra": 13.42,
+      "dec": -11.16,
+      "mag": 0.98,
+      "spect": "B1III"
+    },
+    {
+      "id": "porrima",
+      "name": "Porrima",
+      "ra": 12.69,
+      "dec": -1.45,
+      "mag": 2.74,
+      "spect": "F0V"
+    },
+    {
+      "id": "vindemiatrix",
+      "name": "Vindemiatrix",
+      "ra": 13.04,
+      "dec": 10.96,
+      "mag": 2.85,
+      "spect": "G8III"
+    },
+    {
+      "id": "heze",
+      "name": "Heze (Zeta Vir)",
+      "ra": 13.58,
+      "dec": -0.6,
+      "mag": 3.38,
+      "spect": "A3V"
+    },
+    {
+      "id": "zaniah",
+      "name": "Zaniah",
+      "ra": 12.33,
+      "dec": -0.67,
+      "mag": 3.89,
+      "spect": "A2V"
+    },
+    {
+      "id": "syrma",
+      "name": "Syrma (Iota Vir)",
+      "ra": 14.27,
+      "dec": -6,
+      "mag": 4.07,
+      "spect": "F6III"
+    },
+    {
+      "id": "fomalhaut",
+      "name": "Fomalhaut",
+      "ra": 22.96,
+      "dec": -29.62,
+      "mag": 1.17,
+      "spect": "A3V"
+    },
+    {
+      "id": "canopus",
+      "name": "Canopus",
+      "ra": 6.4,
+      "dec": -52.7,
+      "mag": -0.74,
+      "spect": "F0II"
+    },
+    {
+      "id": "alpha_cen_a",
+      "name": "Alpha Centauri",
+      "ra": 14.66,
+      "dec": -60.83,
+      "mag": -0.01,
+      "spect": "G2V"
+    },
+    {
+      "id": "hadar",
+      "name": "Hadar (Beta Cen)",
+      "ra": 14.06,
+      "dec": -60.37,
+      "mag": 0.61,
+      "spect": "B1III"
+    },
+    {
+      "id": "acrux",
+      "name": "Acrux (Alpha Cru)",
+      "ra": 12.44,
+      "dec": -63.1,
+      "mag": 0.77,
+      "spect": "B0.5IV"
+    },
+    {
+      "id": "mimosa",
+      "name": "Mimosa (Beta Cru)",
+      "ra": 12.79,
+      "dec": -59.69,
+      "mag": 1.25,
+      "spect": "B0.5III"
+    },
+    {
+      "id": "gacrux",
+      "name": "Gacrux (Gamma Cru)",
+      "ra": 12.52,
+      "dec": -57.11,
+      "mag": 1.59,
+      "spect": "M3.5III"
+    },
+    {
+      "id": "achernar",
+      "name": "Achernar",
+      "ra": 1.63,
+      "dec": -57.24,
+      "mag": 0.45,
+      "spect": "B6Vep"
+    },
+    {
+      "id": "alphecca",
+      "name": "Alphecca",
+      "ra": 15.58,
+      "dec": 26.71,
+      "mag": 2.22,
+      "spect": "A0V"
+    },
+    {
+      "id": "nusakan",
+      "name": "Nusakan",
+      "ra": 15.47,
+      "dec": 29.11,
+      "mag": 3.66,
+      "spect": "F0p"
+    },
+    {
+      "id": "kornephoros",
+      "name": "Kornephoros",
+      "ra": 16.5,
+      "dec": 21.49,
+      "mag": 2.78,
+      "spect": "G8III"
+    },
+    {
+      "id": "rasalgethi",
+      "name": "Rasalgethi",
+      "ra": 17.25,
+      "dec": 14.39,
+      "mag": 3.1,
+      "spect": "M5Ib"
+    },
+    {
+      "id": "sarina",
+      "name": "Sarina (Delta Her)",
+      "ra": 17.25,
+      "dec": 24.84,
+      "mag": 3.12,
+      "spect": "A3IV"
+    },
+    {
+      "id": "rutilicus",
+      "name": "Rutilicus (Zeta Her)",
+      "ra": 16.69,
+      "dec": 31.6,
+      "mag": 2.81,
+      "spect": "F9IV"
+    },
+    {
+      "id": "rasalhague",
+      "name": "Rasalhague",
+      "ra": 17.58,
+      "dec": 12.56,
+      "mag": 2.08,
+      "spect": "A5III"
+    },
+    {
+      "id": "cebalrai",
+      "name": "Cebalrai",
+      "ra": 17.72,
+      "dec": 4.57,
+      "mag": 2.76,
+      "spect": "K2III"
+    },
+    {
+      "id": "sabik",
+      "name": "Sabik",
+      "ra": 17.17,
+      "dec": -15.72,
+      "mag": 2.43,
+      "spect": "A1V"
+    },
+    {
+      "id": "han",
+      "name": "Zeta Oph",
+      "ra": 16.62,
+      "dec": -10.57,
+      "mag": 2.54,
+      "spect": "O9.5V"
+    },
+    {
+      "id": "unukalhai",
+      "name": "Unukalhai",
+      "ra": 15.74,
+      "dec": 6.43,
+      "mag": 2.63,
+      "spect": "K2III"
+    },
+    {
+      "id": "hamal",
+      "name": "Hamal",
+      "ra": 2.12,
+      "dec": 23.46,
+      "mag": 2.01,
+      "spect": "K2III"
+    },
+    {
+      "id": "sheratan",
+      "name": "Sheratan",
+      "ra": 1.91,
+      "dec": 20.81,
+      "mag": 2.64,
+      "spect": "A5V"
+    },
+    {
+      "id": "mesarthim",
+      "name": "Mesarthim",
+      "ra": 1.9,
+      "dec": 19.29,
+      "mag": 3.88,
+      "spect": "B9V"
+    },
+    {
+      "id": "alpherg",
+      "name": "Alpherg (Eta Psc)",
+      "ra": 1.52,
+      "dec": 15.35,
+      "mag": 3.62,
+      "spect": "G7III"
+    },
+    {
+      "id": "alrescha",
+      "name": "Alrescha (Alpha Psc)",
+      "ra": 2.03,
+      "dec": 2.76,
+      "mag": 3.82,
+      "spect": "A0p"
+    },
+    {
+      "id": "sadalsuud",
+      "name": "Sadalsuud (Beta Aqr)",
+      "ra": 21.53,
+      "dec": -5.57,
+      "mag": 2.9,
+      "spect": "G0Ib"
+    },
+    {
+      "id": "sadalmelik",
+      "name": "Sadalmelik (Alpha Aqr)",
+      "ra": 22.1,
+      "dec": -0.32,
+      "mag": 2.95,
+      "spect": "G2Ib"
+    },
+    {
+      "id": "skat",
+      "name": "Skat (Delta Aqr)",
+      "ra": 22.91,
+      "dec": -15.82,
+      "mag": 3.27,
+      "spect": "A3V"
+    },
+    {
+      "id": "deneb_algedi",
+      "name": "Deneb Algedi",
+      "ra": 21.78,
+      "dec": -16.13,
+      "mag": 2.85,
+      "spect": "A7m"
+    },
+    {
+      "id": "dabih",
+      "name": "Dabih",
+      "ra": 20.35,
+      "dec": -14.78,
+      "mag": 3.05,
+      "spect": "K0II"
+    },
+    {
+      "id": "hip_1000",
+      "name": "HIP 24000",
+      "ra": 0,
+      "dec": -71.81,
+      "mag": 4.35,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1001",
+      "name": "HIP 24137",
+      "ra": 9.17,
+      "dec": 35.95,
+      "mag": 3.74,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1002",
+      "name": "HIP 24274",
+      "ra": 18.33,
+      "dec": 12.96,
+      "mag": 5.38,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1003",
+      "name": "HIP 24411",
+      "ra": 3.5,
+      "dec": -7.97,
+      "mag": 3.21,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1004",
+      "name": "HIP 24548",
+      "ra": 12.67,
+      "dec": -30.11,
+      "mag": 5.26,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1005",
+      "name": "HIP 24685",
+      "ra": 21.83,
+      "dec": -59.83,
+      "mag": 3.96,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1006",
+      "name": "HIP 24822",
+      "ra": 7,
+      "dec": 42.27,
+      "mag": 4.11,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1007",
+      "name": "HIP 24959",
+      "ra": 16.17,
+      "dec": 18.04,
+      "mag": 5.15,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1008",
+      "name": "HIP 25096",
+      "ra": 1.33,
+      "dec": -3.05,
+      "mag": 3.23,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1009",
+      "name": "HIP 25233",
+      "ra": 10.5,
+      "dec": -24.59,
+      "mag": 5.44,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1010",
+      "name": "HIP 25370",
+      "ra": 19.67,
+      "dec": -51.17,
+      "mag": 3.61,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1011",
+      "name": "HIP 25507",
+      "ra": 4.83,
+      "dec": 49.3,
+      "mag": 4.51,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1012",
+      "name": "HIP 25644",
+      "ra": 14,
+      "dec": 23.28,
+      "mag": 4.82,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1013",
+      "name": "HIP 25781",
+      "ra": 23.17,
+      "dec": 1.85,
+      "mag": 3.4,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1014",
+      "name": "HIP 25918",
+      "ra": 8.33,
+      "dec": -19.31,
+      "mag": 5.5,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1015",
+      "name": "HIP 26055",
+      "ra": 17.5,
+      "dec": -43.91,
+      "mag": 3.35,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1016",
+      "name": "HIP 26192",
+      "ra": 2.67,
+      "dec": 57.52,
+      "mag": 4.89,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1017",
+      "name": "HIP 26329",
+      "ra": 11.83,
+      "dec": 28.73,
+      "mag": 4.43,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1018",
+      "name": "HIP 26466",
+      "ra": 21,
+      "dec": 6.77,
+      "mag": 3.68,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1019",
+      "name": "HIP 26603",
+      "ra": 6.17,
+      "dec": -14.19,
+      "mag": 5.42,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1020",
+      "name": "HIP 26740",
+      "ra": 15.33,
+      "dec": -37.45,
+      "mag": 3.22,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1021",
+      "name": "HIP 26877",
+      "ra": 0.5,
+      "dec": 68.29,
+      "mag": 5.21,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1022",
+      "name": "HIP 27014",
+      "ra": 9.67,
+      "dec": 34.49,
+      "mag": 4.03,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1023",
+      "name": "HIP 27151",
+      "ra": 18.83,
+      "dec": 11.73,
+      "mag": 4.04,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1024",
+      "name": "HIP 27288",
+      "ra": 4,
+      "dec": -9.18,
+      "mag": 5.2,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1025",
+      "name": "HIP 27425",
+      "ra": 13.17,
+      "dec": -31.5,
+      "mag": 3.22,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1026",
+      "name": "HIP 27562",
+      "ra": 22.33,
+      "dec": -62.3,
+      "mag": 5.42,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1027",
+      "name": "HIP 27699",
+      "ra": 7.5,
+      "dec": 40.67,
+      "mag": 3.67,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1028",
+      "name": "HIP 27836",
+      "ra": 16.67,
+      "dec": 16.79,
+      "mag": 4.43,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1029",
+      "name": "HIP 27973",
+      "ra": 1.83,
+      "dec": -4.25,
+      "mag": 4.89,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1030",
+      "name": "HIP 28110",
+      "ra": 11,
+      "dec": -25.91,
+      "mag": 3.36,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1031",
+      "name": "HIP 28247",
+      "ra": 20.17,
+      "dec": -53.12,
+      "mag": 5.5,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1032",
+      "name": "HIP 28384",
+      "ra": 5.33,
+      "dec": 47.49,
+      "mag": 3.39,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1033",
+      "name": "HIP 28521",
+      "ra": 14.5,
+      "dec": 21.98,
+      "mag": 4.82,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1034",
+      "name": "HIP 28658",
+      "ra": 23.67,
+      "dec": 0.65,
+      "mag": 4.51,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1035",
+      "name": "HIP 28795",
+      "ra": 8.83,
+      "dec": -20.58,
+      "mag": 3.61,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1036",
+      "name": "HIP 28932",
+      "ra": 18,
+      "dec": -45.59,
+      "mag": 5.44,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1037",
+      "name": "HIP 29069",
+      "ra": 3.17,
+      "dec": 55.36,
+      "mag": 3.23,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1038",
+      "name": "HIP 29206",
+      "ra": 12.33,
+      "dec": 27.37,
+      "mag": 5.15,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1039",
+      "name": "HIP 29343",
+      "ra": 21.5,
+      "dec": 5.56,
+      "mag": 4.11,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1040",
+      "name": "HIP 29480",
+      "ra": 6.67,
+      "dec": -15.43,
+      "mag": 3.96,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1041",
+      "name": "HIP 29617",
+      "ra": 15.83,
+      "dec": -38.97,
+      "mag": 5.25,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1042",
+      "name": "HIP 29754",
+      "ra": 1,
+      "dec": 65.26,
+      "mag": 3.21,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1043",
+      "name": "HIP 29891",
+      "ra": 10.17,
+      "dec": 33.05,
+      "mag": 5.39,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1044",
+      "name": "HIP 30028",
+      "ra": 19.33,
+      "dec": 10.51,
+      "mag": 3.74,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1045",
+      "name": "HIP 30165",
+      "ra": 4.5,
+      "dec": -10.4,
+      "mag": 4.36,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1046",
+      "name": "HIP 30302",
+      "ra": 13.67,
+      "dec": -32.92,
+      "mag": 4.96,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1047",
+      "name": "HIP 30439",
+      "ra": 22.83,
+      "dec": -65,
+      "mag": 3.32,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1048",
+      "name": "HIP 30576",
+      "ra": 8,
+      "dec": 39.11,
+      "mag": 5.49,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1049",
+      "name": "HIP 30713",
+      "ra": 17.17,
+      "dec": 15.54,
+      "mag": 3.44,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1050",
+      "name": "HIP 30850",
+      "ra": 2.33,
+      "dec": -5.45,
+      "mag": 4.75,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1051",
+      "name": "HIP 30987",
+      "ra": 11.5,
+      "dec": -27.25,
+      "mag": 4.58,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1052",
+      "name": "HIP 31124",
+      "ra": 20.67,
+      "dec": -55.16,
+      "mag": 3.56,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1053",
+      "name": "HIP 31261",
+      "ra": 5.83,
+      "dec": 45.75,
+      "mag": 5.46,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1054",
+      "name": "HIP 31398",
+      "ra": 15,
+      "dec": 20.7,
+      "mag": 3.25,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1055",
+      "name": "HIP 31535",
+      "ra": 0.17,
+      "dec": -0.54,
+      "mag": 5.09,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1056",
+      "name": "HIP 31672",
+      "ra": 9.33,
+      "dec": -21.86,
+      "mag": 4.18,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1057",
+      "name": "HIP 31809",
+      "ra": 18.5,
+      "dec": -47.33,
+      "mag": 3.89,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1058",
+      "name": "HIP 31946",
+      "ra": 3.67,
+      "dec": 53.3,
+      "mag": 5.3,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1059",
+      "name": "HIP 32083",
+      "ra": 12.83,
+      "dec": 26.03,
+      "mag": 3.2,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1060",
+      "name": "HIP 32220",
+      "ra": 22,
+      "dec": 4.36,
+      "mag": 5.35,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1061",
+      "name": "HIP 32357",
+      "ra": 7.17,
+      "dec": -16.67,
+      "mag": 3.8,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1062",
+      "name": "HIP 32494",
+      "ra": 16.33,
+      "dec": -40.53,
+      "mag": 4.28,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1063",
+      "name": "HIP 32631",
+      "ra": 1.5,
+      "dec": 62.54,
+      "mag": 5.02,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1064",
+      "name": "HIP 32768",
+      "ra": 10.67,
+      "dec": 31.63,
+      "mag": 3.29,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1065",
+      "name": "HIP 32905",
+      "ra": 19.83,
+      "dec": 9.29,
+      "mag": 5.48,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1066",
+      "name": "HIP 33042",
+      "ra": 5,
+      "dec": -11.62,
+      "mag": 3.49,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1067",
+      "name": "HIP 33179",
+      "ra": 14.17,
+      "dec": -34.35,
+      "mag": 4.67,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1068",
+      "name": "HIP 33316",
+      "ra": 23.33,
+      "dec": -68,
+      "mag": 4.66,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1069",
+      "name": "HIP 33453",
+      "ra": 8.5,
+      "dec": 37.58,
+      "mag": 3.5,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1070",
+      "name": "HIP 33590",
+      "ra": 17.67,
+      "dec": 14.3,
+      "mag": 5.48,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1071",
+      "name": "HIP 33727",
+      "ra": 2.83,
+      "dec": -6.66,
+      "mag": 3.28,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1072",
+      "name": "HIP 33864",
+      "ra": 12,
+      "dec": -28.61,
+      "mag": 5.03,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1073",
+      "name": "HIP 34001",
+      "ra": 21.17,
+      "dec": -57.32,
+      "mag": 4.26,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1074",
+      "name": "HIP 34138",
+      "ra": 6.33,
+      "dec": 44.06,
+      "mag": 3.82,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1075",
+      "name": "HIP 34275",
+      "ra": 15.5,
+      "dec": 19.42,
+      "mag": 5.34,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1076",
+      "name": "HIP 34412",
+      "ra": 0.67,
+      "dec": -1.74,
+      "mag": 3.2,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1077",
+      "name": "HIP 34549",
+      "ra": 9.83,
+      "dec": -23.16,
+      "mag": 5.31,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1078",
+      "name": "HIP 34686",
+      "ra": 19,
+      "dec": -49.13,
+      "mag": 3.87,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1079",
+      "name": "HIP 34823",
+      "ra": 4.17,
+      "dec": 51.34,
+      "mag": 4.2,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1080",
+      "name": "HIP 34960",
+      "ra": 13.33,
+      "dec": 24.71,
+      "mag": 5.08,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1081",
+      "name": "HIP 35097",
+      "ra": 22.5,
+      "dec": 3.16,
+      "mag": 3.26,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1082",
+      "name": "HIP 35234",
+      "ra": 7.67,
+      "dec": -17.93,
+      "mag": 5.47,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1083",
+      "name": "HIP 35371",
+      "ra": 16.83,
+      "dec": -42.12,
+      "mag": 3.54,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1084",
+      "name": "HIP 35508",
+      "ra": 2,
+      "dec": 60.04,
+      "mag": 4.6,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1085",
+      "name": "HIP 35645",
+      "ra": 11.17,
+      "dec": 30.23,
+      "mag": 4.73,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1086",
+      "name": "HIP 35782",
+      "ra": 20.33,
+      "dec": 8.08,
+      "mag": 3.45,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1087",
+      "name": "HIP 35919",
+      "ra": 5.5,
+      "dec": -12.84,
+      "mag": 5.49,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1088",
+      "name": "HIP 36056",
+      "ra": 14.67,
+      "dec": -35.82,
+      "mag": 3.31,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1089",
+      "name": "HIP 36193",
+      "ra": 23.83,
+      "dec": -71.46,
+      "mag": 4.97,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1090",
+      "name": "HIP 36330",
+      "ra": 9,
+      "dec": 36.09,
+      "mag": 4.34,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1091",
+      "name": "HIP 36467",
+      "ra": 18.17,
+      "dec": 13.07,
+      "mag": 3.75,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1092",
+      "name": "HIP 36604",
+      "ra": 3.33,
+      "dec": -7.86,
+      "mag": 5.38,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1093",
+      "name": "HIP 36741",
+      "ra": 12.5,
+      "dec": -29.98,
+      "mag": 3.21,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1094",
+      "name": "HIP 36878",
+      "ra": 21.67,
+      "dec": -59.61,
+      "mag": 5.26,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1095",
+      "name": "HIP 37015",
+      "ra": 6.83,
+      "dec": 42.42,
+      "mag": 3.95,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1096",
+      "name": "HIP 37152",
+      "ra": 16,
+      "dec": 18.16,
+      "mag": 4.12,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1097",
+      "name": "HIP 37289",
+      "ra": 1.17,
+      "dec": -2.94,
+      "mag": 5.14,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1098",
+      "name": "HIP 37426",
+      "ra": 10.33,
+      "dec": -24.47,
+      "mag": 3.24,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1099",
+      "name": "HIP 37563",
+      "ra": 19.5,
+      "dec": -51,
+      "mag": 5.45,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1100",
+      "name": "HIP 37700",
+      "ra": 4.67,
+      "dec": 49.46,
+      "mag": 3.6,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1101",
+      "name": "HIP 37837",
+      "ra": 13.83,
+      "dec": 23.4,
+      "mag": 4.52,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1102",
+      "name": "HIP 37974",
+      "ra": 23,
+      "dec": 1.96,
+      "mag": 4.81,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1103",
+      "name": "HIP 38111",
+      "ra": 8.17,
+      "dec": -19.19,
+      "mag": 3.4,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1104",
+      "name": "HIP 38248",
+      "ra": 17.33,
+      "dec": -43.76,
+      "mag": 5.5,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1105",
+      "name": "HIP 38385",
+      "ra": 2.5,
+      "dec": 57.73,
+      "mag": 3.35,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1106",
+      "name": "HIP 38522",
+      "ra": 11.67,
+      "dec": 28.86,
+      "mag": 4.9,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1107",
+      "name": "HIP 38659",
+      "ra": 20.83,
+      "dec": 6.87,
+      "mag": 4.42,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1108",
+      "name": "HIP 38796",
+      "ra": 6,
+      "dec": -14.08,
+      "mag": 3.68,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1109",
+      "name": "HIP 38933",
+      "ra": 15.17,
+      "dec": -37.31,
+      "mag": 5.41,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1110",
+      "name": "HIP 39070",
+      "ra": 0.33,
+      "dec": 68.59,
+      "mag": 3.22,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1111",
+      "name": "HIP 39207",
+      "ra": 9.5,
+      "dec": 34.62,
+      "mag": 5.21,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1112",
+      "name": "HIP 39344",
+      "ra": 18.67,
+      "dec": 11.84,
+      "mag": 4.02,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1113",
+      "name": "HIP 39481",
+      "ra": 3.83,
+      "dec": -9.07,
+      "mag": 4.05,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1114",
+      "name": "HIP 39618",
+      "ra": 13,
+      "dec": -31.37,
+      "mag": 5.2,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1115",
+      "name": "HIP 39755",
+      "ra": 22.17,
+      "dec": -62.07,
+      "mag": 3.22,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1116",
+      "name": "HIP 39892",
+      "ra": 7.33,
+      "dec": 40.81,
+      "mag": 5.42,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1117",
+      "name": "HIP 40029",
+      "ra": 16.5,
+      "dec": 16.9,
+      "mag": 3.66,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1118",
+      "name": "HIP 40166",
+      "ra": 1.67,
+      "dec": -4.14,
+      "mag": 4.44,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1119",
+      "name": "HIP 40303",
+      "ra": 10.83,
+      "dec": -25.79,
+      "mag": 4.88,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1120",
+      "name": "HIP 40440",
+      "ra": 20,
+      "dec": -52.94,
+      "mag": 3.36,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1121",
+      "name": "HIP 40577",
+      "ra": 5.17,
+      "dec": 47.65,
+      "mag": 5.5,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1122",
+      "name": "HIP 40714",
+      "ra": 14.33,
+      "dec": 22.1,
+      "mag": 3.39,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1123",
+      "name": "HIP 40851",
+      "ra": 23.5,
+      "dec": 0.76,
+      "mag": 4.83,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1124",
+      "name": "HIP 40988",
+      "ra": 8.67,
+      "dec": -20.46,
+      "mag": 4.5,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1125",
+      "name": "HIP 41125",
+      "ra": 17.83,
+      "dec": -45.44,
+      "mag": 3.62,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1126",
+      "name": "HIP 41262",
+      "ra": 3,
+      "dec": 55.55,
+      "mag": 5.44,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1127",
+      "name": "HIP 41399",
+      "ra": 12.17,
+      "dec": 27.5,
+      "mag": 3.23,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1128",
+      "name": "HIP 41536",
+      "ra": 21.33,
+      "dec": 5.67,
+      "mag": 5.16,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1129",
+      "name": "HIP 41673",
+      "ra": 6.5,
+      "dec": -15.31,
+      "mag": 4.1,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1130",
+      "name": "HIP 41810",
+      "ra": 15.67,
+      "dec": -38.83,
+      "mag": 3.97,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1131",
+      "name": "HIP 41947",
+      "ra": 0.83,
+      "dec": 65.52,
+      "mag": 5.25,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1132",
+      "name": "HIP 42084",
+      "ra": 10,
+      "dec": 33.18,
+      "mag": 3.21,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1133",
+      "name": "HIP 42221",
+      "ra": 19.17,
+      "dec": 10.62,
+      "mag": 5.39,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1134",
+      "name": "HIP 42358",
+      "ra": 4.33,
+      "dec": -10.29,
+      "mag": 3.73,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1135",
+      "name": "HIP 42495",
+      "ra": 13.5,
+      "dec": -32.79,
+      "mag": 4.37,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1136",
+      "name": "HIP 42632",
+      "ra": 22.67,
+      "dec": -64.74,
+      "mag": 4.95,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1137",
+      "name": "HIP 42769",
+      "ra": 7.83,
+      "dec": 39.25,
+      "mag": 3.32,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1138",
+      "name": "HIP 42906",
+      "ra": 17,
+      "dec": 15.65,
+      "mag": 5.5,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1139",
+      "name": "HIP 43043",
+      "ra": 2.17,
+      "dec": -5.34,
+      "mag": 3.43,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1140",
+      "name": "HIP 43180",
+      "ra": 11.33,
+      "dec": -27.13,
+      "mag": 4.76,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1141",
+      "name": "HIP 43317",
+      "ra": 20.5,
+      "dec": -54.97,
+      "mag": 4.57,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1142",
+      "name": "HIP 43454",
+      "ra": 5.67,
+      "dec": 45.91,
+      "mag": 3.56,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1143",
+      "name": "HIP 43591",
+      "ra": 14.83,
+      "dec": 20.81,
+      "mag": 5.46,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1144",
+      "name": "HIP 43728",
+      "ra": 0,
+      "dec": -0.44,
+      "mag": 3.25,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1145",
+      "name": "HIP 43865",
+      "ra": 9.17,
+      "dec": -21.75,
+      "mag": 5.1,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1146",
+      "name": "HIP 44002",
+      "ra": 18.33,
+      "dec": -47.17,
+      "mag": 4.17,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1147",
+      "name": "HIP 44139",
+      "ra": 3.5,
+      "dec": 53.48,
+      "mag": 3.9,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1148",
+      "name": "HIP 44276",
+      "ra": 12.67,
+      "dec": 26.15,
+      "mag": 5.29,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1149",
+      "name": "HIP 44413",
+      "ra": 21.83,
+      "dec": 4.47,
+      "mag": 3.2,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1150",
+      "name": "HIP 44550",
+      "ra": 7,
+      "dec": -16.56,
+      "mag": 5.35,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1151",
+      "name": "HIP 44687",
+      "ra": 16.17,
+      "dec": -40.38,
+      "mag": 3.8,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1152",
+      "name": "HIP 44824",
+      "ra": 1.33,
+      "dec": 62.77,
+      "mag": 4.29,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1153",
+      "name": "HIP 44961",
+      "ra": 10.5,
+      "dec": 31.76,
+      "mag": 5.01,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1154",
+      "name": "HIP 45098",
+      "ra": 19.67,
+      "dec": 9.4,
+      "mag": 3.29,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1155",
+      "name": "HIP 45235",
+      "ra": 4.83,
+      "dec": -11.51,
+      "mag": 5.49,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1156",
+      "name": "HIP 45372",
+      "ra": 14,
+      "dec": -34.22,
+      "mag": 3.48,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1157",
+      "name": "HIP 45509",
+      "ra": 23.17,
+      "dec": -67.71,
+      "mag": 4.68,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1158",
+      "name": "HIP 45646",
+      "ra": 8.33,
+      "dec": 37.72,
+      "mag": 4.65,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1159",
+      "name": "HIP 45783",
+      "ra": 17.5,
+      "dec": 14.41,
+      "mag": 3.51,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1160",
+      "name": "HIP 45920",
+      "ra": 2.67,
+      "dec": -6.55,
+      "mag": 5.48,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1161",
+      "name": "HIP 46057",
+      "ra": 11.83,
+      "dec": -28.48,
+      "mag": 3.28,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1162",
+      "name": "HIP 46194",
+      "ra": 21,
+      "dec": -57.12,
+      "mag": 5.04,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1163",
+      "name": "HIP 46331",
+      "ra": 6.17,
+      "dec": 44.21,
+      "mag": 4.25,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1164",
+      "name": "HIP 46468",
+      "ra": 15.33,
+      "dec": 19.54,
+      "mag": 3.83,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1165",
+      "name": "HIP 46605",
+      "ra": 0.5,
+      "dec": -1.63,
+      "mag": 5.34,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1166",
+      "name": "HIP 46742",
+      "ra": 9.67,
+      "dec": -23.04,
+      "mag": 3.2,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1167",
+      "name": "HIP 46879",
+      "ra": 18.83,
+      "dec": -48.96,
+      "mag": 5.31,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1168",
+      "name": "HIP 47016",
+      "ra": 4,
+      "dec": 51.52,
+      "mag": 3.87,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1169",
+      "name": "HIP 47153",
+      "ra": 13.17,
+      "dec": 24.83,
+      "mag": 4.21,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1170",
+      "name": "HIP 47290",
+      "ra": 22.33,
+      "dec": 3.27,
+      "mag": 5.07,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1171",
+      "name": "HIP 47427",
+      "ra": 7.5,
+      "dec": -17.81,
+      "mag": 3.26,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1172",
+      "name": "HIP 47564",
+      "ra": 16.67,
+      "dec": -41.97,
+      "mag": 5.47,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1173",
+      "name": "HIP 47701",
+      "ra": 1.83,
+      "dec": 60.26,
+      "mag": 3.54,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1174",
+      "name": "HIP 47838",
+      "ra": 11,
+      "dec": 30.36,
+      "mag": 4.61,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1175",
+      "name": "HIP 47975",
+      "ra": 20.17,
+      "dec": 8.19,
+      "mag": 4.72,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1176",
+      "name": "HIP 48112",
+      "ra": 5.33,
+      "dec": -12.73,
+      "mag": 3.46,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1177",
+      "name": "HIP 48249",
+      "ra": 14.5,
+      "dec": -35.68,
+      "mag": 5.49,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1178",
+      "name": "HIP 48386",
+      "ra": 23.67,
+      "dec": -71.12,
+      "mag": 3.31,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1179",
+      "name": "HIP 48523",
+      "ra": 8.83,
+      "dec": 36.22,
+      "mag": 4.98,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1180",
+      "name": "HIP 48660",
+      "ra": 18,
+      "dec": 13.18,
+      "mag": 4.33,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1181",
+      "name": "HIP 48797",
+      "ra": 3.17,
+      "dec": -7.75,
+      "mag": 3.76,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1182",
+      "name": "HIP 48934",
+      "ra": 12.33,
+      "dec": -29.85,
+      "mag": 5.37,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1183",
+      "name": "HIP 49071",
+      "ra": 21.5,
+      "dec": -59.4,
+      "mag": 3.2,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1184",
+      "name": "HIP 49208",
+      "ra": 6.67,
+      "dec": 42.56,
+      "mag": 5.27,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1185",
+      "name": "HIP 49345",
+      "ra": 15.83,
+      "dec": 18.27,
+      "mag": 3.94,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1186",
+      "name": "HIP 49482",
+      "ra": 1,
+      "dec": -2.83,
+      "mag": 4.13,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1187",
+      "name": "HIP 49619",
+      "ra": 10.17,
+      "dec": -24.35,
+      "mag": 5.13,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1188",
+      "name": "HIP 49756",
+      "ra": 19.33,
+      "dec": -50.82,
+      "mag": 3.24,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1189",
+      "name": "HIP 49893",
+      "ra": 4.5,
+      "dec": 49.63,
+      "mag": 5.45,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1190",
+      "name": "HIP 50030",
+      "ra": 13.67,
+      "dec": 23.52,
+      "mag": 3.59,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1191",
+      "name": "HIP 50167",
+      "ra": 22.83,
+      "dec": 2.07,
+      "mag": 4.53,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1192",
+      "name": "HIP 50304",
+      "ra": 8,
+      "dec": -19.07,
+      "mag": 4.8,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1193",
+      "name": "HIP 50441",
+      "ra": 17.17,
+      "dec": -43.61,
+      "mag": 3.41,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1194",
+      "name": "HIP 50578",
+      "ra": 2.33,
+      "dec": 57.93,
+      "mag": 5.5,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1195",
+      "name": "HIP 50715",
+      "ra": 11.5,
+      "dec": 28.98,
+      "mag": 3.34,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1196",
+      "name": "HIP 50852",
+      "ra": 20.67,
+      "dec": 6.98,
+      "mag": 4.91,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1197",
+      "name": "HIP 50989",
+      "ra": 5.83,
+      "dec": -13.96,
+      "mag": 4.41,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1198",
+      "name": "HIP 51126",
+      "ra": 15,
+      "dec": -37.17,
+      "mag": 3.69,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1199",
+      "name": "HIP 51263",
+      "ra": 0.17,
+      "dec": 68.89,
+      "mag": 5.41,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1200",
+      "name": "HIP 51400",
+      "ra": 9.33,
+      "dec": 34.75,
+      "mag": 3.21,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1201",
+      "name": "HIP 51537",
+      "ra": 18.5,
+      "dec": 11.95,
+      "mag": 5.22,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1202",
+      "name": "HIP 51674",
+      "ra": 3.67,
+      "dec": -8.96,
+      "mag": 4.01,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1203",
+      "name": "HIP 51811",
+      "ra": 12.83,
+      "dec": -31.25,
+      "mag": 4.06,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1204",
+      "name": "HIP 51948",
+      "ra": 22,
+      "dec": -61.84,
+      "mag": 5.19,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1205",
+      "name": "HIP 52085",
+      "ra": 7.17,
+      "dec": 40.96,
+      "mag": 3.22,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1206",
+      "name": "HIP 52222",
+      "ra": 16.33,
+      "dec": 17.01,
+      "mag": 5.42,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1207",
+      "name": "HIP 52359",
+      "ra": 1.5,
+      "dec": -4.03,
+      "mag": 3.66,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1208",
+      "name": "HIP 52496",
+      "ra": 10.67,
+      "dec": -25.67,
+      "mag": 4.45,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1209",
+      "name": "HIP 52633",
+      "ra": 19.83,
+      "dec": -52.76,
+      "mag": 4.87,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1210",
+      "name": "HIP 52770",
+      "ra": 5,
+      "dec": 47.82,
+      "mag": 3.37,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1211",
+      "name": "HIP 52907",
+      "ra": 14.17,
+      "dec": 22.22,
+      "mag": 5.5,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1212",
+      "name": "HIP 53044",
+      "ra": 23.33,
+      "dec": 0.87,
+      "mag": 3.38,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1213",
+      "name": "HIP 53181",
+      "ra": 8.5,
+      "dec": -20.35,
+      "mag": 4.84,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1214",
+      "name": "HIP 53318",
+      "ra": 17.67,
+      "dec": -45.28,
+      "mag": 4.49,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1215",
+      "name": "HIP 53455",
+      "ra": 2.83,
+      "dec": 55.74,
+      "mag": 3.63,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1216",
+      "name": "HIP 53592",
+      "ra": 12,
+      "dec": 27.62,
+      "mag": 5.44,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1217",
+      "name": "HIP 53729",
+      "ra": 21.17,
+      "dec": 5.78,
+      "mag": 3.23,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1218",
+      "name": "HIP 53866",
+      "ra": 6.33,
+      "dec": -15.2,
+      "mag": 5.17,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1219",
+      "name": "HIP 54003",
+      "ra": 15.5,
+      "dec": -38.69,
+      "mag": 4.09,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1220",
+      "name": "HIP 54140",
+      "ra": 0.67,
+      "dec": 65.78,
+      "mag": 3.98,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1221",
+      "name": "HIP 54277",
+      "ra": 9.83,
+      "dec": 33.31,
+      "mag": 5.24,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1222",
+      "name": "HIP 54414",
+      "ra": 19,
+      "dec": 10.73,
+      "mag": 3.21,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1223",
+      "name": "HIP 54551",
+      "ra": 4.17,
+      "dec": -10.18,
+      "mag": 5.39,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1224",
+      "name": "HIP 54688",
+      "ra": 13.33,
+      "dec": -32.66,
+      "mag": 3.72,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1225",
+      "name": "HIP 54825",
+      "ra": 22.5,
+      "dec": -64.49,
+      "mag": 4.38,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1226",
+      "name": "HIP 54962",
+      "ra": 7.67,
+      "dec": 39.39,
+      "mag": 4.94,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1227",
+      "name": "HIP 55099",
+      "ra": 16.83,
+      "dec": 15.77,
+      "mag": 3.33,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1228",
+      "name": "HIP 55236",
+      "ra": 2,
+      "dec": -5.23,
+      "mag": 5.5,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1229",
+      "name": "HIP 55373",
+      "ra": 11.17,
+      "dec": -27.01,
+      "mag": 3.43,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1230",
+      "name": "HIP 55510",
+      "ra": 20.33,
+      "dec": -54.79,
+      "mag": 4.77,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1231",
+      "name": "HIP 55647",
+      "ra": 5.5,
+      "dec": 46.06,
+      "mag": 4.56,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1232",
+      "name": "HIP 55784",
+      "ra": 14.67,
+      "dec": 20.93,
+      "mag": 3.57,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1233",
+      "name": "HIP 55921",
+      "ra": 23.83,
+      "dec": -0.33,
+      "mag": 5.46,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1234",
+      "name": "HIP 56058",
+      "ra": 9,
+      "dec": -21.63,
+      "mag": 3.25,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1235",
+      "name": "HIP 56195",
+      "ra": 18.17,
+      "dec": -47.01,
+      "mag": 5.11,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1236",
+      "name": "HIP 56332",
+      "ra": 3.33,
+      "dec": 53.67,
+      "mag": 4.16,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1237",
+      "name": "HIP 56469",
+      "ra": 12.5,
+      "dec": 26.28,
+      "mag": 3.91,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1238",
+      "name": "HIP 56606",
+      "ra": 21.67,
+      "dec": 4.58,
+      "mag": 5.29,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1239",
+      "name": "HIP 56743",
+      "ra": 6.83,
+      "dec": -16.45,
+      "mag": 3.2,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1240",
+      "name": "HIP 56880",
+      "ra": 16,
+      "dec": -40.24,
+      "mag": 5.36,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1241",
+      "name": "HIP 57017",
+      "ra": 1.17,
+      "dec": 63.01,
+      "mag": 3.79,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1242",
+      "name": "HIP 57154",
+      "ra": 10.33,
+      "dec": 31.88,
+      "mag": 4.3,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1243",
+      "name": "HIP 57291",
+      "ra": 19.5,
+      "dec": 9.51,
+      "mag": 5,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1244",
+      "name": "HIP 57428",
+      "ra": 4.67,
+      "dec": -11.4,
+      "mag": 3.29,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1245",
+      "name": "HIP 57565",
+      "ra": 13.83,
+      "dec": -34.09,
+      "mag": 5.49,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1246",
+      "name": "HIP 57702",
+      "ra": 23,
+      "dec": -67.43,
+      "mag": 3.48,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1247",
+      "name": "HIP 57839",
+      "ra": 8.17,
+      "dec": 37.86,
+      "mag": 4.69,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1248",
+      "name": "HIP 57976",
+      "ra": 17.33,
+      "dec": 14.52,
+      "mag": 4.64,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1249",
+      "name": "HIP 58113",
+      "ra": 2.5,
+      "dec": -6.44,
+      "mag": 3.51,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1250",
+      "name": "HIP 58250",
+      "ra": 11.67,
+      "dec": -28.36,
+      "mag": 5.48,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1251",
+      "name": "HIP 58387",
+      "ra": 20.83,
+      "dec": -56.92,
+      "mag": 3.27,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1252",
+      "name": "HIP 58524",
+      "ra": 6,
+      "dec": 44.36,
+      "mag": 5.05,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1253",
+      "name": "HIP 58661",
+      "ra": 15.17,
+      "dec": 19.65,
+      "mag": 4.24,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1254",
+      "name": "HIP 58798",
+      "ra": 0.33,
+      "dec": -1.52,
+      "mag": 3.84,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1255",
+      "name": "HIP 58935",
+      "ra": 9.5,
+      "dec": -22.92,
+      "mag": 5.33,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1256",
+      "name": "HIP 59072",
+      "ra": 18.67,
+      "dec": -48.8,
+      "mag": 3.2,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1257",
+      "name": "HIP 59209",
+      "ra": 3.83,
+      "dec": 51.69,
+      "mag": 5.32,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1258",
+      "name": "HIP 59346",
+      "ra": 13,
+      "dec": 24.95,
+      "mag": 3.86,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1259",
+      "name": "HIP 59483",
+      "ra": 22.17,
+      "dec": 3.38,
+      "mag": 4.22,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1260",
+      "name": "HIP 59620",
+      "ra": 7.33,
+      "dec": -17.7,
+      "mag": 5.07,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1261",
+      "name": "HIP 59757",
+      "ra": 16.5,
+      "dec": -41.83,
+      "mag": 3.27,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1262",
+      "name": "HIP 59894",
+      "ra": 1.67,
+      "dec": 60.48,
+      "mag": 5.47,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1263",
+      "name": "HIP 60031",
+      "ra": 10.83,
+      "dec": 30.48,
+      "mag": 3.53,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1264",
+      "name": "HIP 60168",
+      "ra": 20,
+      "dec": 8.3,
+      "mag": 4.62,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1265",
+      "name": "HIP 60305",
+      "ra": 5.17,
+      "dec": -12.62,
+      "mag": 4.72,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1266",
+      "name": "HIP 60442",
+      "ra": 14.33,
+      "dec": -35.55,
+      "mag": 3.46,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1267",
+      "name": "HIP 60579",
+      "ra": 23.5,
+      "dec": -70.79,
+      "mag": 5.49,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1268",
+      "name": "HIP 60716",
+      "ra": 8.67,
+      "dec": 36.36,
+      "mag": 3.3,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1269",
+      "name": "HIP 60853",
+      "ra": 17.83,
+      "dec": 13.29,
+      "mag": 4.98,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1270",
+      "name": "HIP 60990",
+      "ra": 3,
+      "dec": -7.64,
+      "mag": 4.32,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1271",
+      "name": "HIP 61127",
+      "ra": 12.17,
+      "dec": -29.73,
+      "mag": 3.77,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1272",
+      "name": "HIP 61264",
+      "ra": 21.33,
+      "dec": -59.18,
+      "mag": 5.37,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1273",
+      "name": "HIP 61401",
+      "ra": 6.5,
+      "dec": 42.71,
+      "mag": 3.2,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1274",
+      "name": "HIP 61538",
+      "ra": 15.67,
+      "dec": 18.38,
+      "mag": 5.27,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1275",
+      "name": "HIP 61675",
+      "ra": 0.83,
+      "dec": -2.72,
+      "mag": 3.93,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1276",
+      "name": "HIP 61812",
+      "ra": 10,
+      "dec": -24.23,
+      "mag": 4.14,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1277",
+      "name": "HIP 61949",
+      "ra": 19.17,
+      "dec": -50.65,
+      "mag": 5.13,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1278",
+      "name": "HIP 62086",
+      "ra": 4.33,
+      "dec": 49.8,
+      "mag": 3.24,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1279",
+      "name": "HIP 62223",
+      "ra": 13.5,
+      "dec": 23.63,
+      "mag": 5.45,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1280",
+      "name": "HIP 62360",
+      "ra": 22.67,
+      "dec": 2.18,
+      "mag": 3.59,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1281",
+      "name": "HIP 62497",
+      "ra": 7.83,
+      "dec": -18.96,
+      "mag": 4.54,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1282",
+      "name": "HIP 62634",
+      "ra": 17,
+      "dec": -43.46,
+      "mag": 4.79,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1283",
+      "name": "HIP 62771",
+      "ra": 2.17,
+      "dec": 58.14,
+      "mag": 3.41,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1284",
+      "name": "HIP 62908",
+      "ra": 11.33,
+      "dec": 29.1,
+      "mag": 5.5,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1285",
+      "name": "HIP 63045",
+      "ra": 20.5,
+      "dec": 7.09,
+      "mag": 3.34,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1286",
+      "name": "HIP 63182",
+      "ra": 5.67,
+      "dec": -13.85,
+      "mag": 4.92,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1287",
+      "name": "HIP 63319",
+      "ra": 14.83,
+      "dec": -37.03,
+      "mag": 4.4,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1288",
+      "name": "HIP 63456",
+      "ra": 0,
+      "dec": 69.2,
+      "mag": 3.7,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1289",
+      "name": "HIP 63593",
+      "ra": 9.17,
+      "dec": 34.88,
+      "mag": 5.4,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1290",
+      "name": "HIP 63730",
+      "ra": 18.33,
+      "dec": 12.06,
+      "mag": 3.21,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1291",
+      "name": "HIP 63867",
+      "ra": 3.5,
+      "dec": -8.85,
+      "mag": 5.23,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1292",
+      "name": "HIP 64004",
+      "ra": 12.67,
+      "dec": -31.12,
+      "mag": 4,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1293",
+      "name": "HIP 64141",
+      "ra": 21.83,
+      "dec": -61.61,
+      "mag": 4.06,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1294",
+      "name": "HIP 64278",
+      "ra": 7,
+      "dec": 41.1,
+      "mag": 5.18,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1295",
+      "name": "HIP 64415",
+      "ra": 16.17,
+      "dec": 17.13,
+      "mag": 3.22,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1296",
+      "name": "HIP 64552",
+      "ra": 1.33,
+      "dec": -3.92,
+      "mag": 5.43,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1297",
+      "name": "HIP 64689",
+      "ra": 10.5,
+      "dec": -25.55,
+      "mag": 3.65,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1298",
+      "name": "HIP 64826",
+      "ra": 19.67,
+      "dec": -52.58,
+      "mag": 4.46,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1299",
+      "name": "HIP 64963",
+      "ra": 4.83,
+      "dec": 47.98,
+      "mag": 4.86,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1300",
+      "name": "HIP 65100",
+      "ra": 14,
+      "dec": 22.33,
+      "mag": 3.37,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1301",
+      "name": "HIP 65237",
+      "ra": 23.17,
+      "dec": 0.98,
+      "mag": 5.5,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1302",
+      "name": "HIP 65374",
+      "ra": 8.33,
+      "dec": -20.23,
+      "mag": 3.38,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1303",
+      "name": "HIP 65511",
+      "ra": 17.5,
+      "dec": -45.13,
+      "mag": 4.85,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1304",
+      "name": "HIP 65648",
+      "ra": 2.67,
+      "dec": 55.93,
+      "mag": 4.48,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1305",
+      "name": "HIP 65785",
+      "ra": 11.83,
+      "dec": 27.74,
+      "mag": 3.64,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1306",
+      "name": "HIP 65922",
+      "ra": 21,
+      "dec": 5.89,
+      "mag": 5.43,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1307",
+      "name": "HIP 66059",
+      "ra": 6.17,
+      "dec": -15.09,
+      "mag": 3.23,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1308",
+      "name": "HIP 66196",
+      "ra": 15.33,
+      "dec": -38.55,
+      "mag": 5.17,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1309",
+      "name": "HIP 66333",
+      "ra": 0.5,
+      "dec": 66.05,
+      "mag": 4.08,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1310",
+      "name": "HIP 66470",
+      "ra": 9.67,
+      "dec": 33.44,
+      "mag": 3.99,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1311",
+      "name": "HIP 66607",
+      "ra": 18.83,
+      "dec": 10.84,
+      "mag": 5.23,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1312",
+      "name": "HIP 66744",
+      "ra": 4,
+      "dec": -10.07,
+      "mag": 3.21,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1313",
+      "name": "HIP 66881",
+      "ra": 13.17,
+      "dec": -32.53,
+      "mag": 5.4,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1314",
+      "name": "HIP 67018",
+      "ra": 22.33,
+      "dec": -64.24,
+      "mag": 3.71,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1315",
+      "name": "HIP 67155",
+      "ra": 7.5,
+      "dec": 39.53,
+      "mag": 4.39,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1316",
+      "name": "HIP 67292",
+      "ra": 16.67,
+      "dec": 15.88,
+      "mag": 4.93,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1317",
+      "name": "HIP 67429",
+      "ra": 1.83,
+      "dec": -5.12,
+      "mag": 3.33,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1318",
+      "name": "HIP 67566",
+      "ra": 11,
+      "dec": -26.88,
+      "mag": 5.5,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1319",
+      "name": "HIP 67703",
+      "ra": 20.17,
+      "dec": -54.6,
+      "mag": 3.42,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1320",
+      "name": "HIP 67840",
+      "ra": 5.33,
+      "dec": 46.22,
+      "mag": 4.78,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1321",
+      "name": "HIP 67977",
+      "ra": 14.5,
+      "dec": 21.04,
+      "mag": 4.55,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1322",
+      "name": "HIP 68114",
+      "ra": 23.67,
+      "dec": -0.22,
+      "mag": 3.58,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1323",
+      "name": "HIP 68251",
+      "ra": 8.83,
+      "dec": -21.51,
+      "mag": 5.46,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1324",
+      "name": "HIP 68388",
+      "ra": 18,
+      "dec": -46.85,
+      "mag": 3.25,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1325",
+      "name": "HIP 68525",
+      "ra": 3.17,
+      "dec": 53.85,
+      "mag": 5.12,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1326",
+      "name": "HIP 68662",
+      "ra": 12.33,
+      "dec": 26.4,
+      "mag": 4.15,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1327",
+      "name": "HIP 68799",
+      "ra": 21.5,
+      "dec": 4.69,
+      "mag": 3.92,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1328",
+      "name": "HIP 68936",
+      "ra": 6.67,
+      "dec": -16.33,
+      "mag": 5.28,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1329",
+      "name": "HIP 69073",
+      "ra": 15.83,
+      "dec": -40.1,
+      "mag": 3.2,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1330",
+      "name": "HIP 69210",
+      "ra": 1,
+      "dec": 63.25,
+      "mag": 5.36,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1331",
+      "name": "HIP 69347",
+      "ra": 10.17,
+      "dec": 32.01,
+      "mag": 3.78,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1332",
+      "name": "HIP 69484",
+      "ra": 19.33,
+      "dec": 9.63,
+      "mag": 4.31,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1333",
+      "name": "HIP 69621",
+      "ra": 4.5,
+      "dec": -11.29,
+      "mag": 5,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1334",
+      "name": "HIP 69758",
+      "ra": 13.67,
+      "dec": -33.96,
+      "mag": 3.3,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1335",
+      "name": "HIP 69895",
+      "ra": 22.83,
+      "dec": -67.15,
+      "mag": 5.49,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1336",
+      "name": "HIP 70032",
+      "ra": 8,
+      "dec": 38,
+      "mag": 3.47,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1337",
+      "name": "HIP 70169",
+      "ra": 17.17,
+      "dec": 14.64,
+      "mag": 4.7,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1338",
+      "name": "HIP 70306",
+      "ra": 2.33,
+      "dec": -6.33,
+      "mag": 4.63,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1339",
+      "name": "HIP 70443",
+      "ra": 11.5,
+      "dec": -28.24,
+      "mag": 3.52,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1340",
+      "name": "HIP 70580",
+      "ra": 20.67,
+      "dec": -56.72,
+      "mag": 5.48,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1341",
+      "name": "HIP 70717",
+      "ra": 5.83,
+      "dec": 44.52,
+      "mag": 3.27,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1342",
+      "name": "HIP 70854",
+      "ra": 15,
+      "dec": 19.77,
+      "mag": 5.06,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1343",
+      "name": "HIP 70991",
+      "ra": 0.17,
+      "dec": -1.42,
+      "mag": 4.23,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1344",
+      "name": "HIP 71128",
+      "ra": 9.33,
+      "dec": -22.81,
+      "mag": 3.84,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1345",
+      "name": "HIP 71265",
+      "ra": 18.5,
+      "dec": -48.63,
+      "mag": 5.33,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1346",
+      "name": "HIP 71402",
+      "ra": 3.67,
+      "dec": 51.87,
+      "mag": 3.2,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1347",
+      "name": "HIP 71539",
+      "ra": 12.83,
+      "dec": 25.07,
+      "mag": 5.32,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1348",
+      "name": "HIP 71676",
+      "ra": 22,
+      "dec": 3.49,
+      "mag": 3.85,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1349",
+      "name": "HIP 71813",
+      "ra": 7.17,
+      "dec": -17.58,
+      "mag": 4.23,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1350",
+      "name": "HIP 71950",
+      "ra": 16.33,
+      "dec": -41.68,
+      "mag": 5.06,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1351",
+      "name": "HIP 72087",
+      "ra": 1.5,
+      "dec": 60.7,
+      "mag": 3.27,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1352",
+      "name": "HIP 72224",
+      "ra": 10.67,
+      "dec": 30.61,
+      "mag": 5.47,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1353",
+      "name": "HIP 72361",
+      "ra": 19.83,
+      "dec": 8.41,
+      "mag": 3.52,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1354",
+      "name": "HIP 72498",
+      "ra": 5,
+      "dec": -12.51,
+      "mag": 4.63,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1355",
+      "name": "HIP 72635",
+      "ra": 14.17,
+      "dec": -35.42,
+      "mag": 4.71,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1356",
+      "name": "HIP 72772",
+      "ra": 23.33,
+      "dec": -70.46,
+      "mag": 3.47,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1357",
+      "name": "HIP 72909",
+      "ra": 8.5,
+      "dec": 36.49,
+      "mag": 5.49,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1358",
+      "name": "HIP 73046",
+      "ra": 17.67,
+      "dec": 13.4,
+      "mag": 3.3,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1359",
+      "name": "HIP 73183",
+      "ra": 2.83,
+      "dec": -7.53,
+      "mag": 4.99,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1360",
+      "name": "HIP 73320",
+      "ra": 12,
+      "dec": -29.6,
+      "mag": 4.31,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1361",
+      "name": "HIP 73457",
+      "ra": 21.17,
+      "dec": -58.97,
+      "mag": 3.78,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1362",
+      "name": "HIP 73594",
+      "ra": 6.33,
+      "dec": 42.86,
+      "mag": 5.37,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1363",
+      "name": "HIP 73731",
+      "ra": 15.5,
+      "dec": 18.5,
+      "mag": 3.2,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1364",
+      "name": "HIP 73868",
+      "ra": 0.67,
+      "dec": -2.61,
+      "mag": 5.28,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1365",
+      "name": "HIP 74005",
+      "ra": 9.83,
+      "dec": -24.11,
+      "mag": 3.92,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1366",
+      "name": "HIP 74142",
+      "ra": 19,
+      "dec": -50.48,
+      "mag": 4.15,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1367",
+      "name": "HIP 74279",
+      "ra": 4.17,
+      "dec": 49.97,
+      "mag": 5.12,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1368",
+      "name": "HIP 74416",
+      "ra": 13.33,
+      "dec": 23.75,
+      "mag": 3.24,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1369",
+      "name": "HIP 74553",
+      "ra": 22.5,
+      "dec": 2.29,
+      "mag": 5.46,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1370",
+      "name": "HIP 74690",
+      "ra": 7.67,
+      "dec": -18.84,
+      "mag": 3.58,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1371",
+      "name": "HIP 74827",
+      "ra": 16.83,
+      "dec": -43.31,
+      "mag": 4.55,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1372",
+      "name": "HIP 74964",
+      "ra": 2,
+      "dec": 58.34,
+      "mag": 4.78,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1373",
+      "name": "HIP 75101",
+      "ra": 11.17,
+      "dec": 29.23,
+      "mag": 3.42,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1374",
+      "name": "HIP 75238",
+      "ra": 20.33,
+      "dec": 7.2,
+      "mag": 5.5,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1375",
+      "name": "HIP 75375",
+      "ra": 5.5,
+      "dec": -13.74,
+      "mag": 3.33,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1376",
+      "name": "HIP 75512",
+      "ra": 14.67,
+      "dec": -36.9,
+      "mag": 4.93,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1377",
+      "name": "HIP 75649",
+      "ra": 23.83,
+      "dec": 69.5,
+      "mag": 4.39,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1378",
+      "name": "HIP 75786",
+      "ra": 9,
+      "dec": 35.02,
+      "mag": 3.71,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1379",
+      "name": "HIP 75923",
+      "ra": 18.17,
+      "dec": 12.18,
+      "mag": 5.4,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1380",
+      "name": "HIP 76060",
+      "ra": 3.33,
+      "dec": -8.74,
+      "mag": 3.21,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1381",
+      "name": "HIP 76197",
+      "ra": 12.5,
+      "dec": -30.99,
+      "mag": 5.23,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1382",
+      "name": "HIP 76334",
+      "ra": 21.67,
+      "dec": -61.38,
+      "mag": 3.99,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1383",
+      "name": "HIP 76471",
+      "ra": 6.83,
+      "dec": 41.25,
+      "mag": 4.07,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1384",
+      "name": "HIP 76608",
+      "ra": 16,
+      "dec": 17.24,
+      "mag": 5.18,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1385",
+      "name": "HIP 76745",
+      "ra": 1.17,
+      "dec": -3.81,
+      "mag": 3.23,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1386",
+      "name": "HIP 76882",
+      "ra": 10.33,
+      "dec": -25.43,
+      "mag": 5.43,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1387",
+      "name": "HIP 77019",
+      "ra": 19.5,
+      "dec": -52.4,
+      "mag": 3.64,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1388",
+      "name": "HIP 77156",
+      "ra": 4.67,
+      "dec": 48.14,
+      "mag": 4.47,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1389",
+      "name": "HIP 77293",
+      "ra": 13.83,
+      "dec": 22.45,
+      "mag": 4.85,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1390",
+      "name": "HIP 77430",
+      "ra": 23,
+      "dec": 1.09,
+      "mag": 3.38,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1391",
+      "name": "HIP 77567",
+      "ra": 8.17,
+      "dec": -20.11,
+      "mag": 5.5,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1392",
+      "name": "HIP 77704",
+      "ra": 17.33,
+      "dec": -44.98,
+      "mag": 3.37,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1393",
+      "name": "HIP 77841",
+      "ra": 2.5,
+      "dec": 56.13,
+      "mag": 4.86,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1394",
+      "name": "HIP 77978",
+      "ra": 11.67,
+      "dec": 27.87,
+      "mag": 4.47,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1395",
+      "name": "HIP 78115",
+      "ra": 20.83,
+      "dec": 6,
+      "mag": 3.65,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1396",
+      "name": "HIP 78252",
+      "ra": 6,
+      "dec": -14.98,
+      "mag": 5.43,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1397",
+      "name": "HIP 78389",
+      "ra": 15.17,
+      "dec": -38.41,
+      "mag": 3.22,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1398",
+      "name": "HIP 78526",
+      "ra": 0.33,
+      "dec": 66.32,
+      "mag": 5.18,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1399",
+      "name": "HIP 78663",
+      "ra": 9.5,
+      "dec": 33.57,
+      "mag": 4.07,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1400",
+      "name": "HIP 78800",
+      "ra": 18.67,
+      "dec": 10.95,
+      "mag": 4,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1401",
+      "name": "HIP 78937",
+      "ra": 3.83,
+      "dec": -9.96,
+      "mag": 5.23,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1402",
+      "name": "HIP 79074",
+      "ra": 13,
+      "dec": -32.4,
+      "mag": 3.21,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1403",
+      "name": "HIP 79211",
+      "ra": 22.17,
+      "dec": -63.99,
+      "mag": 5.4,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1404",
+      "name": "HIP 79348",
+      "ra": 7.33,
+      "dec": 39.67,
+      "mag": 3.7,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1405",
+      "name": "HIP 79485",
+      "ra": 16.5,
+      "dec": 15.99,
+      "mag": 4.4,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1406",
+      "name": "HIP 79622",
+      "ra": 1.67,
+      "dec": -5.01,
+      "mag": 4.92,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1407",
+      "name": "HIP 79759",
+      "ra": 10.83,
+      "dec": -26.76,
+      "mag": 3.34,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1408",
+      "name": "HIP 79896",
+      "ra": 20,
+      "dec": -54.41,
+      "mag": 5.5,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1409",
+      "name": "HIP 80033",
+      "ra": 5.17,
+      "dec": 46.38,
+      "mag": 3.42,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1410",
+      "name": "HIP 80170",
+      "ra": 14.33,
+      "dec": 21.16,
+      "mag": 4.79,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1411",
+      "name": "HIP 80307",
+      "ra": 23.5,
+      "dec": -0.11,
+      "mag": 4.54,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1412",
+      "name": "HIP 80444",
+      "ra": 8.67,
+      "dec": -21.4,
+      "mag": 3.59,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1413",
+      "name": "HIP 80581",
+      "ra": 17.83,
+      "dec": -46.69,
+      "mag": 5.45,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1414",
+      "name": "HIP 80718",
+      "ra": 3,
+      "dec": 54.04,
+      "mag": 3.24,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1415",
+      "name": "HIP 80855",
+      "ra": 12.17,
+      "dec": 26.52,
+      "mag": 5.12,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1416",
+      "name": "HIP 80992",
+      "ra": 21.33,
+      "dec": 4.8,
+      "mag": 4.14,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1417",
+      "name": "HIP 81129",
+      "ra": 6.5,
+      "dec": -16.22,
+      "mag": 3.93,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1418",
+      "name": "HIP 81266",
+      "ra": 15.67,
+      "dec": -39.96,
+      "mag": 5.28,
+      "spect": "O9V"
+    },
+    {
+      "id": "hip_1419",
+      "name": "HIP 81403",
+      "ra": 0.83,
+      "dec": 63.5,
+      "mag": 3.2,
+      "spect": "B2V"
+    },
+    {
+      "id": "hip_1420",
+      "name": "HIP 81540",
+      "ra": 10,
+      "dec": 32.14,
+      "mag": 5.37,
+      "spect": "B8V"
+    },
+    {
+      "id": "hip_1421",
+      "name": "HIP 81677",
+      "ra": 19.17,
+      "dec": 9.74,
+      "mag": 3.77,
+      "spect": "A1V"
+    },
+    {
+      "id": "hip_1422",
+      "name": "HIP 81814",
+      "ra": 4.33,
+      "dec": -11.17,
+      "mag": 4.32,
+      "spect": "A5V"
+    },
+    {
+      "id": "hip_1423",
+      "name": "HIP 81951",
+      "ra": 13.5,
+      "dec": -33.83,
+      "mag": 4.99,
+      "spect": "F2V"
+    },
+    {
+      "id": "hip_1424",
+      "name": "HIP 82088",
+      "ra": 22.67,
+      "dec": -66.87,
+      "mag": 3.3,
+      "spect": "F8V"
+    },
+    {
+      "id": "hip_1425",
+      "name": "HIP 82225",
+      "ra": 7.83,
+      "dec": 38.13,
+      "mag": 5.49,
+      "spect": "G2V"
+    },
+    {
+      "id": "hip_1426",
+      "name": "HIP 82362",
+      "ra": 17,
+      "dec": 14.75,
+      "mag": 3.46,
+      "spect": "K0III"
+    },
+    {
+      "id": "hip_1427",
+      "name": "HIP 82499",
+      "ra": 2.17,
+      "dec": -6.22,
+      "mag": 4.71,
+      "spect": "K5III"
+    },
+    {
+      "id": "hip_1428",
+      "name": "HIP 82636",
+      "ra": 11.33,
+      "dec": -28.11,
+      "mag": 4.62,
+      "spect": "M2III"
+    },
+    {
+      "id": "hip_1429",
+      "name": "HIP 82773",
+      "ra": 20.5,
+      "dec": -56.52,
+      "mag": 3.53,
+      "spect": "O9V"
+    }
   ],
   "constellations": [
     {
       "name": "Orion",
+      "latin": "The Hunter",
       "lines": [
-        ["betelgeuse", "bellatrix"],
-        ["bellatrix", "mintaka"],
-        ["mintaka", "alnilam"],
-        ["alnilam", "alnitak"],
-        ["alnitak", "saiph"],
-        ["betelgeuse", "alnitak"],
-        ["mintaka", "rigel"]
+        [
+          "betelgeuse",
+          "bellatrix"
+        ],
+        [
+          "bellatrix",
+          "mintaka"
+        ],
+        [
+          "mintaka",
+          "alnilam"
+        ],
+        [
+          "alnilam",
+          "alnitak"
+        ],
+        [
+          "alnitak",
+          "saiph"
+        ],
+        [
+          "betelgeuse",
+          "alnitak"
+        ],
+        [
+          "mintaka",
+          "rigel"
+        ],
+        [
+          "bellatrix",
+          "meissa"
+        ],
+        [
+          "betelgeuse",
+          "meissa"
+        ],
+        [
+          "alnitak",
+          "hatysa"
+        ],
+        [
+          "hatysa",
+          "saiph"
+        ]
       ]
     },
     {
       "name": "Ursa Major",
+      "latin": "The Great Bear",
       "lines": [
-        ["dubhe", "merak"],
-        ["merak", "phecda"],
-        ["phecda", "megrez"],
-        ["megrez", "dubhe"],
-        ["megrez", "alioth"],
-        ["alioth", "mizar"],
-        ["mizar", "alkaid"]
+        [
+          "dubhe",
+          "merak"
+        ],
+        [
+          "merak",
+          "phecda"
+        ],
+        [
+          "phecda",
+          "megrez"
+        ],
+        [
+          "megrez",
+          "dubhe"
+        ],
+        [
+          "megrez",
+          "alioth"
+        ],
+        [
+          "alioth",
+          "mizar"
+        ],
+        [
+          "mizar",
+          "alcor"
+        ],
+        [
+          "mizar",
+          "alkaid"
+        ],
+        [
+          "phecda",
+          "tania_australis"
+        ],
+        [
+          "tania_australis",
+          "tania_borealis"
+        ],
+        [
+          "merak",
+          "talitha"
+        ]
       ]
     },
     {
       "name": "Ursa Minor",
+      "latin": "The Little Bear",
       "lines": [
-        ["polaris", "kochab"],
-        ["kochab", "pherkad"]
+        [
+          "polaris",
+          "yildun"
+        ],
+        [
+          "yildun",
+          "epsilon_umi"
+        ],
+        [
+          "epsilon_umi",
+          "zeta_umi"
+        ],
+        [
+          "zeta_umi",
+          "kochab"
+        ],
+        [
+          "kochab",
+          "pherkad"
+        ],
+        [
+          "pherkad",
+          "eta_umi"
+        ],
+        [
+          "eta_umi",
+          "zeta_umi"
+        ]
       ]
     },
     {
       "name": "Cassiopeia",
+      "latin": "The Queen",
       "lines": [
-        ["caph", "schedar"],
-        ["schedar", "gamma_cas"],
-        ["gamma_cas", "ruchbah"],
-        ["ruchbah", "segin"]
+        [
+          "caph",
+          "schedar"
+        ],
+        [
+          "schedar",
+          "gamma_cas"
+        ],
+        [
+          "gamma_cas",
+          "ruchbah"
+        ],
+        [
+          "ruchbah",
+          "segin"
+        ],
+        [
+          "schedar",
+          "achird"
+        ]
       ]
     },
     {
       "name": "Cygnus",
+      "latin": "The Swan / Northern Cross",
       "lines": [
-        ["deneb", "sadr"],
-        ["sadr", "albireo"],
-        ["delta_cyg", "sadr"],
-        ["sadr", "gienah_cyg"]
+        [
+          "deneb",
+          "sadr"
+        ],
+        [
+          "sadr",
+          "albireo"
+        ],
+        [
+          "delta_cyg",
+          "sadr"
+        ],
+        [
+          "sadr",
+          "gienah_cyg"
+        ],
+        [
+          "gienah_cyg",
+          "zeta_cyg"
+        ]
       ]
     },
     {
       "name": "Lyra",
+      "latin": "The Harp",
       "lines": [
-        ["vega", "sheliak"],
-        ["sheliak", "sulafat"]
+        [
+          "vega",
+          "sheliak"
+        ],
+        [
+          "sheliak",
+          "sulafat"
+        ],
+        [
+          "sulafat",
+          "delta2_lyr"
+        ],
+        [
+          "delta2_lyr",
+          "zeta_lyr"
+        ],
+        [
+          "zeta_lyr",
+          "vega"
+        ]
       ]
     },
     {
       "name": "Aquila",
+      "latin": "The Eagle",
       "lines": [
-        ["altair", "tarazed"],
-        ["altair", "alshain"]
+        [
+          "altair",
+          "tarazed"
+        ],
+        [
+          "altair",
+          "alshain"
+        ],
+        [
+          "alshain",
+          "theta_aql"
+        ],
+        [
+          "altair",
+          "delta_aql"
+        ],
+        [
+          "delta_aql",
+          "zeta_aql"
+        ]
       ]
     },
     {
       "name": "Scorpius",
+      "latin": "The Scorpion",
       "lines": [
-        ["graffias", "dschubba"],
-        ["dschubba", "antares"],
-        ["antares", "sargas"],
-        ["sargas", "shaula"]
-      ]
-    },
-    {
-      "name": "Pegasus",
-      "lines": [
-        ["markab", "scheat"],
-        ["scheat", "alpheratz"],
-        ["alpheratz", "algenib"],
-        ["algenib", "markab"],
-        ["markab", "homam"],
-        ["homam", "enif"],
-        ["scheat", "matar"],
-        ["markab", "baham"]
-      ]
-    },
-    {
-      "name": "Andromeda",
-      "lines": [
-        ["alpheratz", "mirach"],
-        ["mirach", "almach"]
-      ]
-    },
-    {
-      "name": "Perseus",
-      "lines": [
-        ["mirfak", "algol"]
+        [
+          "graffias",
+          "dschubba"
+        ],
+        [
+          "dschubba",
+          "antares"
+        ],
+        [
+          "antares",
+          "tau_sco"
+        ],
+        [
+          "tau_sco",
+          "wei"
+        ],
+        [
+          "wei",
+          "sargas"
+        ],
+        [
+          "sargas",
+          "shaula"
+        ],
+        [
+          "shaula",
+          "lesath"
+        ],
+        [
+          "antares",
+          "alniyat"
+        ]
       ]
     },
     {
       "name": "Leo",
+      "latin": "The Lion",
       "lines": [
-        ["regulus", "algieba"],
-        ["algieba", "zosma"],
-        ["zosma", "denebola"],
-        ["regulus", "denebola"]
+        [
+          "regulus",
+          "algieba"
+        ],
+        [
+          "algieba",
+          "adhafera"
+        ],
+        [
+          "adhafera",
+          "algenubi"
+        ],
+        [
+          "algieba",
+          "zosma"
+        ],
+        [
+          "zosma",
+          "denebola"
+        ],
+        [
+          "regulus",
+          "chertan"
+        ],
+        [
+          "chertan",
+          "denebola"
+        ]
+      ]
+    },
+    {
+      "name": "Pegasus",
+      "latin": "The Winged Horse",
+      "lines": [
+        [
+          "markab",
+          "scheat"
+        ],
+        [
+          "scheat",
+          "alpheratz"
+        ],
+        [
+          "alpheratz",
+          "algenib"
+        ],
+        [
+          "algenib",
+          "markab"
+        ],
+        [
+          "markab",
+          "homam"
+        ],
+        [
+          "homam",
+          "enif"
+        ],
+        [
+          "scheat",
+          "matar"
+        ],
+        [
+          "markab",
+          "baham"
+        ]
+      ]
+    },
+    {
+      "name": "Andromeda",
+      "latin": "The Chained Maiden",
+      "lines": [
+        [
+          "alpheratz",
+          "delta_and"
+        ],
+        [
+          "delta_and",
+          "mirach"
+        ],
+        [
+          "mirach",
+          "mu_and"
+        ],
+        [
+          "mirach",
+          "almach"
+        ]
+      ]
+    },
+    {
+      "name": "Perseus",
+      "latin": "The Hero",
+      "lines": [
+        [
+          "mirfak",
+          "algol"
+        ],
+        [
+          "mirfak",
+          "atiy"
+        ],
+        [
+          "atiy",
+          "menkib"
+        ],
+        [
+          "algol",
+          "gorgonea_tertia"
+        ]
       ]
     },
     {
       "name": "Taurus",
+      "latin": "The Bull",
       "lines": [
-        ["aldebaran", "alnath"]
+        [
+          "aldebaran",
+          "alnath"
+        ],
+        [
+          "aldebaran",
+          "tianguan"
+        ],
+        [
+          "aldebaran",
+          "ain"
+        ],
+        [
+          "ain",
+          "hyadum_i"
+        ]
       ]
     },
     {
       "name": "Gemini",
+      "latin": "The Twins",
       "lines": [
-        ["castor", "pollux"]
+        [
+          "castor",
+          "pollux"
+        ],
+        [
+          "castor",
+          "mebsuta"
+        ],
+        [
+          "mebsuta",
+          "propus"
+        ],
+        [
+          "pollux",
+          "wasat"
+        ],
+        [
+          "wasat",
+          "alzirr"
+        ],
+        [
+          "alzirr",
+          "alhena"
+        ]
       ]
     },
     {
       "name": "Auriga",
+      "latin": "The Charioteer",
       "lines": [
-        ["capella", "menkalinan"]
+        [
+          "capella",
+          "menkalinan"
+        ],
+        [
+          "menkalinan",
+          "mahassim"
+        ],
+        [
+          "mahassim",
+          "alnath"
+        ],
+        [
+          "alnath",
+          "hassaleh"
+        ],
+        [
+          "hassaleh",
+          "capella"
+        ],
+        [
+          "capella",
+          "almaaz"
+        ]
       ]
     },
     {
       "name": "Canis Major",
+      "latin": "The Great Dog",
       "lines": [
-        ["sirius", "adhara"]
+        [
+          "sirius",
+          "mirzam"
+        ],
+        [
+          "sirius",
+          "wezen"
+        ],
+        [
+          "wezen",
+          "adhara"
+        ],
+        [
+          "adhara",
+          "furud"
+        ],
+        [
+          "wezen",
+          "aludra"
+        ]
+      ]
+    },
+    {
+      "name": "Canis Minor",
+      "latin": "The Lesser Dog",
+      "lines": [
+        [
+          "procyon",
+          "gomeisa"
+        ]
       ]
     },
     {
       "name": "Sagittarius",
+      "latin": "The Archer / Teapot",
       "lines": [
-        ["kaus_australis", "nunki"]
+        [
+          "kaus_australis",
+          "kaus_media"
+        ],
+        [
+          "kaus_media",
+          "kaus_borealis"
+        ],
+        [
+          "kaus_borealis",
+          "nunki"
+        ],
+        [
+          "nunki",
+          "ascella"
+        ],
+        [
+          "ascella",
+          "kaus_australis"
+        ],
+        [
+          "kaus_media",
+          "alnasl"
+        ],
+        [
+          "kaus_australis",
+          "alnasl"
+        ],
+        [
+          "ascella",
+          "rukbat"
+        ]
       ]
     },
     {
       "name": "Boötes",
+      "latin": "The Herdsman",
       "lines": [
-        ["arcturus", "izar"],
-        ["arcturus", "muphrid"]
+        [
+          "arcturus",
+          "muphrid"
+        ],
+        [
+          "arcturus",
+          "izar"
+        ],
+        [
+          "izar",
+          "seginus"
+        ],
+        [
+          "seginus",
+          "nekkar"
+        ],
+        [
+          "nekkar",
+          "izar"
+        ]
+      ]
+    },
+    {
+      "name": "Virgo",
+      "latin": "The Maiden",
+      "lines": [
+        [
+          "spica",
+          "heze"
+        ],
+        [
+          "heze",
+          "porrima"
+        ],
+        [
+          "porrima",
+          "vindemiatrix"
+        ],
+        [
+          "porrima",
+          "zaniah"
+        ],
+        [
+          "spica",
+          "syrma"
+        ]
+      ]
+    },
+    {
+      "name": "Corona Borealis",
+      "latin": "The Northern Crown",
+      "lines": [
+        [
+          "nusakan",
+          "alphecca"
+        ]
+      ]
+    },
+    {
+      "name": "Hercules",
+      "latin": "The Strongman",
+      "lines": [
+        [
+          "kornephoros",
+          "rutilicus"
+        ],
+        [
+          "rutilicus",
+          "sarina"
+        ],
+        [
+          "sarina",
+          "rasalgethi"
+        ],
+        [
+          "rasalgethi",
+          "kornephoros"
+        ]
+      ]
+    },
+    {
+      "name": "Ophiuchus",
+      "latin": "The Serpent Bearer",
+      "lines": [
+        [
+          "rasalhague",
+          "cebalrai"
+        ],
+        [
+          "cebalrai",
+          "sabik"
+        ],
+        [
+          "sabik",
+          "han"
+        ],
+        [
+          "han",
+          "unukalhai"
+        ]
+      ]
+    },
+    {
+      "name": "Aries",
+      "latin": "The Ram",
+      "lines": [
+        [
+          "hamal",
+          "sheratan"
+        ],
+        [
+          "sheratan",
+          "mesarthim"
+        ]
       ]
     }
   ]

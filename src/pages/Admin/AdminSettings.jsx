@@ -175,6 +175,7 @@ export default function AdminSettings() {
   const [adminsLoading, setAdminsLoading] = useState(true)
   const [adminsError, setAdminsError] = useState('')
   const [newAdminEmail, setNewAdminEmail] = useState('')
+  const [newAdminRole, setNewAdminRole] = useState('moderator')
   const [grantingAdmin, setGrantingAdmin] = useState(false)
 
   // 📝 CMS Page Content Manager state
@@ -243,7 +244,7 @@ export default function AdminSettings() {
       setAdminsError('')
       try {
         const list = await cloudflare.fetchAdmins()
-        if (!unmounted) setAdmins(list)
+        if (!unmounted) setAdmins(list || [])
       } catch (e) {
         if (!unmounted) setAdminsError(e.message || 'Failed to load admin team')
       } finally {
@@ -260,23 +261,35 @@ export default function AdminSettings() {
     setGrantingAdmin(true)
     setAdminsError('')
     try {
-      const res = await cloudflare.grantAdmin(newAdminEmail.trim())
-      setAdmins(res.admins || [])
+      await cloudflare.grantAdmin(newAdminEmail.trim(), newAdminRole)
+      const list = await cloudflare.fetchAdmins()
+      setAdmins(list || [])
       setNewAdminEmail('')
     } catch (e) {
-      setAdminsError(e.message || 'Failed to grant admin access')
+      setAdminsError(e.message || 'Failed to grant access')
     } finally {
       setGrantingAdmin(false)
     }
   }
 
-  async function handleRevokeAdmin(email) {
-    if (!confirm(`Revoke admin access for ${email}?`)) return
+  async function handleUpdateRole(email, newRole) {
     try {
-      const res = await cloudflare.revokeAdmin(email)
-      setAdmins(res.admins || [])
+      await cloudflare.updateAdminRole(email, newRole)
+      const list = await cloudflare.fetchAdmins()
+      setAdmins(list || [])
     } catch (e) {
-      setAdminsError(e.message || 'Failed to revoke admin access')
+      setAdminsError(e.message || 'Failed to update role')
+    }
+  }
+
+  async function handleRevokeAdmin(email) {
+    if (!confirm(`Revoke access for ${email}?`)) return
+    try {
+      await cloudflare.revokeAdmin(email)
+      const list = await cloudflare.fetchAdmins()
+      setAdmins(list || [])
+    } catch (e) {
+      setAdminsError(e.message || 'Failed to revoke access')
     }
   }
 
@@ -1206,7 +1219,7 @@ export default function AdminSettings() {
             </div>
           </div>
 
-          <form onSubmit={handleGrantAdmin} className="flex items-end gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
+          <form onSubmit={handleGrantAdmin} className="flex flex-col sm:flex-row items-stretch sm:items-end gap-3 p-4 rounded-2xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10 mb-6">
             <div className="flex-1">
               <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Email address</label>
               <input
@@ -1218,6 +1231,17 @@ export default function AdminSettings() {
                 required
               />
             </div>
+            <div className="w-full sm:w-36">
+              <label className="block text-xs font-semibold text-ink dark:text-slate-300 mb-1">Role</label>
+              <select
+                value={newAdminRole}
+                onChange={e => setNewAdminRole(e.target.value)}
+                className="input text-xs"
+              >
+                <option value="moderator">Moderator</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
             <button type="submit" disabled={grantingAdmin} className="btn-primary text-xs gap-2 !py-2.5 flex-shrink-0">
               {grantingAdmin ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UserPlus className="w-3.5 h-3.5" />}
               Grant Access
@@ -1227,28 +1251,51 @@ export default function AdminSettings() {
           {adminsError && <p className="text-xs text-red-500 mb-4">{adminsError}</p>}
 
           {adminsLoading ? (
-            <p className="text-xs text-ink-ghost flex items-center gap-2"><Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading admins…</p>
+            <p className="text-xs text-ink-ghost flex items-center gap-2"><Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading team…</p>
           ) : admins.length > 0 ? (
             <div className="space-y-2">
               {admins.map((a) => (
                 <div key={a.email} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-night-200/60 border border-slate-200 dark:border-white/10">
-                  <div className="min-w-0">
-                    <p className="font-bold text-xs text-ink dark:text-white truncate">{a.email}</p>
-                    {a.added_at && (
-                      <p className="text-[11px] text-ink-ghost dark:text-slate-400">
-                        Added {new Date(a.added_at).toLocaleDateString()}
-                      </p>
-                    )}
+                  <div className="min-w-0 flex items-center gap-3">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-xs text-ink dark:text-white truncate">{a.email}</p>
+                        <span className={clsx(
+                          "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                          a.role === 'admin'
+                            ? "bg-purple-500/15 text-purple-600 dark:text-purple-400 border border-purple-400/30"
+                            : "bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-400/30"
+                        )}>
+                          {a.role === 'admin' ? 'Admin' : 'Moderator'}
+                        </span>
+                      </div>
+                      {a.added_at && (
+                        <p className="text-[11px] text-ink-ghost dark:text-slate-400">
+                          Added {new Date(a.added_at).toLocaleDateString()} {a.added_by ? `by ${a.added_by}` : ''}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <button type="button" onClick={() => handleRevokeAdmin(a.email)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0" title="Revoke access">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={a.role || 'moderator'}
+                      onChange={(e) => handleUpdateRole(a.email, e.target.value)}
+                      className="text-[11px] px-2 py-1 rounded-lg bg-white dark:bg-black/40 border border-slate-200 dark:border-white/10 text-ink dark:text-white focus:outline-none"
+                      title="Change member role"
+                    >
+                      <option value="moderator">Moderator</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                    <button type="button" onClick={() => handleRevokeAdmin(a.email)} className="p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 flex-shrink-0" title="Revoke access">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
           ) : (
             <p className="text-xs text-ink-ghost">
-              No admins granted via this panel yet — your super-admin email (set as a Worker secret) always has access regardless of what's listed here.
+              No staff granted via this panel yet — your super-admin email (set as a Worker secret) always has access regardless of what's listed here.
             </p>
           )}
         </div>

@@ -26,7 +26,18 @@ export function useEditablePage(slug, defaultContent) {
       }
     }
     loadPage()
-    return () => { active = false }
+
+    const handleUpdate = (e) => {
+      if (e.detail?.page === slug && e.detail?.full) {
+        setContent(e.detail.full)
+      }
+    }
+    window.addEventListener('page-content-updated', handleUpdate)
+
+    return () => {
+      active = false
+      window.removeEventListener('page-content-updated', handleUpdate)
+    }
   }, [slug])
 
   const updatePage = useCallback(async (newContent) => {

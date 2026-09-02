@@ -8,6 +8,7 @@ import { getPlaylistCategory } from "@/data/profileHelpers";
 import { useEditablePage } from "@/hooks/useEditablePage";
 import { DEFAULT_SITE_SETTINGS } from "@/data/siteSettings";
 import ParticleBackground from "@/components/ui/ParticleBackground";
+import InlineEditable from "@/components/ui/InlineEditable";
 
 export default function FeaturedCourses() {
   const { data, isLoading, isError } = usePlaylists();
@@ -26,12 +27,28 @@ export default function FeaturedCourses() {
       <div className="section relative z-10">
         <ScrollReveal className="flex items-end justify-between mb-12">
           <div>
-            <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">
-              {category}
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl text-ink dark:text-white font-bold">
-              {title}
-            </h2>
+            <InlineEditable
+              page="site_settings"
+              field="featuredCoursesCategory"
+              value={category}
+              defaultContent={DEFAULT_SITE_SETTINGS}
+              label="Section Category"
+            >
+              <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">
+                {category}
+              </p>
+            </InlineEditable>
+            <InlineEditable
+              page="site_settings"
+              field="featuredCoursesTitle"
+              value={title}
+              defaultContent={DEFAULT_SITE_SETTINGS}
+              label="Section Title"
+            >
+              <h2 className="font-display text-4xl md:text-5xl text-ink dark:text-white font-bold">
+                {title}
+              </h2>
+            </InlineEditable>
           </div>
           <Link
             to="/courses"

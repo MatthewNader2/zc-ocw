@@ -4,6 +4,7 @@ import { useAdminData } from '@/context/AdminDataContext'
 import { useEditablePage } from '@/hooks/useEditablePage'
 import { DEFAULT_SITE_SETTINGS } from '@/data/siteSettings'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import InlineEditable from '@/components/ui/InlineEditable'
 
 const ACCENT = { csai:'#0096c7', business:'#0d9488', science:'#7c3aed', engineering:'#ea580c' }
 
@@ -18,8 +19,24 @@ export default function DepartmentGrid() {
     <section className="py-20 bg-slate-50/60 dark:bg-night-200/40">
       <div className="section">
         <ScrollReveal className="text-center mb-12">
-          <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">{category}</p>
-          <h2 className="font-display text-4xl md:text-5xl text-ink dark:text-white font-bold">{title}</h2>
+          <InlineEditable
+            page="site_settings"
+            field="departmentsCategory"
+            value={category}
+            defaultContent={DEFAULT_SITE_SETTINGS}
+            label="Departments Category"
+          >
+            <p className="text-ocean-500 text-xs font-semibold font-mono uppercase tracking-[0.2em] mb-3">{category}</p>
+          </InlineEditable>
+          <InlineEditable
+            page="site_settings"
+            field="departmentsTitle"
+            value={title}
+            defaultContent={DEFAULT_SITE_SETTINGS}
+            label="Departments Title"
+          >
+            <h2 className="font-display text-4xl md:text-5xl text-ink dark:text-white font-bold">{title}</h2>
+          </InlineEditable>
         </ScrollReveal>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">

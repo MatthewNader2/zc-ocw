@@ -9,7 +9,9 @@
 		"ALLOWED_ORIGIN": "https://zc-ocw.vercel.app",
 		"R2_PUBLIC_ID": "https://pub-c9973170d9e940ff93b0152afec2c45d.r2.dev",
 		"ASTRONOMY_API_APP_ID": "REDACTED_APP_ID",
-		"ASTRONOMY_API_APP_SECRET": "REDACTED_SECRET"
+		"ASTRONOMY_API_APP_SECRET": "REDACTED_SECRET",
+		"YOUTUBE_API_KEY": "REDACTED_API_KEY",
+		"FEEDBACK_EMAIL": "zcocw@zewailcity.edu.eg"
 	},
 
 	"d1_databases": [

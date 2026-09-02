@@ -44,13 +44,19 @@ function ContinueSection() {
   )
 }
 
-const HOW_STEPS = [
-  { icon: BookOpen,   n: '01', title: 'Choose a Course',   body: 'Browse 4 schools and 20+ programs, or search by topic or course code.' },
-  { icon: PlayCircle, n: '02', title: 'Watch Lectures',    body: 'Stream HD lectures with our custom player. No sign-up required.' },
-  { icon: Download,   n: '03', title: 'Get Materials',     body: 'Download slides, problem sheets, past exams, and textbook recommendations.' },
-]
+import { useAdminData } from '@/context/AdminDataContext'
 
 export default function Home() {
+  const { allSchools, allPrograms } = useAdminData()
+  const schoolsCount = allSchools?.length || 4
+  const programsCount = allPrograms?.length || 20
+
+  const HOW_STEPS = [
+    { icon: BookOpen,   n: '01', title: 'Choose a Course',   body: `Browse ${schoolsCount} schools and ${programsCount}+ programs, or search by topic or course code.` },
+    { icon: PlayCircle, n: '02', title: 'Watch Lectures',    body: 'Stream HD lectures with our custom player. No sign-up required.' },
+    { icon: Download,   n: '03', title: 'Get Materials',     body: 'Download slides, problem sheets, past exams, and textbook recommendations.' },
+  ]
+
   return (
     <>
       <Helmet>

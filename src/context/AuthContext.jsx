@@ -15,23 +15,37 @@ const WORKER_URL = import.meta.env.VITE_WORKER_URL;
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);       // Firebase user, or null
-  const [isAdmin, setIsAdmin] = useState(false); // server-verified role
+  const [role, setRole] = useState(null);       // 'admin' | 'moderator' | null
+  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [loading, setLoading] = useState(true);  // true until first auth check resolves
 
-  // Ask the Worker whether the current token belongs to an admin. This is
-  // the source of truth — never trust a client-side flag for this, since
-  // it gates admin-only routes that themselves re-check the token anyway.
+  const isAdmin = role === "admin";
+  const isModerator = role === "moderator";
+  const isStaff = isAdmin || isModerator;
+
+  // Ask the Worker whether the current token belongs to an admin or moderator.
   const refreshRole = useCallback(async () => {
-    if (!WORKER_URL) return setIsAdmin(false);
+    if (!WORKER_URL) {
+      setRole(null);
+      setIsSuperAdmin(false);
+      return;
+    }
     try {
       const token = await getIdToken();
+      if (!token) {
+        setRole(null);
+        setIsSuperAdmin(false);
+        return;
+      }
       const res = await fetch(`${WORKER_URL}/api/admins/me`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      setIsAdmin(!!data.isAdmin);
+      setRole(data.role || (data.isAdmin ? "admin" : null));
+      setIsSuperAdmin(!!data.isSuperAdmin);
     } catch {
-      setIsAdmin(false);
+      setRole(null);
+      setIsSuperAdmin(false);
     }
   }, []);
 
@@ -41,7 +55,8 @@ export function AuthProvider({ children }) {
       if (firebaseUser) {
         await refreshRole();
       } else {
-        setIsAdmin(false);
+        setRole(null);
+        setIsSuperAdmin(false);
       }
       setLoading(false);
     });
@@ -65,17 +80,24 @@ export function AuthProvider({ children }) {
 
   const logout = useCallback(async () => {
     await signOutUser();
-    setIsAdmin(false);
+    setRole(null);
+    setIsSuperAdmin(false);
   }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        role,
         isAdmin,
+        isModerator,
+        isStaff,
+        canModerate: isStaff,
+        isSuperAdmin,
         loading,
         isFirebaseConfigured,
         getIdToken,
+        refreshRole,
         loginWithGoogle,
         loginWithEmail,
         signup,

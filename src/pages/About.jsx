@@ -4,6 +4,7 @@ import { Youtube, Globe, BookOpen, PlayCircle, Search, Smartphone, ArrowRight, S
 import { useChannelStats } from '@/hooks/useYouTube'
 import { useEditablePage } from '@/hooks/useEditablePage'
 import ScrollReveal from '@/components/ui/ScrollReveal'
+import InlineEditable from '@/components/ui/InlineEditable'
 
 export const DEFAULT_ABOUT = {
   headerSubtitle: "Knowledge becomes more powerful when it is shared — carrying world-class science and engineering education from Zewail City to learners across Egypt and the Arab world.",
@@ -39,6 +40,14 @@ export default function About() {
     },
   ]
 
+  const headerSubtitle = content?.headerSubtitle || DEFAULT_ABOUT.headerSubtitle
+  const aboutTitle = content?.aboutTitle || DEFAULT_ABOUT.aboutTitle
+  const aboutBody = content?.aboutBody || DEFAULT_ABOUT.aboutBody
+  const missionTitle = content?.missionTitle || DEFAULT_ABOUT.missionTitle
+  const missionBody = content?.missionBody || DEFAULT_ABOUT.missionBody
+  const licenseTitle = content?.licenseTitle || DEFAULT_ABOUT.licenseTitle
+  const licenseBody = content?.licenseBody || DEFAULT_ABOUT.licenseBody
+
   return (
     <>
       <Helmet><title>About — ZC OCW</title></Helmet>
@@ -54,9 +63,18 @@ export default function About() {
               <p className="text-white/40 mt-1">University of Science and Technology</p>
             </div>
           </div>
-          <p className="text-white/70 text-lg leading-relaxed max-w-3xl">
-            {content?.headerSubtitle || DEFAULT_ABOUT.headerSubtitle}
-          </p>
+          <InlineEditable
+            page="about"
+            field="headerSubtitle"
+            value={headerSubtitle}
+            defaultContent={DEFAULT_ABOUT}
+            multiline
+            label="About Header Subtitle"
+          >
+            <p className="text-white/70 text-lg leading-relaxed max-w-3xl whitespace-pre-line">
+              {headerSubtitle}
+            </p>
+          </InlineEditable>
         </div>
       </div>
 
@@ -79,12 +97,29 @@ export default function About() {
             <Sparkles className="w-4 h-4" />
             <span>Our Story</span>
           </div>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-ink dark:text-white">
-            {content?.aboutTitle || DEFAULT_ABOUT.aboutTitle}
-          </h2>
-          <p className="text-ink-muted dark:text-slate-300 leading-relaxed text-base md:text-lg">
-            {content?.aboutBody || DEFAULT_ABOUT.aboutBody}
-          </p>
+          <InlineEditable
+            page="about"
+            field="aboutTitle"
+            value={aboutTitle}
+            defaultContent={DEFAULT_ABOUT}
+            label="Story Title"
+          >
+            <h2 className="font-display text-3xl md:text-4xl font-bold text-ink dark:text-white">
+              {aboutTitle}
+            </h2>
+          </InlineEditable>
+          <InlineEditable
+            page="about"
+            field="aboutBody"
+            value={aboutBody}
+            defaultContent={DEFAULT_ABOUT}
+            multiline
+            label="Story Body Text"
+          >
+            <p className="text-ink-muted dark:text-slate-300 leading-relaxed text-base md:text-lg whitespace-pre-line">
+              {aboutBody}
+            </p>
+          </InlineEditable>
         </ScrollReveal>
 
         {/* Mission Statement */}
@@ -96,12 +131,29 @@ export default function About() {
                 <Target className="w-4 h-4" />
                 <span>Our Vision & Purpose</span>
               </div>
-              <h2 className="font-display text-2xl md:text-3xl font-bold text-white">
-                {content?.missionTitle || DEFAULT_ABOUT.missionTitle}
-              </h2>
-              <p className="text-white/80 leading-relaxed text-base md:text-lg">
-                {content?.missionBody || DEFAULT_ABOUT.missionBody}
-              </p>
+              <InlineEditable
+                page="about"
+                field="missionTitle"
+                value={missionTitle}
+                defaultContent={DEFAULT_ABOUT}
+                label="Mission Title"
+              >
+                <h2 className="font-display text-2xl md:text-3xl font-bold text-white">
+                  {missionTitle}
+                </h2>
+              </InlineEditable>
+              <InlineEditable
+                page="about"
+                field="missionBody"
+                value={missionBody}
+                defaultContent={DEFAULT_ABOUT}
+                multiline
+                label="Mission Statement"
+              >
+                <p className="text-white/80 leading-relaxed text-base md:text-lg whitespace-pre-line">
+                  {missionBody}
+                </p>
+              </InlineEditable>
             </div>
           </div>
         </ScrollReveal>
@@ -138,20 +190,40 @@ export default function About() {
         </div>
 
         {/* License */}
-        <ScrollReveal delay="0.1s">
-          <div className="bg-ocean-50 dark:bg-night-200/80 border border-ocean-200/60 dark:border-white/10 rounded-2xl p-6">
-            <h2 className="font-display text-2xl font-bold text-ink dark:text-white mb-3">
-              {content?.licenseTitle || DEFAULT_ABOUT.licenseTitle}
-            </h2>
-            <p className="text-ink-muted dark:text-slate-300 leading-relaxed text-sm">
-              {content?.licenseBody || DEFAULT_ABOUT.licenseBody}{' '}
-              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer"
-                 className="text-ocean-600 dark:text-ocean-400 hover:underline font-semibold">
-                Creative Commons BY-NC-SA 4.0
-              </a>{' '}
-              license. You are free to use, adapt, and share them for non-commercial purposes with proper attribution.
-            </p>
+        <ScrollReveal className="card p-6 border border-slate-100 dark:border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <InlineEditable
+              page="about"
+              field="licenseTitle"
+              value={licenseTitle}
+              defaultContent={DEFAULT_ABOUT}
+              label="License Title"
+            >
+              <h3 className="font-display font-bold text-ink dark:text-white text-base mb-1">
+                {licenseTitle}
+              </h3>
+            </InlineEditable>
+            <InlineEditable
+              page="about"
+              field="licenseBody"
+              value={licenseBody}
+              defaultContent={DEFAULT_ABOUT}
+              multiline
+              label="License Description"
+            >
+              <p className="text-xs text-ink-ghost dark:text-slate-400 max-w-xl whitespace-pre-line">
+                {licenseBody}
+              </p>
+            </InlineEditable>
           </div>
+          <a
+            href="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-outline text-xs gap-1.5 flex-shrink-0"
+          >
+            CC BY-NC-SA 4.0 <ArrowRight className="w-3.5 h-3.5" />
+          </a>
         </ScrollReveal>
 
         <ScrollReveal className="flex flex-wrap gap-4">

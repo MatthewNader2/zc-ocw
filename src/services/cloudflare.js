@@ -235,17 +235,26 @@ export async function fetchWeather() {
   return call("weather");
 }
 
+export async function fetchIss() {
+  if (!isConfigured) return null;
+  return call("iss");
+}
+
 // ── Admin team management ────────────────────────────────────────────────────
 // Distinct from the content sync above — this manages who is allowed into
-// /admin at all. All three require the caller to already be an admin
+// /admin at all. All require the caller to already be an admin
 // (enforced server-side); the Worker rejects otherwise.
 
 export async function fetchAdmins() {
   return call("admins", { admin: true });
 }
 
-export async function grantAdmin(email) {
-  return call("admins", { method: "POST", body: { email }, admin: true });
+export async function grantAdmin(email, role = "moderator") {
+  return call("admins", { method: "POST", body: { email, role }, admin: true });
+}
+
+export async function updateAdminRole(email, role) {
+  return call(`admins/${encodeURIComponent(email)}`, { method: "PUT", body: { role }, admin: true });
 }
 
 export async function revokeAdmin(email) {

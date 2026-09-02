@@ -83,3 +83,42 @@ export function getSolarTimes(date, latDeg, lonDeg) {
 
   return { sunrise: riseDate, sunset: setDate };
 }
+
+/**
+ * Computes altitude and azimuth of a satellite (like ISS) relative to observer coordinates
+ */
+export function satelliteAltAz(satLat, satLon, satAltKm = 420, obsLat = 30.03, obsLon = 30.95) {
+  const R_EARTH = 6371;
+  const rObs = R_EARTH;
+  const rSat = R_EARTH + satAltKm;
+
+  const lat1 = (obsLat * Math.PI) / 180;
+  const lon1 = (obsLon * Math.PI) / 180;
+  const lat2 = (satLat * Math.PI) / 180;
+  const lon2 = (satLon * Math.PI) / 180;
+
+  const x1 = rObs * Math.cos(lat1) * Math.cos(lon1);
+  const y1 = rObs * Math.cos(lat1) * Math.sin(lon1);
+  const z1 = rObs * Math.sin(lat1);
+
+  const x2 = rSat * Math.cos(lat2) * Math.cos(lon2);
+  const y2 = rSat * Math.cos(lat2) * Math.sin(lon2);
+  const z2 = rSat * Math.sin(lat2);
+
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const dz = z2 - z1;
+
+  const up = Math.cos(lat1) * Math.cos(lon1) * dx + Math.cos(lat1) * Math.sin(lon1) * dy + Math.sin(lat1) * dz;
+  const east = -Math.sin(lon1) * dx + Math.cos(lon1) * dy;
+  const north = -Math.sin(lat1) * Math.cos(lon1) * dx - Math.sin(lat1) * Math.sin(lon1) * dy + Math.cos(lat1) * dz;
+
+  const horizDist = Math.hypot(north, east);
+  const alt = (Math.atan2(up, horizDist) * 180) / Math.PI;
+  let az = (Math.atan2(east, north) * 180) / Math.PI;
+  if (az < 0) az += 360;
+
+  const rangeKm = Math.hypot(dx, dy, dz);
+  return { alt, az, rangeKm, visible: alt > 0 };
+}
+

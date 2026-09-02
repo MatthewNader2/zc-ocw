@@ -32,7 +32,7 @@ const SCHOOL_ACCENT = {
 };
 
 export default function AdminDashboard() {
-  const { logout } = useAuth();
+  const { logout, role, isAdmin, isModerator } = useAuth();
   const { getCourseData, getMaterials, getBooks, isSpecialPlaylist, version } = useAdminData();
   const { data, isLoading, refetch } = usePlaylists();
   const courses = data?.pages?.flatMap((p) => p.items) ?? [];
@@ -60,31 +60,11 @@ export default function AdminDashboard() {
     setSyncing(true);
     setSyncMsg("");
     try {
-      const ytData = await fetchPlaylists({ maxResults: 50 });
-      const ytItems = ytData?.items || [];
-      let newCount = 0;
-
-      for (const item of ytItems) {
-        const cd = getCourseData(item.id);
-        if (!cd || Object.keys(cd).length === 0) {
-          const auto = detectFromTitle(item.snippet.title);
-          await cloudflare.upsertProfile(item.id, {
-            category: "course",
-            schoolId: auto?.schoolId || null,
-            programId: auto?.programId || null,
-            courseCode: auto?.code || null,
-            courseName: auto?.name || item.snippet.title,
-            isIncomplete: true,
-            lectureCount: item.contentDetails?.itemCount || 0,
-          });
-          newCount++;
-        }
-      }
-
-      await refetch();
-      setSyncMsg(newCount > 0 ? `Synced! Found ${newCount} new playlist(s).` : "Channel already up-to-date!");
+      const fresh = await fetchPlaylists();
+      refetch();
+      setSyncMsg(`✓ Synced ${fresh.length} playlists from YouTube.`);
     } catch (e) {
-      setSyncMsg(`Sync error: ${e.message}`);
+      setSyncMsg(`Failed to sync from YouTube: ${e.message}`);
     } finally {
       setSyncing(false);
     }
@@ -107,26 +87,40 @@ export default function AdminDashboard() {
       <div className="page-header">
         <div className="section flex items-center justify-between flex-wrap gap-4">
           <div>
-            <p className="text-ocean-400 text-xs font-semibold uppercase tracking-widest mb-1">
-              Admin Panel
-            </p>
+            <div className="flex items-center gap-2 mb-1">
+              <p className="text-ocean-400 text-xs font-semibold uppercase tracking-widest">
+                Staff Panel
+              </p>
+              <span className={clsx(
+                "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider",
+                isAdmin
+                  ? "bg-purple-500/20 text-purple-300 border border-purple-400/40"
+                  : "bg-cyan-500/20 text-cyan-300 border border-cyan-400/40"
+              )}>
+                {isAdmin ? "Administrator" : "Moderator"}
+              </span>
+            </div>
             <h1 className="font-display text-4xl font-bold">Dashboard</h1>
             <p className="text-white/45 text-sm mt-1">
               {courses.length} playlists from YouTube
             </p>
           </div>
           <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={handleSyncYouTube}
-              disabled={syncing}
-              className="btn-primary gap-2 text-xs"
-            >
-              <RefreshCw className={clsx("w-3.5 h-3.5", syncing && "animate-spin")} />
-              {syncing ? "Syncing YouTube…" : "Sync from YouTube Now"}
-            </button>
-            <Link to="/admin/settings" className="btn-outline-dark gap-2">
-              <Settings className="w-4 h-4" /> Settings
-            </Link>
+            {isAdmin && (
+              <button
+                onClick={handleSyncYouTube}
+                disabled={syncing}
+                className="btn-primary gap-2 text-xs"
+              >
+                <RefreshCw className={clsx("w-3.5 h-3.5", syncing && "animate-spin")} />
+                {syncing ? "Syncing YouTube…" : "Sync from YouTube Now"}
+              </button>
+            )}
+            {isAdmin && (
+              <Link to="/admin/settings" className="btn-outline-dark gap-2">
+                <Settings className="w-4 h-4" /> Settings
+              </Link>
+            )}
             <button onClick={logout} className="btn-outline-dark gap-2">
               <LogOut className="w-4 h-4" /> Sign Out
             </button>

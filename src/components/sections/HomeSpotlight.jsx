@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Play, Sparkles, ArrowRight, ShieldCheck, Heart } from "lucide-react";
 import { useEditablePage } from "@/hooks/useEditablePage";
 import ScrollReveal from "@/components/ui/ScrollReveal";
+import InlineEditable from "@/components/ui/InlineEditable";
 
 const DEFAULT_HOME = {
   heroTitle: "Knowledge Unlocked",
@@ -44,22 +45,47 @@ export default function HomeSpotlight() {
           {/* Left / Info Column */}
           <div className="lg:col-span-5 space-y-6 text-center lg:text-left">
             <ScrollReveal>
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-semibold tracking-wide uppercase">
-                <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                <span>{badge}</span>
-              </div>
+              <InlineEditable
+                page="home"
+                field="featuredVideoBadge"
+                value={badge}
+                defaultContent={DEFAULT_HOME}
+                label="Spotlight Badge"
+              >
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-semibold tracking-wide uppercase">
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>{badge}</span>
+                </div>
+              </InlineEditable>
             </ScrollReveal>
 
             <ScrollReveal delay="0.1s">
-              <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-                {title}
-              </h2>
+              <InlineEditable
+                page="home"
+                field="featuredVideoTitle"
+                value={title}
+                defaultContent={DEFAULT_HOME}
+                label="Spotlight Title"
+              >
+                <h2 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
+                  {title}
+                </h2>
+              </InlineEditable>
             </ScrollReveal>
 
             <ScrollReveal delay="0.15s">
-              <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
-                {description}
-              </p>
+              <InlineEditable
+                page="home"
+                field="featuredVideoDescription"
+                value={description}
+                defaultContent={DEFAULT_HOME}
+                multiline
+                label="Spotlight Description"
+              >
+                <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl mx-auto lg:mx-0 whitespace-pre-line">
+                  {description}
+                </p>
+              </InlineEditable>
             </ScrollReveal>
 
             <ScrollReveal delay="0.2s" className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">

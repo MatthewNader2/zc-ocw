@@ -8,9 +8,11 @@ import {
   PlayCircle,
   Award,
 } from "lucide-react";
-import { useChannelStats } from "@/hooks/useYouTube";
+import { useChannelStats, usePlaylists } from "@/hooks/useYouTube";
 import { useEditablePage } from "@/hooks/useEditablePage";
+import { useAdminData } from "@/context/AdminDataContext";
 import ParticleBackground from "@/components/ui/ParticleBackground";
+import InlineEditable from "@/components/ui/InlineEditable";
 
 export const DEFAULT_HOME = {
   heroTitle: "Knowledge Unlocked",
@@ -25,7 +27,7 @@ function AnimatedNumber({ target, suffix = "" }) {
   const [val, setVal] = useState(0);
   useEffect(() => {
     let start = 0;
-    const step = Math.ceil(target / 40);
+    const step = Math.ceil(target / 40) || 1;
     const t = setInterval(() => {
       start += step;
       if (start >= target) {
@@ -45,6 +47,8 @@ function AnimatedNumber({ target, suffix = "" }) {
 
 export default function HeroSection() {
   const { data: channel } = useChannelStats();
+  const { data: playlistsData } = usePlaylists();
+  const { allSchools } = useAdminData();
   const { content } = useEditablePage("home", DEFAULT_HOME);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(false);
@@ -63,14 +67,18 @@ export default function HeroSection() {
     if (query.trim()) navigate(`/search?q=${encodeURIComponent(query.trim())}`);
   }
 
+  // Dynamic Real Counts
   const videoCount = channel?.statistics?.videoCount
     ? Number(channel.statistics.videoCount)
     : 551;
+  const coursesList = playlistsData?.pages?.flatMap((p) => p.items) || [];
+  const coursesCount = coursesList.length > 0 ? coursesList.length : 35;
+  const schoolsCount = allSchools?.length || 4;
 
   const stats = [
     { icon: PlayCircle, label: "Lectures", value: videoCount, suffix: "+" },
-    { icon: BookOpen, label: "Courses", value: 50, suffix: "+" },
-    { icon: Users, label: "Schools", value: 4, suffix: "" },
+    { icon: BookOpen, label: "Courses", value: coursesCount, suffix: "+" },
+    { icon: Users, label: "Schools", value: schoolsCount, suffix: "" },
     { icon: Award, label: "Free", value: 100, suffix: "%" },
   ];
 
@@ -127,55 +135,73 @@ export default function HeroSection() {
           </div>
 
           {/* Headline */}
-          <h1
-            className={clsx_light(
-              "font-display text-5xl sm:text-6xl md:text-7xl font-extrabold text-white leading-[1.08] mb-6 tracking-tight transition-all duration-700 delay-100",
-              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
-            )}
+          <InlineEditable
+            page="home"
+            field="heroTitle"
+            value={heroTitle}
+            defaultContent={DEFAULT_HOME}
+            label="Hero Headline"
           >
-            {heroTitle.includes(" ") ? (
-              <>
-                {heroTitle.split(" ").slice(0, -1).join(" ")}{" "}
-                <span className="relative inline-block">
-                  <span className="bg-gradient-to-r from-ocean-400 to-ocean-300 bg-clip-text text-transparent">
-                    {heroTitle.split(" ").slice(-1)[0]}
-                  </span>
-                  <svg
-                    className="absolute -bottom-2 left-0 w-full"
-                    viewBox="0 0 300 8"
-                    fill="none"
-                  >
-                    <path
-                      d="M2 6 Q75 1 150 5 Q225 9 298 3"
-                      stroke="url(#ul)"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
+            <h1
+              className={clsx_light(
+                "font-display text-5xl sm:text-6xl md:text-7xl font-extrabold text-white leading-[1.08] mb-6 tracking-tight transition-all duration-700 delay-100",
+                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8",
+              )}
+            >
+              {heroTitle.includes(" ") ? (
+                <>
+                  {heroTitle.split(" ").slice(0, -1).join(" ")}{" "}
+                  <span className="relative inline-block">
+                    <span className="bg-gradient-to-r from-ocean-400 to-ocean-300 bg-clip-text text-transparent">
+                      {heroTitle.split(" ").slice(-1)[0]}
+                    </span>
+                    <svg
+                      className="absolute -bottom-2 left-0 w-full"
+                      viewBox="0 0 300 8"
                       fill="none"
-                    />
-                    <defs>
-                      <linearGradient id="ul" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#48cae4" />
-                        <stop offset="100%" stopColor="#90e0ef" />
-                      </linearGradient>
-                    </defs>
-                  </svg>
+                    >
+                      <path
+                        d="M2 6 Q75 1 150 5 Q225 9 298 3"
+                        stroke="url(#ul)"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        fill="none"
+                      />
+                      <defs>
+                        <linearGradient id="ul" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#48cae4" />
+                          <stop offset="100%" stopColor="#90e0ef" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </span>
+                </>
+              ) : (
+                <span className="bg-gradient-to-r from-ocean-400 to-ocean-300 bg-clip-text text-transparent">
+                  {heroTitle}
                 </span>
-              </>
-            ) : (
-              <span className="bg-gradient-to-r from-ocean-400 to-ocean-300 bg-clip-text text-transparent">
-                {heroTitle}
-              </span>
-            )}
-          </h1>
+              )}
+            </h1>
+          </InlineEditable>
 
-          <p
-            className={clsx_light(
-              "text-white/65 text-lg md:text-xl font-body mb-10 leading-relaxed max-w-2xl mx-auto transition-all duration-700 delay-200",
-              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
-            )}
+          {/* Subtitle */}
+          <InlineEditable
+            page="home"
+            field="heroSubtitle"
+            value={heroSubtitle}
+            defaultContent={DEFAULT_HOME}
+            multiline
+            label="Hero Subtitle"
           >
-            {heroSubtitle}
-          </p>
+            <p
+              className={clsx_light(
+                "text-white/65 text-lg md:text-xl font-body mb-10 leading-relaxed max-w-2xl mx-auto whitespace-pre-line transition-all duration-700 delay-200",
+                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6",
+              )}
+            >
+              {heroSubtitle}
+            </p>
+          </InlineEditable>
 
           {/* Search */}
           <form

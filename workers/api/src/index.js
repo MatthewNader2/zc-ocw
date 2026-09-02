@@ -87,8 +87,8 @@ function sanitize(str) {
 // ── Auth check ──────────────────────────────────────────────────────────────
 // Verifies the caller sent a real, valid Firebase ID token (signature +
 // expiry + project), then checks that the token's email is allowed to
-// administer this site. Returns the verified email on success, or null.
-async function verifyAdmin(req, env) {
+// administer this site. Returns { email, role, isSuperAdmin } on success, or null.
+async function verifyRole(req, env) {
 	const header = req.headers.get('Authorization') || '';
 	const token = header.replace('Bearer ', '').trim();
 	if (!token) return null;
@@ -125,21 +125,34 @@ async function verifyAdmin(req, env) {
 	].filter(Boolean).map((e) => e.toLowerCase());
 
 	if (superAdmins.includes(email)) {
-		return email;
+		return { email, role: 'admin', isSuperAdmin: true };
 	}
 
 	try {
-		const row = await env.DB.prepare('SELECT email FROM admins WHERE LOWER(email) = ?').bind(email).first();
-		return row ? email : null;
+		const row = await env.DB.prepare('SELECT email, role FROM admins WHERE LOWER(email) = ?').bind(email).first();
+		if (!row) return null;
+		return { email, role: row.role || 'moderator', isSuperAdmin: false };
 	} catch (err) {
 		console.error('Error querying admins table in D1:', err);
 		return null;
 	}
 }
 
-// Convenience boolean wrapper for routes that only need a yes/no.
+// True for full administrators (can manage site copy, taxonomy, admins)
 async function isAdmin(req, env) {
-	return (await verifyAdmin(req, env)) !== null;
+	const user = await verifyRole(req, env);
+	return user?.role === 'admin';
+}
+
+// True for both admins and moderators (can edit course data, upload materials)
+async function isStaff(req, env) {
+	const user = await verifyRole(req, env);
+	return user !== null && (user.role === 'admin' || user.role === 'moderator');
+}
+
+async function verifyAdmin(req, env) {
+	const user = await verifyRole(req, env);
+	return user?.role === 'admin' ? user.email : null;
 }
 
 // Verifies caller sent any valid Firebase ID token (user or admin). Returns { uid, email } or null.
@@ -205,7 +218,8 @@ export default {
 		if (url.pathname.startsWith('/api/youtube/')) {
 			const endpoint = url.pathname.replace('/api/youtube/', '');
 			const params = new URLSearchParams(url.search);
-			params.set('key', env.YOUTUBE_API_KEY);
+			const apiKey = env.YOUTUBE_API_KEY || params.get('key');
+			if (apiKey) params.set('key', apiKey);
 
 			// Dynamic Part handling based on endpoint
 			if (!params.has('part')) {
@@ -231,39 +245,6 @@ export default {
 			}
 		}
 
-		// Handle YouTube Proxy Routes BEFORE splitting segments
-		if (url.pathname === '/api/youtube/playlists' && req.method === 'GET') {
-			const channelId = url.searchParams.get('channelId');
-			if (!channelId) return err('Missing channelId', 400, cors);
-
-			const ytUrl = `https://www.googleapis.com/youtube/v3/playlists?channelId=${channelId}&part=snippet,contentDetails&maxResults=20&key=${env.YOUTUBE_API_KEY}`;
-
-			try {
-				const response = await fetch(ytUrl);
-				const data = await response.json();
-				if (!response.ok) return err(data.error?.message || 'YouTube API Error', response.status, cors);
-				return json(data, 200, cors);
-			} catch (e) {
-				return err('Failed to fetch from YouTube', 500, cors);
-			}
-		}
-
-		if (url.pathname === '/api/youtube/channels' && req.method === 'GET') {
-			const id = url.searchParams.get('id');
-			if (!id) return err('Missing id', 400, cors);
-
-			const ytUrl = `https://www.googleapis.com/youtube/v3/channels?id=${id}&part=snippet,statistics,brandingSettings&key=${env.YOUTUBE_API_KEY}`;
-
-			try {
-				const response = await fetch(ytUrl);
-				const data = await response.json();
-				if (!response.ok) return err(data.error?.message || 'YouTube API Error', response.status, cors);
-				return json(data, 200, cors);
-			} catch (e) {
-				return err('Failed to fetch from YouTube', 500, cors);
-			}
-		}
-
 		// Standard resource routing
 		const segments = url.pathname.replace('/api/', '').split('/');
 		const [resource, id] = segments;
@@ -282,9 +263,9 @@ export default {
 				return json({ ...row, tags: JSON.parse(row.tags || '[]') }, 200, cors);
 			}
 
-			// ── PUT /api/overrides/:playlistId ─────────────────────────────────
+			// ── PUT /api/overrides/:playlistId ───────────────────────────────── [staff: admin & moderator]
 			if (resource === 'overrides' && id && req.method === 'PUT') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				await env.DB.prepare(
 					`
@@ -345,42 +326,60 @@ export default {
 			}
 
 			// ── GET /api/admins/me ──────────────────────────────────────────────
-			// Frontend calls this right after Firebase login to decide whether to
-			// show the admin UI. Never trust a client-side role check alone —
-			// every actual admin write below re-verifies via isAdmin() regardless.
+			// Returns user role information: { isStaff, isAdmin, isModerator, role, email, isSuperAdmin }
 			if (resource === 'admins' && id === 'me' && req.method === 'GET') {
-				const email = await verifyAdmin(req, env);
-				return json({ isAdmin: !!email, email: email || null }, 200, cors);
+				const auth = await verifyRole(req, env);
+				return json({
+					isStaff: !!auth,
+					isAdmin: auth?.role === 'admin',
+					isModerator: auth?.role === 'moderator',
+					role: auth?.role || null,
+					email: auth?.email || null,
+					isSuperAdmin: !!auth?.isSuperAdmin,
+				}, 200, cors);
 			}
 
 			// ── GET /api/admins ──────────────────────────────────────────────── [admin]
 			if (resource === 'admins' && !id && req.method === 'GET') {
 				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
-				const { results } = await env.DB.prepare('SELECT email, added_by, added_at FROM admins ORDER BY added_at').all();
+				const { results } = await env.DB.prepare('SELECT email, role, added_by, added_at FROM admins ORDER BY added_at').all();
 				return json(results, 200, cors);
 			}
 
 			// ── POST /api/admins ─────────────────────────────────────────────── [admin]
-			// Body: { email }. Grants admin access to another Firebase account.
+			// Body: { email, role }. Grants admin/moderator access to another Firebase account.
 			if (resource === 'admins' && !id && req.method === 'POST') {
-				const grantedBy = await verifyAdmin(req, env);
-				if (!grantedBy) return err('Unauthorized', 401, cors);
+				const granter = await verifyRole(req, env);
+				if (!granter || granter.role !== 'admin') return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				const email = (body.email || '').trim().toLowerCase();
+				const role = body.role === 'admin' ? 'admin' : 'moderator';
 				if (!email || !email.includes('@')) return err('Valid email required', 400, cors);
-				await env.DB.prepare('INSERT OR IGNORE INTO admins (email, added_by) VALUES (?, ?)').bind(email, grantedBy).run();
-				return json({ ok: true, email }, 201, cors);
+				await env.DB.prepare('INSERT INTO admins (email, role, added_by) VALUES (?, ?, ?) ON CONFLICT(email) DO UPDATE SET role = excluded.role').bind(email, role, granter.email).run();
+				return json({ ok: true, email, role }, 201, cors);
+			}
+
+			// ── PUT /api/admins/:email ───────────────────────────────────────── [admin]
+			// Body: { role }. Updates role of existing admin/moderator.
+			if (resource === 'admins' && id && req.method === 'PUT') {
+				const updater = await verifyRole(req, env);
+				if (!updater || updater.role !== 'admin') return err('Unauthorized', 401, cors);
+				const targetEmail = decodeURIComponent(id).toLowerCase();
+				const body = await req.json();
+				const role = body.role === 'admin' ? 'admin' : 'moderator';
+				await env.DB.prepare('UPDATE admins SET role = ? WHERE LOWER(email) = ?').bind(role, targetEmail).run();
+				return json({ ok: true, email: targetEmail, role }, 200, cors);
 			}
 
 			// ── DELETE /api/admins/:email ────────────────────────────────────── [admin]
 			if (resource === 'admins' && id && req.method === 'DELETE') {
-				const requester = await verifyAdmin(req, env);
-				if (!requester) return err('Unauthorized', 401, cors);
+				const requester = await verifyRole(req, env);
+				if (!requester || requester.role !== 'admin') return err('Unauthorized', 401, cors);
 				const targetEmail = decodeURIComponent(id).toLowerCase();
 				if (env.FIREBASE_SUPER_ADMIN_EMAIL && targetEmail === env.FIREBASE_SUPER_ADMIN_EMAIL.toLowerCase()) {
 					return err('Cannot remove the super admin', 400, cors);
 				}
-				await env.DB.prepare('DELETE FROM admins WHERE email = ?').bind(targetEmail).run();
+				await env.DB.prepare('DELETE FROM admins WHERE LOWER(email) = ?').bind(targetEmail).run();
 				return json({ ok: true }, 200, cors);
 			}
 
@@ -405,7 +404,7 @@ export default {
 
 			// ── POST /api/materials/:playlistId ────────────────────────────────
 			if (resource === 'materials' && id && req.method === 'POST') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				const newId = crypto.randomUUID();
 				await env.DB.prepare(
@@ -430,7 +429,7 @@ export default {
 
 			// ── DELETE /api/materials/:id ──────────────────────────────────────
 			if (resource === 'materials' && id && req.method === 'DELETE') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				// If file was in R2, delete it too
 				const row = await env.DB.prepare('SELECT file_key FROM materials WHERE id = ?').bind(id).first();
 				if (row?.file_key) {
@@ -442,7 +441,7 @@ export default {
 
 			// ── POST /api/upload/:playlistId ───────────────────────────────────
 			if (resource === 'upload' && id && req.method === 'POST') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 
 				const contentType = req.headers.get('Content-Type') || '';
 				if (!contentType.includes('multipart/form-data')) {
@@ -507,7 +506,7 @@ export default {
 
 			// ── POST /api/books/:playlistId ────────────────────────────────────
 			if (resource === 'books' && id && req.method === 'POST') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				const newId = crypto.randomUUID();
 				await env.DB.prepare(
@@ -523,7 +522,7 @@ export default {
 
 			// ── DELETE /api/books/:id ──────────────────────────────────────────
 			if (resource === 'books' && id && req.method === 'DELETE') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				await env.DB.prepare('DELETE FROM books WHERE id = ?').bind(id).run();
 				return json({ ok: true }, 200, cors);
 			}
@@ -552,7 +551,7 @@ export default {
 			// ── PUT /api/profiles ──────────────────────────────────────────────────────
 			// Bulk upsert (profiler script uses this)
 			if (resource === 'profiles' && !id && req.method === 'PUT') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				const profiles = Array.isArray(body) ? body : [body];
 
@@ -608,7 +607,7 @@ export default {
 
 			// ── PUT /api/profiles/:playlistId ──────────────────────────────────────────
 			if (resource === 'profiles' && id && req.method === 'PUT') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				await env.DB.prepare(
 					`
@@ -750,9 +749,9 @@ export default {
 				return json({ ok: true, id }, 201, cors);
 			}
 
-			// ── GET /api/feedback ── Admin only: list all feedback ─────────────────────
+			// ── GET /api/feedback ── Staff: list all feedback ─────────────────────
 			if (resource === 'feedback' && !id && req.method === 'GET') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 
 				const type = url.searchParams.get('type');
 				let sql = 'SELECT * FROM feedback';
@@ -770,9 +769,9 @@ export default {
 				return json(results, 200, cors);
 			}
 
-			// ── GET /api/feedback/:id ── Admin only: get single feedback ───────────────
+			// ── GET /api/feedback/:id ── Staff: get single feedback ───────────────
 			if (resource === 'feedback' && id && req.method === 'GET') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 
 				const row = await env.DB.prepare('SELECT * FROM feedback WHERE id = ?').bind(id).first();
 				if (!row) return err('Not found', 404, cors);
@@ -976,6 +975,20 @@ export default {
 					console.warn('Open-Meteo error:', e);
 				}
 				return json({ sunrise: null, sunset: null }, 200, cors);
+			}
+
+			// ── GET /api/iss ────────────────────────────────────────────────────── [Live ISS Position via Open Notify]
+			if (url.pathname === '/api/iss' && req.method === 'GET') {
+				try {
+					const issRes = await fetch('http://api.open-notify.org/iss-now.json');
+					if (issRes.ok) {
+						const issData = await issRes.json();
+						return json(issData, 200, cors);
+					}
+				} catch (e) {
+					console.warn('ISS error:', e);
+				}
+				return json({ message: 'error', iss_position: null }, 200, cors);
 			}
 
 			// ── GET /sitemap.xml ───────────────────────────────────────────────── [Dynamic XML Sitemap]
