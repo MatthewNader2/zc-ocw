@@ -2,7 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
@@ -35,25 +40,58 @@
 
     <!-- Google Structured Data (Schema.org) -->
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "EducationalOrganization",
-      "name": "Zewail City OpenCourseWare",
-      "alternateName": "ZC OCW",
-      "url": "https://zc-ocw.vercel.app",
-      "logo": "https://zc-ocw.vercel.app/logo.svg",
-      "sameAs": [
-        "https://www.youtube.com/@ZCOCW",
-        "https://www.facebook.com/share/18FUoA3XCp/",
-        "https://www.linkedin.com/company/zewail-city-opencourseware/"
-      ],
-      "description": "Student-led open educational platform carrying university courses and research to learners across Egypt and the Arab world.",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": "https://zc-ocw.vercel.app/search?q={search_term_string}",
-        "query-input": "required name=search_term_string"
+    [
+      {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "Zewail City OpenCourseWare",
+        "alternateName": ["ZC OCW", "ZC-OCW"],
+        "url": "https://zc-ocw.vercel.app",
+        "logo": "https://zc-ocw.vercel.app/ocw-logo.jpg",
+        "image": "https://zc-ocw.vercel.app/ocw-logo.jpg",
+        "sameAs": [
+          "https://www.youtube.com/@ZCOCW",
+          "https://www.facebook.com/share/18FUoA3XCp/",
+          "https://www.linkedin.com/company/zewail-city-opencourseware/"
+        ],
+        "description": "Student-led open educational platform carrying university courses, 550+ recorded lectures, and research from the University of Science and Technology at Zewail City to learners across Egypt and the Arab world.",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://zc-ocw.vercel.app/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is ZC OCW (Zewail City OpenCourseWare)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "ZC-OCW is an open educational initiative founded in 2017 by students at the University of Science and Technology at Zewail City. It provides free, open access to 550+ recorded university lectures, course materials, problem sets, and academic interviews."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Are courses on ZC OCW free?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes, 100% of lectures, playlists, syllabus guides, and course materials on ZC-OCW are completely free and open to students across Egypt and the Arab world without requiring accounts or subscriptions."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What academic programs are available on ZC OCW?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Courses cover Computer Science & Artificial Intelligence (CSAI), Aerospace Engineering, Communications & Information Engineering (CIE), Environmental Engineering (ENV), Nanotechnology Engineering (NAN), Renewable Energy (REE), Biomedical Sciences (BMS), Physics of Earth & Universe (PEU), and Business Administration."
+            }
+          }
+        ]
       }
-    }
+    ]
     </script>
     <link
       href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap"
