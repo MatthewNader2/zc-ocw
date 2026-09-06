@@ -14,6 +14,11 @@ build/
 .env.*.local
 .env.example
 .eve.*
+.dev.vars
+.dev.vars.*
+workers/api/.dev.vars
+workers/api/.dev.vars.*
+
 
 # Vercel & Vite caches
 .vercel/

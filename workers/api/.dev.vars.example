@@ -1,0 +1,16 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Cloudflare Worker Local Secrets (used by 'wrangler dev')
+# Copy this file to .dev.vars in workers/api/ and populate with your credentials.
+# DO NOT commit .dev.vars to version control.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# YouTube Data API v3 key (for proxying YouTube playlist and video requests)
+YOUTUBE_API_KEY=your_youtube_api_key_here
+
+# Astronomy API credentials (for night sky ephemeris & star maps)
+ASTRONOMY_API_APP_ID=your_astronomy_api_app_id_here
+ASTRONOMY_API_APP_SECRET=your_astronomy_api_app_secret_here
+
+# Firebase Authentication (for admin role verification)
+FIREBASE_PROJECT_ID=zc-ocw
+FIREBASE_SUPER_ADMIN_EMAIL=your_email@zewailcity.edu.eg

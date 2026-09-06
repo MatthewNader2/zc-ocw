@@ -114,7 +114,18 @@ npx wrangler secret put FIREBASE_SUPER_ADMIN_EMAIL
 # the email of the very first admin — must be the exact email of a
 # Google/email account you'll sign in with. This account is always
 # treated as admin, even before the `admins` D1 table has any rows.
+
+npx wrangler secret put YOUTUBE_API_KEY
+# your Google YouTube Data API v3 key (keeps the key private from client browsers)
+
+npx wrangler secret put ASTRONOMY_API_APP_ID
+# your Astronomy API application ID
+
+npx wrangler secret put ASTRONOMY_API_APP_SECRET
+# your Astronomy API application secret
 ```
+
+> **Security Note**: Never commit API keys or secrets to `wrangler.jsonc`. Production secrets are stored securely in Cloudflare via `npx wrangler secret put`. For local testing with `npx wrangler dev`, create a `.dev.vars` file (copied from `.dev.vars.example`).
 
 You can now delete the old `ADMIN_PASSWORD` secret if it's still set:
 ```bash
