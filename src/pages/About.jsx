@@ -3,15 +3,16 @@ import { Link } from 'react-router-dom'
 import { Youtube, Globe, BookOpen, PlayCircle, Search, Smartphone, ArrowRight, Sparkles, Target, Compass } from 'lucide-react'
 import { useChannelStats } from '@/hooks/useYouTube'
 import { useEditablePage } from '@/hooks/useEditablePage'
+import { floorPlus } from '@/utils/format'
 import ScrollReveal from '@/components/ui/ScrollReveal'
 import InlineEditable from '@/components/ui/InlineEditable'
 
 export const DEFAULT_ABOUT = {
   headerSubtitle: "Knowledge becomes more powerful when it is shared — carrying world-class science and engineering education from Zewail City to learners across Egypt and the Arab world.",
   aboutTitle: "About ZC-OCW",
-  aboutBody: "Zewail City OpenCourseWare (ZC-OCW) was born from a simple belief: knowledge becomes more powerful when it is shared. Inspired by the vision of the late Nobel Laureate Professor Ahmed Zewail and his lifelong pursuit of a scientific renaissance in Egypt and the Arab world, a group of students began, in 2017, recording and sharing courses from the University of Science and Technology at Zewail City. What started with students, cameras, and an ambitious idea has since grown into an open educational platform carrying the knowledge of remarkable professors and researchers far beyond the university classroom. Today, with more than 551 recorded lectures, 22,000+ subscribers, and 833,000+ views, ZC-OCW continues to share university-level courses, seminars, interviews, summer schools, and other scientific content with learners across Egypt and the Arab world. Yet behind every lecture published and every learner reached remains the same spirit with which the project began: students working for students, believing that great education should never stop at the doors of a university.",
+  aboutBody: "Zewail City OpenCourseWare (ZC-OCW) was born from a simple belief: knowledge becomes more powerful when it is shared. Inspired by the vision of the late Nobel Laureate Professor Ahmed Zewail and his lifelong pursuit of a scientific renaissance in Egypt and the Arab world, a group of students began, in 2017, recording and sharing courses from the University of Science and Technology at Zewail City. What started with students, cameras, and an ambitious idea has since grown into an open educational platform carrying the knowledge of remarkable professors and researchers far beyond the university classroom. Today, with more than 550 recorded lectures, 22,000+ subscribers, and 833,000+ views, ZC-OCW continues to share university-level courses, seminars, interviews, summer schools, and other scientific content with learners across Egypt and the Arab world. Yet behind every lecture published and every learner reached remains the same spirit with which the project began: students working for students, believing that great education should never stop at the doors of a university.",
   missionTitle: "Our Mission",
-  missionBody: "Our mission is bigger than recording lectures. We aspire to help make high-quality science and engineering education from Egypt accessible to every curious mind that seeks it, wherever they may be. By carefully recording, editing, organizing, and publishing university-level learning materials with the guidance and consent of their instructors, we work to preserve the academic excellence of Zewail City while transforming it into knowledge that can travel—across universities, cities, countries, and generations. We dream of an Arab world where a student's opportunity to learn is not defined by geography or circumstance, and where Arabic-speaking students can freely reach the kind of rigorous scientific education offered at leading universities around the world. ZC-OCW remains built and sustained by students who chose to believe that they could contribute to that future—and, in our own way, carry Dr. Zewail's dream a little further.",
+  missionBody: "We aspire to help make high-quality science and engineering education from Egypt accessible to every curious mind that seeks it, wherever they may be. By carefully recording, editing, organizing, and publishing university-level learning materials with the guidance and consent of their instructors, we work to preserve the academic excellence of Zewail City while transforming it into knowledge that can travel—across universities, cities, countries, and generations. We dream of an Arab world where a student's opportunity to learn is not defined by geography or circumstance, and where Arabic-speaking students can freely reach a rigorous scientific education. ZC-OCW remains built and sustained by students who chose to believe that they could contribute to that future—and, in our own way, carry Dr. Zewail's dream a little further.",
   licenseTitle: "License",
   licenseBody: "All course materials on ZC OCW are shared under a Creative Commons BY-NC-SA 4.0 license. You are free to use, adapt, and share them for non-commercial purposes with proper attribution.",
 }
@@ -24,7 +25,7 @@ export default function About() {
   const statItems = [
     {
       label: 'Recorded Lectures',
-      value: stats?.videoCount ? `${Number(stats.videoCount).toLocaleString()}+` : '551+',
+      value: stats?.videoCount ? floorPlus(stats.videoCount) : '550+',
     },
     {
       label: 'Total Views',

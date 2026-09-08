@@ -11,6 +11,7 @@ import {
 import { useChannelStats, usePlaylists } from "@/hooks/useYouTube";
 import { useEditablePage } from "@/hooks/useEditablePage";
 import { useAdminData } from "@/context/AdminDataContext";
+import { floorToNearest } from "@/utils/format";
 import ParticleBackground from "@/components/ui/ParticleBackground";
 import InlineEditable from "@/components/ui/InlineEditable";
 
@@ -67,12 +68,18 @@ export default function HeroSection() {
     if (query.trim()) navigate(`/search?q=${encodeURIComponent(query.trim())}`);
   }
 
-  // Dynamic Real Counts
-  const videoCount = channel?.statistics?.videoCount
+  // Dynamic Real Counts — floored to the nearest 10 for a sleek "550+"
+  // style display. Still driven by the live fetched numbers, so once
+  // more videos/courses are uploaded this rolls from 550+ to 560+, etc.
+  const rawVideoCount = channel?.statistics?.videoCount
     ? Number(channel.statistics.videoCount)
     : 551;
+  const videoCount = floorToNearest(rawVideoCount);
+
   const coursesList = playlistsData?.pages?.flatMap((p) => p.items) || [];
-  const coursesCount = coursesList.length > 0 ? coursesList.length : 35;
+  const rawCoursesCount = coursesList.length > 0 ? coursesList.length : 35;
+  const coursesCount = floorToNearest(rawCoursesCount);
+
   const schoolsCount = allSchools?.length || 4;
 
   const stats = [
