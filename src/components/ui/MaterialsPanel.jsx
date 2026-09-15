@@ -41,8 +41,13 @@ export default function MaterialsPanel({ playlistId, inAdmin = false }) {
   const { getMaterials, addMaterial, deleteMaterial,
           getBooks, addBook, deleteBook, useCloud, syncCourseContent } = useAdminData()
 
+  const hasSyncedRef = useRef(null)
+
   useEffect(() => {
-    syncCourseContent(playlistId)
+    if (playlistId && hasSyncedRef.current !== playlistId) {
+      hasSyncedRef.current = playlistId
+      syncCourseContent(playlistId)
+    }
   }, [playlistId, syncCourseContent])
 
   const materials = getMaterials(playlistId)

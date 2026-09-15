@@ -71,16 +71,16 @@ export default function Courses() {
   }, [allCourses, schoolFilter, slugProgram, levelFilter, getCourseData, version]);
 
   useEffect(() => {
-    if (!hasNextPage) return;
+    if (!hasNextPage || isFetchingNextPage) return;
     const obs = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) fetchNextPage();
+        if (e.isIntersecting && !isFetchingNextPage) fetchNextPage();
       },
       { threshold: 0.1 },
     );
     if (loadMoreRef.current) obs.observe(loadMoreRef.current);
     return () => obs.disconnect();
-  }, [hasNextPage, fetchNextPage]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   useEffect(() => {
     if (slugSchool) setSchoolFilter(slugSchool);

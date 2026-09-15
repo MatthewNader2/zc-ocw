@@ -16,8 +16,8 @@ export function usePlaylists() {
     queryKey: ["playlists"],
     queryFn: ({ pageParam = "" }) => fetchPlaylists({ pageToken: pageParam }),
     getNextPageParam: (lastPage) => lastPage.nextPageToken || undefined,
-    staleTime: 1000 * 60 * 5, // 5 min
-    gcTime: 1000 * 60 * 30, // 30 min
+    staleTime: 1000 * 60 * 30, // 30 min
+    gcTime: 1000 * 60 * 60, // 60 min
     select: (data) => ({
       ...data,
       pages: data.pages.map((page) => ({
@@ -35,8 +35,8 @@ export function useCourse(playlistId) {
     queryKey: ["playlist", playlistId],
     queryFn: () => fetchPlaylist(playlistId),
     enabled: !!playlistId,
-    staleTime: 1000 * 60 * 15,
-    gcTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 30, // 30 min
+    gcTime: 1000 * 60 * 60 * 2, // 2 hours
     select: (data) => enrichCourse(data),
   });
 }
@@ -48,8 +48,8 @@ export function useLectures(playlistId) {
     queryKey: ["lectures", playlistId],
     queryFn: () => fetchPlaylistItems(playlistId),
     enabled: !!playlistId,
-    staleTime: 1000 * 60 * 15,
-    gcTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 30, // 30 min
+    gcTime: 1000 * 60 * 60 * 2, // 2 hours
   });
 }
 
@@ -60,8 +60,8 @@ export function useVideo(videoId) {
     queryKey: ["video", videoId],
     queryFn: () => fetchVideos([videoId]).then((items) => items[0] ?? null),
     enabled: !!videoId,
-    staleTime: 1000 * 60 * 15,
-    gcTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 30, // 30 min
+    gcTime: 1000 * 60 * 60 * 2, // 2 hours
   });
 }
 
@@ -71,8 +71,8 @@ export function useChannelStats() {
   return useQuery({
     queryKey: ["channelStats"],
     queryFn: fetchChannelStats,
-    staleTime: 1000 * 60 * 60, // 1 hour
-    gcTime: 1000 * 60 * 60 * 2,
+    staleTime: 1000 * 60 * 60 * 2, // 2 hours
+    gcTime: 1000 * 60 * 60 * 4, // 4 hours
   });
 }
 
@@ -83,6 +83,6 @@ export function useSearch(query) {
     queryKey: ["search", query],
     queryFn: () => searchChannel(query),
     enabled: !!query && query.length >= 2,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 30, // 30 min
   });
 }

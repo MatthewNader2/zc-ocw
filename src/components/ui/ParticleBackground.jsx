@@ -135,23 +135,63 @@ export default function ParticleBackground({ className = '', mode = 'astro', isF
     hoveredConstel: null,
   })
 
-  // 1. Fetch live Ephemeris, Weather, and ISS periodically
+  // 1. Fetch live Ephemeris, Weather, and ISS periodically with session caching & visibility awareness
   useEffect(() => {
     if (mode === 'astro') {
-      cloudflare.pingStats()
-      cloudflare.fetchSky().then(data => { if (data) setSkyData(data) }).catch(() => {})
-      cloudflare.fetchWeather().then(w => {
-        if (w && w.sunrise && w.sunset) {
-          setSunTimes({ sunrise: new Date(w.sunrise), sunset: new Date(w.sunset) })
-        } else {
-          setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
-        }
-      }).catch(() => {
-        setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
-      })
+      // Debounce pingStats to at most once every 30 minutes per session
+      const lastPing = parseInt(sessionStorage.getItem('zc_ocw_last_ping') || '0', 10)
+      if (Date.now() - lastPing > 30 * 60 * 1000) {
+        cloudflare.pingStats()
+        sessionStorage.setItem('zc_ocw_last_ping', String(Date.now()))
+      }
 
-      // ISS Live Location
+      // Check cached sky data (valid for 1 hour)
+      try {
+        const cachedSky = JSON.parse(sessionStorage.getItem('zc_ocw_sky') || 'null')
+        if (cachedSky?.data && Date.now() - cachedSky.time < 60 * 60 * 1000) {
+          setSkyData(cachedSky.data)
+        } else {
+          cloudflare.fetchSky().then(data => {
+            if (data) {
+              setSkyData(data)
+              try { sessionStorage.setItem('zc_ocw_sky', JSON.stringify({ data, time: Date.now() })) } catch {}
+            }
+          }).catch(() => {})
+        }
+      } catch {
+        cloudflare.fetchSky().then(data => { if (data) setSkyData(data) }).catch(() => {})
+      }
+
+      // Check cached weather (valid for 4 hours)
+      try {
+        const cachedWeather = JSON.parse(sessionStorage.getItem('zc_ocw_weather') || 'null')
+        if (cachedWeather?.data && Date.now() - cachedWeather.time < 4 * 60 * 60 * 1000) {
+          const w = cachedWeather.data
+          if (w.sunrise && w.sunset) {
+            setSunTimes({ sunrise: new Date(w.sunrise), sunset: new Date(w.sunset) })
+          } else {
+            setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
+          }
+        } else {
+          cloudflare.fetchWeather().then(w => {
+            if (w && w.sunrise && w.sunset) {
+              setSunTimes({ sunrise: new Date(w.sunrise), sunset: new Date(w.sunset) })
+              try { sessionStorage.setItem('zc_ocw_weather', JSON.stringify({ data: w, time: Date.now() })) } catch {}
+            } else {
+              setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
+            }
+          }).catch(() => {
+            setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
+          })
+        }
+      } catch {
+        setSunTimes(getSolarTimes(new Date(), ZEWAIL_LAT, ZEWAIL_LON))
+      }
+
+      // ISS Live Location with visibility check and 60s interval
+      let issInterval = null
       const updateIss = () => {
+        if (document.visibilityState !== 'visible') return
         cloudflare.fetchIss().then(res => {
           if (res?.iss_position) {
             setIssData({
@@ -162,9 +202,36 @@ export default function ParticleBackground({ className = '', mode = 'astro', isF
           }
         }).catch(() => {})
       }
-      updateIss()
-      const issInterval = setInterval(updateIss, 20000)
-      return () => clearInterval(issInterval)
+
+      const startIssPolling = () => {
+        if (!issInterval) {
+          updateIss()
+          issInterval = setInterval(updateIss, 60000)
+        }
+      }
+
+      const stopIssPolling = () => {
+        if (issInterval) {
+          clearInterval(issInterval)
+          issInterval = null
+        }
+      }
+
+      const handleVisibilityChange = () => {
+        if (document.visibilityState === 'visible') {
+          startIssPolling()
+        } else {
+          stopIssPolling()
+        }
+      }
+
+      startIssPolling()
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+
+      return () => {
+        stopIssPolling()
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
     }
   }, [mode])
 

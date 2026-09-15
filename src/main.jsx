@@ -9,8 +9,11 @@ import './index.css'
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 10,   // 10 min — YouTube quota is precious
-      retry: 2,
+      staleTime: 1000 * 60 * 30,   // 30 min — YouTube quota is precious
+      gcTime: 1000 * 60 * 60,      // 60 min cache time
+      refetchOnWindowFocus: false, // Prevent re-fetching when student switches tabs
+      refetchOnReconnect: false,   // Prevent burst on network blips
+      retry: 1,
     },
   },
 })

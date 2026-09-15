@@ -13,6 +13,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
 } from "react";
 import * as storage from "@/services/storage";
 import * as cloudflare from "@/services/cloudflare";
@@ -24,7 +25,8 @@ export function AdminDataProvider({ children }) {
   const [version, setVersion] = useState(0);
   const [synced, setSynced] = useState(false);
   const [useCloud, setUseCloud] = useState(cloudflare.isConfigured);
-  const [syncingPlaylists, setSyncingPlaylists] = useState({});
+  const syncingRef = useRef(new Set());
+  const syncedRef = useRef(new Map());
   const [profiles, setProfiles] = useState(() => {
     // Hydrate from localStorage on first render to avoid flash
     return storage.get("playlist_profiles", []);
@@ -237,16 +239,21 @@ export function AdminDataProvider({ children }) {
   // ── Course override CRUD ──────────────────────────────────────────────────
 
   const syncCourseContent = useCallback(
-    async (playlistId) => {
-      if (!useCloud || syncingPlaylists[playlistId]) return;
-      setSyncingPlaylists((p) => ({ ...p, [playlistId]: true }));
+    async (playlistId, force = false) => {
+      if (!useCloud || !playlistId) return;
+      const now = Date.now();
+      const lastSynced = syncedRef.current.get(playlistId) || 0;
+      if (!force && (syncingRef.current.has(playlistId) || now - lastSynced < 5 * 60 * 1000)) {
+        return;
+      }
+      syncingRef.current.add(playlistId);
       try {
         const [cloudMats, cloudBooks] = await Promise.all([
           cloudflare.fetchMaterials(playlistId),
           cloudflare.fetchBooks(playlistId),
         ]);
 
-        const formattedMats = cloudMats.map((m) => ({
+        const formattedMats = (cloudMats || []).map((m) => ({
           id: m.id,
           type: m.type,
           label: m.label,
@@ -257,21 +264,22 @@ export function AdminDataProvider({ children }) {
           cloudId: m.id,
         }));
 
-        const formattedBooks = cloudBooks.map((b) => ({
+        const formattedBooks = (cloudBooks || []).map((b) => ({
           ...b,
           cloudId: b.id,
         }));
 
         storage.set(`materials_${playlistId}`, formattedMats);
         storage.set(`books_${playlistId}`, formattedBooks);
+        syncedRef.current.set(playlistId, Date.now());
         bump();
       } catch (e) {
         console.warn("Failed to sync materials from cloud", e);
       } finally {
-        setSyncingPlaylists((p) => ({ ...p, [playlistId]: false }));
+        syncingRef.current.delete(playlistId);
       }
     },
-    [bump, useCloud, syncingPlaylists],
+    [bump, useCloud],
   );
 
   const getCourseData = useCallback(

@@ -32,21 +32,22 @@ export default function Search() {
   const { data: playlistData } = usePlaylists()
   const allPlaylists = playlistData?.pages?.flatMap(p => p.items) ?? []
 
-  // YouTube API search (videos) — costs quota, only on explicit search
-  const { data: apiResults, isLoading: apiLoading, isError: apiError } = useSearch(tab === 'videos' ? query : null)
+  // YouTube API search (videos) — costs quota, only on explicit search with at least 2 chars
+  const { data: apiResults, isLoading: apiLoading, isError: apiError } = useSearch(tab === 'videos' && query.length >= 2 ? query : null)
 
   // Client-side course search
   const courseResults = query ? clientSearch(allPlaylists, query) : []
   const videoResults  = (tab === 'videos' && apiResults?.items) ? apiResults.items.filter(i => i.id.kind === 'youtube#video') : []
 
-  // Debounced query update
+  // Debounced query update (longer debounce on videos tab to conserve YouTube API quota)
   useEffect(() => {
+    const delay = tab === 'videos' ? 600 : 300
     const t = setTimeout(() => {
       setQuery(input.trim())
       if (input.trim()) setSearchParams({ q: input.trim() }, { replace: true })
-    }, 350)
+    }, delay)
     return () => clearTimeout(t)
-  }, [input])
+  }, [input, tab])
 
   // Sync URL → input on load
   useEffect(() => { setInput(initialQ); setQuery(initialQ) }, [])
@@ -135,6 +136,11 @@ export default function Search() {
 
         {/* Videos tab */}
         {query && tab === 'videos' && (
+          query.length < 2 ? (
+            <div className="text-center py-16 text-ink-ghost">
+              Please enter at least 2 characters to search videos.
+            </div>
+          ) :
           apiLoading ? <PageLoader /> :
           apiError   ? <div className="text-center py-16 text-ink-ghost">API search failed. Check your API key quota.</div> :
           videoResults.length === 0 ? <NoResults query={query} /> :

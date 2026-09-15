@@ -57,7 +57,8 @@ function corsHeaders(env, req) {
 		'http://localhost:5173',
 	].filter(Boolean);
 
-	const allowedOrigin = allowed.find((a) => origin && origin.startsWith(a)) || origin || '*';
+	const isAllowed = allowed.some((a) => origin && (origin === a || origin.startsWith(a + '/')));
+	const allowedOrigin = isAllowed ? origin : (allowed[0] || 'https://zc-ocw.vercel.app');
 
 	return {
 		'Access-Control-Allow-Origin': allowedOrigin,
@@ -68,15 +69,70 @@ function corsHeaders(env, req) {
 }
 
 // ── Response helpers ────────────────────────────────────────────────────────
-function json(data, status = 200, cors = {}) {
+function json(data, status = 200, cors = {}, cacheControl = null) {
+	const headers = { 'Content-Type': 'application/json', ...cors };
+	if (cacheControl) {
+		headers['Cache-Control'] = cacheControl;
+	}
 	return new Response(JSON.stringify(data), {
 		status,
-		headers: { 'Content-Type': 'application/json', ...cors },
+		headers,
 	});
 }
 
 function err(message, status = 400, cors = {}) {
 	return json({ error: message }, status, cors);
+}
+
+// ── Edge Cache Helpers (Cloudflare Cache API) ────────────────────────────────
+async function getCachedResponse(req) {
+	try {
+		if (typeof caches !== 'undefined' && caches.default && req.method === 'GET') {
+			const cacheKey = new Request(req.url, req);
+			return await caches.default.match(cacheKey);
+		}
+	} catch (e) {
+		console.warn('Cache match failed:', e);
+	}
+	return null;
+}
+
+async function putCachedResponse(req, res, ctx) {
+	try {
+		if (typeof caches !== 'undefined' && caches.default && req.method === 'GET' && res.status === 200 && res.headers.has('Cache-Control')) {
+			const cacheKey = new Request(req.url, req);
+			const promise = caches.default.put(cacheKey, res.clone());
+			if (ctx && typeof ctx.waitUntil === 'function') {
+				ctx.waitUntil(promise);
+			} else {
+				await promise;
+			}
+		}
+	} catch (e) {
+		console.warn('Cache put failed:', e);
+	}
+}
+
+async function cachedJson(req, ctx, data, status = 200, cors = {}, cacheControl = null) {
+	const res = json(data, status, cors, cacheControl);
+	if (cacheControl && status === 200) {
+		await putCachedResponse(req, res, ctx);
+	}
+	return res;
+}
+
+async function deleteCachedUrls(baseUrl, paths = []) {
+	try {
+		if (typeof caches !== 'undefined' && caches.default) {
+			for (const p of paths) {
+				if (!p) continue;
+				const u = new URL(p, baseUrl).toString();
+				await caches.default.delete(new Request(u));
+			}
+		}
+	} catch (e) {
+		console.warn('Cache deletion failed:', e);
+	}
 }
 
 function sanitize(str) {
@@ -204,7 +260,7 @@ function isRateLimited(req, limit = 60, windowMs = 60000) {
 
 // ── Main router ─────────────────────────────────────────────────────────────
 export default {
-	async fetch(req, env) {
+	async fetch(req, env, ctx) {
 		const cors = corsHeaders(env, req);
 
 		// Handle CORS preflight — browser sends this before the real request
@@ -214,10 +270,63 @@ export default {
 
 		const url = new URL(req.url);
 
+		// Check Cloudflare Edge Cache for any cacheable GET request
+		if (req.method === 'GET') {
+			const cached = await getCachedResponse(req);
+			if (cached) {
+				const responseHeaders = new Headers(cached.headers);
+				Object.entries(cors).forEach(([k, v]) => responseHeaders.set(k, v));
+				return new Response(cached.body, {
+					status: cached.status,
+					statusText: cached.statusText,
+					headers: responseHeaders,
+				});
+			}
+		}
+
 		// Generic YouTube Proxy Handler
 		if (url.pathname.startsWith('/api/youtube/')) {
+			if (isRateLimited(req, 60)) {
+				return err('Too many requests. Please slow down.', 429, cors);
+			}
+
 			const endpoint = url.pathname.replace('/api/youtube/', '');
+			const ALLOWED_ENDPOINTS = ['playlists', 'playlistItems', 'channels', 'videos', 'search'];
+			if (!ALLOWED_ENDPOINTS.includes(endpoint)) {
+				return err('Disallowed YouTube endpoint', 400, cors);
+			}
+
+			const OFFICIAL_CHANNEL_ID = env.YOUTUBE_CHANNEL_ID || 'UCGNOEBp7AZaY4XPNoagpv8w';
 			const params = new URLSearchParams(url.search);
+
+			// Scope & validate channel ID
+			if (endpoint === 'playlists') {
+				if (params.has('channelId') && params.get('channelId') !== OFFICIAL_CHANNEL_ID) {
+					return err('Access denied to foreign YouTube channel', 403, cors);
+				}
+				if (!params.has('channelId') && !params.has('id')) {
+					params.set('channelId', OFFICIAL_CHANNEL_ID);
+				}
+			} else if (endpoint === 'channels') {
+				if (params.has('id') && params.get('id') !== OFFICIAL_CHANNEL_ID) {
+					return err('Access denied to foreign YouTube channel', 403, cors);
+				}
+				if (!params.has('id')) {
+					params.set('id', OFFICIAL_CHANNEL_ID);
+				}
+			} else if (endpoint === 'search') {
+				if (params.has('channelId') && params.get('channelId') !== OFFICIAL_CHANNEL_ID) {
+					return err('Search is restricted to official channel', 403, cors);
+				}
+				params.set('channelId', OFFICIAL_CHANNEL_ID);
+				const q = (params.get('q') || '').trim();
+				if (q.length < 2) {
+					return err('Search query must be at least 2 characters', 400, cors);
+				}
+				const maxResults = Math.min(Math.max(1, parseInt(params.get('maxResults') || '24', 10)), 25);
+				params.set('maxResults', String(maxResults));
+			}
+
 			const apiKey = env.YOUTUBE_API_KEY || params.get('key');
 			if (apiKey) params.set('key', apiKey);
 
@@ -239,7 +348,18 @@ export default {
 			try {
 				const response = await fetch(targetUrl);
 				const data = await response.json();
-				return json(data, response.status, cors);
+				if (!response.ok) {
+					return json(data, response.status, cors);
+				}
+
+				let cacheControl = 'public, max-age=3600, s-maxage=7200, stale-while-revalidate=86400';
+				if (endpoint === 'channels') {
+					cacheControl = 'public, max-age=7200, s-maxage=21600, stale-while-revalidate=86400';
+				} else if (endpoint === 'search') {
+					cacheControl = 'public, max-age=1800, s-maxage=3600, stale-while-revalidate=86400';
+				}
+
+				return await cachedJson(req, ctx, data, response.status, cors, cacheControl);
 			} catch (e) {
 				return err('YouTube Proxy Error', 500, cors);
 			}
@@ -253,14 +373,14 @@ export default {
 			// ── GET /api/overrides ─────────────────────────────────────────────
 			if (resource === 'overrides' && !id && req.method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM course_overrides ORDER BY playlist_id').all();
-				return json(results, 200, cors);
+				return await cachedJson(req, ctx, results, 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
 			}
 
 			// ── GET /api/overrides/:playlistId ─────────────────────────────────
 			if (resource === 'overrides' && id && req.method === 'GET') {
 				const row = await env.DB.prepare('SELECT * FROM course_overrides WHERE playlist_id = ?').bind(id).first();
 				if (!row) return json({}, 200, cors);
-				return json({ ...row, tags: JSON.parse(row.tags || '[]') }, 200, cors);
+				return await cachedJson(req, ctx, { ...row, tags: JSON.parse(row.tags || '[]') }, 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
 			}
 
 			// ── PUT /api/overrides/:playlistId ───────────────────────────────── [staff: admin & moderator]
@@ -297,6 +417,7 @@ export default {
 						JSON.stringify(Array.isArray(body.tags) ? body.tags : []),
 					)
 					.run();
+				await deleteCachedUrls(url, ['/api/overrides', `/api/overrides/${id}`]);
 				return json({ ok: true }, 200, cors);
 			}
 
@@ -304,7 +425,7 @@ export default {
 			if (resource === 'acknowledgments' && !id && req.method === 'GET') {
 				const row = await env.DB.prepare('SELECT config_json FROM acknowledgments WHERE id = 1').first();
 				if (!row) return json(null, 200, cors); // client falls back to its local default
-				return json(JSON.parse(row.config_json), 200, cors);
+				return await cachedJson(req, ctx, JSON.parse(row.config_json), 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
 			}
 
 			// ── PUT /api/acknowledgments ──────────────────────────────────────── [admin]
@@ -322,6 +443,7 @@ export default {
 				)
 					.bind(JSON.stringify(body))
 					.run();
+				await deleteCachedUrls(url, ['/api/acknowledgments']);
 				return json({ ok: true }, 200, cors);
 			}
 
@@ -399,7 +521,7 @@ export default {
 						return row;
 					}),
 				);
-				return json(enriched, 200, cors);
+				return await cachedJson(req, ctx, enriched, 200, cors, 'public, max-age=120, s-maxage=300, stale-while-revalidate=3600');
 			}
 
 			// ── POST /api/materials/:playlistId ────────────────────────────────
@@ -424,6 +546,7 @@ export default {
 						body.mimeType || null,
 					)
 					.run();
+				await deleteCachedUrls(url, [`/api/materials/${id}`]);
 				return json({ id: newId }, 201, cors);
 			}
 
@@ -431,11 +554,14 @@ export default {
 			if (resource === 'materials' && id && req.method === 'DELETE') {
 				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				// If file was in R2, delete it too
-				const row = await env.DB.prepare('SELECT file_key FROM materials WHERE id = ?').bind(id).first();
+				const row = await env.DB.prepare('SELECT file_key, playlist_id FROM materials WHERE id = ?').bind(id).first();
 				if (row?.file_key) {
 					await env.STORAGE.delete(row.file_key);
 				}
 				await env.DB.prepare('DELETE FROM materials WHERE id = ?').bind(id).run();
+				if (row?.playlist_id) {
+					await deleteCachedUrls(url, [`/api/materials/${row.playlist_id}`]);
+				}
 				return json({ ok: true }, 200, cors);
 			}
 
@@ -486,6 +612,7 @@ export default {
 						)
 							.bind(newId, id, type, label, fileKey, file.size, file.type)
 							.run();
+						await deleteCachedUrls(url, [`/api/materials/${id}`]);
 					} catch (e) {
 						console.warn('Materials D1 insert warning:', e.message);
 					}
@@ -501,7 +628,7 @@ export default {
 			// ── GET /api/books/:playlistId ─────────────────────────────────────
 			if (resource === 'books' && id && req.method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM books WHERE playlist_id = ? ORDER BY added_at').bind(id).all();
-				return json(results, 200, cors);
+				return await cachedJson(req, ctx, results, 200, cors, 'public, max-age=120, s-maxage=300, stale-while-revalidate=3600');
 			}
 
 			// ── POST /api/books/:playlistId ────────────────────────────────────
@@ -517,27 +644,34 @@ export default {
 				)
 					.bind(newId, id, body.title || '', body.author || null, body.edition || null, body.isbn || null, body.url || null)
 					.run();
+				await deleteCachedUrls(url, [`/api/books/${id}`]);
 				return json({ id: newId }, 201, cors);
 			}
 
 			// ── DELETE /api/books/:id ──────────────────────────────────────────
 			if (resource === 'books' && id && req.method === 'DELETE') {
 				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
+				const row = await env.DB.prepare('SELECT playlist_id FROM books WHERE id = ?').bind(id).first();
 				await env.DB.prepare('DELETE FROM books WHERE id = ?').bind(id).run();
+				if (row?.playlist_id) {
+					await deleteCachedUrls(url, [`/api/books/${row.playlist_id}`]);
+				}
 				return json({ ok: true }, 200, cors);
 			}
 
 			// ── GET /api/profiles ──────────────────────────────────────────────────────
 			if (resource === 'profiles' && !id && req.method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM playlist_profiles ORDER BY category, title').all();
-				return json(results, 200, cors);
+				return await cachedJson(req, ctx, results, 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
 			}
 
 			// ── GET /api/profiles/:playlistId ──────────────────────────────────────────
 			if (resource === 'profiles' && id && req.method === 'GET') {
 				const row = await env.DB.prepare('SELECT * FROM playlist_profiles WHERE playlist_id = ?').bind(id).first();
 				if (!row) return json({}, 200, cors);
-				return json(
+				return await cachedJson(
+					req,
+					ctx,
 					{
 						...row,
 						detection: JSON.parse(row.detection || '{}'),
@@ -545,6 +679,7 @@ export default {
 					},
 					200,
 					cors,
+					'public, max-age=300, s-maxage=600, stale-while-revalidate=3600',
 				);
 			}
 
@@ -602,6 +737,7 @@ export default {
 						)
 						.run();
 				}
+				await deleteCachedUrls(url, ['/api/profiles']);
 				return json({ ok: true, count: profiles.length }, 200, cors);
 			}
 
@@ -650,6 +786,7 @@ export default {
 						JSON.stringify(body.suggested || {}),
 					)
 					.run();
+				await deleteCachedUrls(url, ['/api/profiles', `/api/profiles/${id}`]);
 				return json({ ok: true }, 200, cors);
 			}
 
@@ -784,7 +921,7 @@ export default {
 				try {
 					const row = await env.DB.prepare('SELECT config_json FROM schools_programs WHERE id = 1').first();
 					if (!row) return json(null, 200, cors);
-					return json(JSON.parse(row.config_json), 200, cors);
+					return await cachedJson(req, ctx, JSON.parse(row.config_json), 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
 				} catch {
 					return json(null, 200, cors);
 				}
@@ -806,6 +943,7 @@ export default {
 					)
 						.bind(JSON.stringify(body))
 						.run();
+					await deleteCachedUrls(url, ['/api/schools-programs']);
 					return json({ ok: true }, 200, cors);
 				} catch (e) {
 					return err(e.message || 'Database error', 500, cors);
@@ -856,7 +994,7 @@ export default {
 				try {
 					const row = await env.DB.prepare('SELECT content_json FROM page_content WHERE page_slug = ?').bind(id).first();
 					if (!row) return json(null, 200, cors);
-					return json(JSON.parse(row.content_json), 200, cors);
+					return await cachedJson(req, ctx, JSON.parse(row.content_json), 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
 				} catch {
 					return json(null, 200, cors);
 				}
@@ -878,6 +1016,7 @@ export default {
 					)
 						.bind(id, JSON.stringify(body))
 						.run();
+					await deleteCachedUrls(url, [`/api/pages/${id}`]);
 					return json({ ok: true }, 200, cors);
 				} catch (e) {
 					return err(e.message || 'Database error', 500, cors);
@@ -910,11 +1049,12 @@ export default {
 				} catch {}
 				// Synthetic active estimate based on total activity (or fallback baseline)
 				const activeCount = Math.max(1, Math.min(42, Math.floor(totalViews / 50) + 3));
-				return json({ activeLearners: activeCount, totalViews }, 200, cors);
+				return await cachedJson(req, ctx, { activeLearners: activeCount, totalViews }, 200, cors, 'public, max-age=30, s-maxage=60');
 			}
 
 			// ── GET /api/sky ────────────────────────────────────────────────────── [astronomyapi.com real-time ephemeris]
 			if (url.pathname === '/api/sky' && req.method === 'GET') {
+				if (isRateLimited(req, 60)) return err('Too many requests', 429, cors);
 				const qAppId = url.searchParams.get('appId');
 				const qAppSecret = url.searchParams.get('appSecret');
 				const appId = (qAppId || env.ASTRONOMY_API_APP_ID || env.ASTRONOMY_APP_ID || '').trim();
@@ -946,7 +1086,7 @@ export default {
 									phase: cell.extraInfo?.phase || null,
 								};
 							});
-							return json({ bodies, table: data?.data?.table, source: 'AstronomyAPI', success: true }, 200, cors);
+							return await cachedJson(req, ctx, { bodies, table: data?.data?.table, source: 'AstronomyAPI', success: true }, 200, cors, 'public, max-age=1800, s-maxage=3600');
 						} else {
 							const errText = await res.text().catch(() => '');
 							return json({ bodies: [], moonPhase: null, source: 'AstronomyAPI_Error', error: `AstronomyAPI HTTP ${res.status}: ${errText}` }, 200, cors);
@@ -961,15 +1101,16 @@ export default {
 
 			// ── GET /api/weather ────────────────────────────────────────────────── [Open-Meteo sunrise / sunset]
 			if (url.pathname === '/api/weather' && req.method === 'GET') {
+				if (isRateLimited(req, 60)) return err('Too many requests', 429, cors);
 				try {
 					const weatherUrl = 'https://api.open-meteo.com/v1/forecast?latitude=30.03&longitude=30.95&daily=sunrise,sunset&timezone=Africa%2FCairo';
 					const res = await fetch(weatherUrl);
 					if (res.ok) {
 						const data = await res.json();
-						return json({
+						return await cachedJson(req, ctx, {
 							sunrise: data.daily?.sunrise?.[0] || null,
 							sunset:  data.daily?.sunset?.[0]  || null,
-						}, 200, cors);
+						}, 200, cors, 'public, max-age=7200, s-maxage=14400');
 					}
 				} catch (e) {
 					console.warn('Open-Meteo error:', e);
@@ -979,11 +1120,12 @@ export default {
 
 			// ── GET /api/iss ────────────────────────────────────────────────────── [Live ISS Position via Open Notify]
 			if (url.pathname === '/api/iss' && req.method === 'GET') {
+				if (isRateLimited(req, 60)) return err('Too many requests', 429, cors);
 				try {
 					const issRes = await fetch('http://api.open-notify.org/iss-now.json');
 					if (issRes.ok) {
 						const issData = await issRes.json();
-						return json(issData, 200, cors);
+						return await cachedJson(req, ctx, issData, 200, cors, 'public, max-age=5, s-maxage=10');
 					}
 				} catch (e) {
 					console.warn('ISS error:', e);
