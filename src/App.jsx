@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { AdminDataProvider } from "@/context/AdminDataContext";
 import { ProgressProvider } from "@/context/ProgressContext";
@@ -147,6 +148,7 @@ export default function App() {
           <AdminDataProvider>
             <ProgressProvider>
               <AppRoutes />
+              <Analytics />
             </ProgressProvider>
           </AdminDataProvider>
         </SettingsProvider>
