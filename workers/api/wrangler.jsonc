@@ -8,7 +8,8 @@
 	"vars": {
 		"ALLOWED_ORIGIN": "https://zc-ocw.vercel.app",
 		"R2_PUBLIC_ID": "https://pub-c9973170d9e940ff93b0152afec2c45d.r2.dev",
-		"FEEDBACK_EMAIL": "zcocw@zewailcity.edu.eg"
+		"FEEDBACK_EMAIL": "zcocw@zewailcity.edu.eg",
+		"FIREBASE_PROJECT_ID": "zc-ocw"
 	},
 
 	"d1_databases": [

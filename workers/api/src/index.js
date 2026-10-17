@@ -36,7 +36,7 @@
  * which always counts as admin — this is how you bootstrap the very first one).
  */
 
-import { jwtVerify, decodeJwt, createRemoteJWKSet } from 'jose';
+import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 // Firebase ID tokens are RS256-signed by Google; this is Google's fixed
 // public JWKS endpoint for "secure token" (Firebase Auth) — same for every
@@ -57,7 +57,20 @@ function corsHeaders(env, req) {
 		'http://localhost:5173',
 	].filter(Boolean);
 
-	const isAllowed = allowed.some((a) => origin && (origin === a || origin.startsWith(a + '/')));
+	let isAllowed = allowed.some((a) => origin && (origin === a || origin.startsWith(a + '/')));
+	if (!isAllowed && origin) {
+		try {
+			const u = new URL(origin);
+			if (
+				u.hostname === 'localhost' ||
+				u.hostname === '127.0.0.1' ||
+				u.hostname.endsWith('.vercel.app') ||
+				u.hostname.endsWith('.zewailcity.edu.eg')
+			) {
+				isAllowed = true;
+			}
+		} catch {}
+	}
 	const allowedOrigin = isAllowed ? origin : (allowed[0] || 'https://zc-ocw.vercel.app');
 
 	return {
@@ -100,6 +113,10 @@ async function getCachedResponse(req) {
 async function putCachedResponse(req, res, ctx) {
 	try {
 		if (typeof caches !== 'undefined' && caches.default && req.method === 'GET' && res.status === 200 && res.headers.has('Cache-Control')) {
+			const cc = res.headers.get('Cache-Control') || '';
+			if (cc.includes('no-cache') || cc.includes('no-store') || cc.includes('max-age=0')) {
+				return;
+			}
 			const cacheKey = new Request(req.url, req);
 			const promise = caches.default.put(cacheKey, res.clone());
 			if (ctx && typeof ctx.waitUntil === 'function') {
@@ -151,21 +168,15 @@ async function verifyRole(req, env) {
 
 	let payload = null;
 	try {
-		if (env.FIREBASE_PROJECT_ID) {
-			const result = await jwtVerify(token, FIREBASE_JWKS, {
-				issuer: `https://securetoken.google.com/${env.FIREBASE_PROJECT_ID}`,
-				audience: env.FIREBASE_PROJECT_ID,
-			});
-			payload = result.payload;
-		} else {
-			payload = decodeJwt(token);
-		}
-	} catch {
-		try {
-			payload = decodeJwt(token);
-		} catch {
-			return null;
-		}
+		const projectId = env.FIREBASE_PROJECT_ID || 'zc-ocw';
+		const result = await jwtVerify(token, FIREBASE_JWKS, {
+			issuer: `https://securetoken.google.com/${projectId}`,
+			audience: projectId,
+		});
+		payload = result.payload;
+	} catch (err) {
+		console.warn('JWT role verification failed:', err?.message || err);
+		return null;
 	}
 
 	if (!payload) return null;
@@ -218,26 +229,17 @@ async function verifyUser(req, env) {
 	if (!token) return null;
 
 	try {
-		if (env.FIREBASE_PROJECT_ID) {
-			const result = await jwtVerify(token, FIREBASE_JWKS, {
-				issuer: `https://securetoken.google.com/${env.FIREBASE_PROJECT_ID}`,
-				audience: env.FIREBASE_PROJECT_ID,
-			});
-			const payload = result.payload;
-			const uid = payload.sub || payload.user_id;
-			if (!uid) return null;
-			return { uid, email: payload.email || null };
-		}
-		const payload = decodeJwt(token);
+		const projectId = env.FIREBASE_PROJECT_ID || 'zc-ocw';
+		const result = await jwtVerify(token, FIREBASE_JWKS, {
+			issuer: `https://securetoken.google.com/${projectId}`,
+			audience: projectId,
+		});
+		const payload = result.payload;
 		const uid = payload.sub || payload.user_id;
 		if (!uid) return null;
 		return { uid, email: payload.email || null };
-	} catch {
-		try {
-			const payload = decodeJwt(token);
-			const uid = payload.sub || payload.user_id;
-			if (uid) return { uid, email: payload.email || null };
-		} catch {}
+	} catch (err) {
+		console.warn('User JWT verification failed:', err?.message || err);
 		return null;
 	}
 }
@@ -373,14 +375,14 @@ export default {
 			// ── GET /api/overrides ─────────────────────────────────────────────
 			if (resource === 'overrides' && !id && req.method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM course_overrides ORDER BY playlist_id').all();
-				return await cachedJson(req, ctx, results, 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
+				return await cachedJson(req, ctx, results, 200, cors, 'public, no-cache, must-revalidate');
 			}
 
 			// ── GET /api/overrides/:playlistId ─────────────────────────────────
 			if (resource === 'overrides' && id && req.method === 'GET') {
 				const row = await env.DB.prepare('SELECT * FROM course_overrides WHERE playlist_id = ?').bind(id).first();
 				if (!row) return json({}, 200, cors);
-				return await cachedJson(req, ctx, { ...row, tags: JSON.parse(row.tags || '[]') }, 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
+				return await cachedJson(req, ctx, { ...row, tags: JSON.parse(row.tags || '[]') }, 200, cors, 'public, no-cache, must-revalidate');
 			}
 
 			// ── PUT /api/overrides/:playlistId ───────────────────────────────── [staff: admin & moderator]
@@ -390,10 +392,11 @@ export default {
 				await env.DB.prepare(
 					`
           INSERT INTO course_overrides
-            (playlist_id, school_id, program_id, course_code, instructor,
+            (playlist_id, category, school_id, program_id, course_code, instructor,
              semester, level, description, tags, updated_at)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
           ON CONFLICT(playlist_id) DO UPDATE SET
+            category    = excluded.category,
             school_id   = excluded.school_id,
             program_id  = excluded.program_id,
             course_code = excluded.course_code,
@@ -407,6 +410,7 @@ export default {
 				)
 					.bind(
 						id,
+						body.category || 'course',
 						body.schoolId || null,
 						body.programId || null,
 						body.courseCode || null,
@@ -417,20 +421,29 @@ export default {
 						JSON.stringify(Array.isArray(body.tags) ? body.tags : []),
 					)
 					.run();
-				await deleteCachedUrls(url, ['/api/overrides', `/api/overrides/${id}`]);
+
+				if (body.category) {
+					try {
+						await env.DB.prepare(
+							`UPDATE playlist_profiles SET category = ?, updated_at = datetime('now') WHERE playlist_id = ?`
+						).bind(body.category, id).run();
+					} catch {}
+				}
+
+				await deleteCachedUrls(url, ['/api/overrides', `/api/overrides/${id}`, '/api/profiles', `/api/profiles/${id}`]);
 				return json({ ok: true }, 200, cors);
 			}
 
 			// ── GET /api/acknowledgments ─────────────────────────────────────────
 			if (resource === 'acknowledgments' && !id && req.method === 'GET') {
 				const row = await env.DB.prepare('SELECT config_json FROM acknowledgments WHERE id = 1').first();
-				if (!row) return json(null, 200, cors); // client falls back to its local default
-				return await cachedJson(req, ctx, JSON.parse(row.config_json), 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
+				if (!row) return json(null, 200, cors, 'public, no-cache, must-revalidate'); // client falls back to its local default
+				return await cachedJson(req, ctx, JSON.parse(row.config_json), 200, cors, 'public, no-cache, must-revalidate');
 			}
 
-			// ── PUT /api/acknowledgments ──────────────────────────────────────── [admin]
+			// ── PUT /api/acknowledgments ──────────────────────────────────────── [staff]
 			if (resource === 'acknowledgments' && !id && req.method === 'PUT') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				const body = await req.json();
 				await env.DB.prepare(
 					`
@@ -521,7 +534,7 @@ export default {
 						return row;
 					}),
 				);
-				return await cachedJson(req, ctx, enriched, 200, cors, 'public, max-age=120, s-maxage=300, stale-while-revalidate=3600');
+				return await cachedJson(req, ctx, enriched, 200, cors, 'public, no-cache, must-revalidate');
 			}
 
 			// ── POST /api/materials/:playlistId ────────────────────────────────
@@ -628,7 +641,7 @@ export default {
 			// ── GET /api/books/:playlistId ─────────────────────────────────────
 			if (resource === 'books' && id && req.method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM books WHERE playlist_id = ? ORDER BY added_at').bind(id).all();
-				return await cachedJson(req, ctx, results, 200, cors, 'public, max-age=120, s-maxage=300, stale-while-revalidate=3600');
+				return await cachedJson(req, ctx, results, 200, cors, 'public, no-cache, must-revalidate');
 			}
 
 			// ── POST /api/books/:playlistId ────────────────────────────────────
@@ -662,7 +675,7 @@ export default {
 			// ── GET /api/profiles ──────────────────────────────────────────────────────
 			if (resource === 'profiles' && !id && req.method === 'GET') {
 				const { results } = await env.DB.prepare('SELECT * FROM playlist_profiles ORDER BY category, title').all();
-				return await cachedJson(req, ctx, results, 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
+				return await cachedJson(req, ctx, results, 200, cors, 'public, no-cache, must-revalidate');
 			}
 
 			// ── GET /api/profiles/:playlistId ──────────────────────────────────────────
@@ -679,7 +692,7 @@ export default {
 					},
 					200,
 					cors,
-					'public, max-age=300, s-maxage=600, stale-while-revalidate=3600',
+					'public, no-cache, must-revalidate',
 				);
 			}
 
@@ -920,16 +933,16 @@ export default {
 			if (resource === 'schools-programs' && !id && req.method === 'GET') {
 				try {
 					const row = await env.DB.prepare('SELECT config_json FROM schools_programs WHERE id = 1').first();
-					if (!row) return json(null, 200, cors);
-					return await cachedJson(req, ctx, JSON.parse(row.config_json), 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
+					if (!row) return json(null, 200, cors, 'public, no-cache, must-revalidate');
+					return await cachedJson(req, ctx, JSON.parse(row.config_json), 200, cors, 'public, no-cache, must-revalidate');
 				} catch {
-					return json(null, 200, cors);
+					return json(null, 200, cors, 'public, no-cache, must-revalidate');
 				}
 			}
 
-			// ── PUT /api/schools-programs ───────────────────────────────────────── [admin]
+			// ── PUT /api/schools-programs ───────────────────────────────────────── [staff]
 			if (resource === 'schools-programs' && !id && req.method === 'PUT') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				try {
 					const body = await req.json();
 					await env.DB.prepare(
@@ -989,20 +1002,20 @@ export default {
 				}
 			}
 
-			// ── GET /api/pages/:slug ──────────────────────────────────────────────
+			// ── GET /api/pages/:slug ──────────────────────────────────────
 			if (resource === 'pages' && id && req.method === 'GET') {
 				try {
 					const row = await env.DB.prepare('SELECT content_json FROM page_content WHERE page_slug = ?').bind(id).first();
-					if (!row) return json(null, 200, cors);
-					return await cachedJson(req, ctx, JSON.parse(row.content_json), 200, cors, 'public, max-age=300, s-maxage=600, stale-while-revalidate=3600');
+					if (!row) return json(null, 200, cors, 'public, no-cache, must-revalidate');
+					return await cachedJson(req, ctx, JSON.parse(row.content_json), 200, cors, 'public, no-cache, must-revalidate');
 				} catch {
-					return json(null, 200, cors);
+					return json(null, 200, cors, 'public, no-cache, must-revalidate');
 				}
 			}
 
-			// ── PUT /api/pages/:slug ────────────────────────────────────────────── [admin]
+			// ── PUT /api/pages/:slug ────────────────────────────────────────────── [staff]
 			if (resource === 'pages' && id && req.method === 'PUT') {
-				if (!(await isAdmin(req, env))) return err('Unauthorized', 401, cors);
+				if (!(await isStaff(req, env))) return err('Unauthorized', 401, cors);
 				try {
 					const body = await req.json();
 					await env.DB.prepare(

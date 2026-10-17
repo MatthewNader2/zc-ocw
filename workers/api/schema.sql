@@ -7,6 +7,7 @@
 -- Course metadata enrichment (one row per YouTube playlist)
 CREATE TABLE IF NOT EXISTS course_overrides (
   playlist_id   TEXT PRIMARY KEY,
+  category      TEXT DEFAULT 'course',
   school_id     TEXT,
   program_id    TEXT,
   course_code   TEXT,
